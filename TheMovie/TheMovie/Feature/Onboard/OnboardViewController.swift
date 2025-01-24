@@ -74,7 +74,7 @@ private extension OnboardViewController {
     }
     
     func configureDescriptionLabel() {
-        descriptionLabel.text = "당신만의 영화세상,\nThe Moive를 시작해보세요."
+        descriptionLabel.text = "당신만의 영화세상,\nThe Movie를 시작해보세요."
         descriptionLabel.textColor = .tm(.white)
         descriptionLabel.textAlignment = .center
         descriptionLabel.numberOfLines = 0
