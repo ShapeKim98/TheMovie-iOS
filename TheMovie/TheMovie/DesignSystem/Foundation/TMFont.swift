@@ -12,6 +12,7 @@ enum TMFont {
     case body
     case title
     case headline
+    case subheadline
     
     var uiFont: UIFont {
         switch self {
@@ -20,9 +21,11 @@ enum TMFont {
         case .body:
             return .systemFont(ofSize: 13, weight: .regular)
         case .title:
-            return .systemFont(ofSize: 15, weight: .bold)
-        case .headline:
             return .systemFont(ofSize: 16, weight: .bold)
+        case .headline:
+            return .systemFont(ofSize: 15, weight: .bold)
+        case .subheadline:
+            return .systemFont(ofSize: 15, weight: .regular)
         }
     }
 }
