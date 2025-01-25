@@ -21,18 +21,19 @@ final class TMBoarderButton: UIButton {
     }
     
     private func configureUI(title: String) {
-        tintColor = .brand
-        setTitle(title, for: .normal)
-        setTitleColor(.tm(.brand), for: .normal)
-        guard let titleLabel else { return }
-        titleLabel.snp.makeConstraints { make in
-            make.verticalEdges.equalToSuperview().inset(12)
-        }
-        titleLabel.font = .systemFont(ofSize: 14, weight: .semibold)
-        backgroundColor = .clear
-        layer.cornerRadius = (titleLabel.frame.height + 20) / 2
-        layer.borderColor = .tm(.brand)
-        layer.borderWidth = 2
+        var configuration = UIButton.Configuration.plain()
+        configuration.background.backgroundColor = .clear
+        configuration.background.strokeColor = .tm(.brand)
+        configuration.background.strokeWidth = 2
+        configuration.contentInsets = .init(top: 12, leading: 16, bottom: 12, trailing: 16)
+        configuration.cornerStyle = .capsule
+        
+        var titleContainer = AttributeContainer()
+        titleContainer.font = .systemFont(ofSize: 14, weight: .bold)
+        titleContainer.foregroundColor = .tm(.brand)
+        configuration.attributedTitle = AttributedString(title, attributes: titleContainer)
+        
+        self.configuration = configuration
     }
 }
 
