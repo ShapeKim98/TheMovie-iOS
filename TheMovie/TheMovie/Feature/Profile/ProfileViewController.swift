@@ -99,12 +99,21 @@ private extension ProfileViewController {
 
 // MARK: Functions
 private extension ProfileViewController {
-    func profileButtonTouchUpInside(_ sender: UIAction) {
-        
+    func profileButtonTouchUpInside(_ action: UIAction) {
+        guard let profileImageId else { return }
+        let viewController = ProfileImageViewController(selectedId: profileImageId)
+        viewController.delegate = self
+        push(viewController)
     }
     
-    func completeButtonTouchUpInside(_ sender: UIAction) {
-        
+    func completeButtonTouchUpInside(_ action: UIAction) {
+        print(#function)
+    }
+}
+
+extension ProfileViewController: ProfileImageViewControllerDelegate {
+    func didSetSelectedId(selectedId: Int) {
+        profileButton.setProfile(.profile(id: selectedId))
     }
 }
 

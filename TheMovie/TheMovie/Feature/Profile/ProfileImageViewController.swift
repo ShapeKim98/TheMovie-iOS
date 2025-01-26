@@ -9,11 +9,17 @@ import UIKit
 
 import SnapKit
 
+protocol ProfileImageViewControllerDelegate: AnyObject {
+    func didSetSelectedId(selectedId: Int)
+}
+
 final class ProfileImageViewController: UIViewController {
     private let selectedProfileView: TMProfileButton
     private lazy var profileCollectionView = {
         configureCollectionView()
     }()
+    
+    weak var delegate: (any ProfileImageViewControllerDelegate)?
     
     private var selectedId: Int {
         didSet { didSetSelectedId() }
@@ -97,6 +103,7 @@ private extension ProfileImageViewController {
 private extension ProfileImageViewController {
     func didSetSelectedId() {
         selectedProfileView.setProfile(.profile(id: selectedId))
+        delegate?.didSetSelectedId(selectedId: selectedId)
     }
 }
 

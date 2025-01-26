@@ -10,12 +10,13 @@ import UIKit
 extension UIViewController {
     func push(_ viewController: UIViewController, source: UIView? = nil) {
         if #available(iOS 18.0, *) {
-            viewController.preferredTransition = .zoom { _ in
-                return source
+            if source != nil {
+                viewController.preferredTransition = .zoom { _ in
+                    return source
+                }
             }
-        } else {
-            navigationController?.pushViewController(viewController, animated: true)
         }
+        navigationController?.pushViewController(viewController, animated: true)
     }
     
     func pop() {
