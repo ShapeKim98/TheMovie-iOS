@@ -56,10 +56,6 @@ final class TMProfileButton: UIButton {
             make.size.equalTo(size)
         }
         
-        profileImageView.snp.makeConstraints { make in
-            make.size.equalTo(size)
-        }
-        
         cameraIconView.snp.makeConstraints { make in
             make.bottom.trailing.equalTo(self)
             make.size.equalTo(28)

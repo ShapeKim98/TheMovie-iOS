@@ -9,9 +9,7 @@ import UIKit
 
 import SnapKit
 
-final class TMProfileImageView: UIView {
-    private let imageView = UIImageView()
-    
+final class TMProfileImageView: UIImageView {
     init(_ profileImage: TMImage, size: CGFloat) {
         super.init(frame: .zero)
         
@@ -26,36 +24,34 @@ final class TMProfileImageView: UIView {
     
     func isSelected(_ isSelected: Bool) {
         if isSelected {
-            imageView.layer.borderWidth = 3
-            imageView.layer.borderColor = .tm(.brand)
-            imageView.alpha = 1
+            layer.borderWidth = 3
+            layer.borderColor = .tm(.brand)
+            alpha = 1
         } else {
-            imageView.layer.borderColor = .tm(.graySecondary)
-            imageView.layer.borderWidth = 1
-            imageView.alpha = 0.5
+            layer.borderColor = .tm(.graySecondary)
+            layer.borderWidth = 1
+            alpha = 0.5
         }
     }
     
     func setProfileImage(_ profileImage: TMImage) {
-        imageView.image = profileImage.uiImage
+        image = profileImage.uiImage
     }
     
     private func configureUI(_ profileImage: TMImage, size: CGFloat) {
         backgroundColor = .clear
         
-        imageView.image = profileImage.uiImage
-        imageView.contentMode = .scaleAspectFill
-        imageView.layer.cornerRadius = size / 2
-        imageView.clipsToBounds = true
-        imageView.layer.borderColor = .tm(.graySecondary)
-        imageView.layer.borderWidth = 1
-        imageView.alpha = 0.5
-        addSubview(imageView)
+        image = profileImage.uiImage
+        contentMode = .scaleAspectFill
+        layer.cornerRadius = size / 2
+        clipsToBounds = true
+        layer.borderColor = .tm(.graySecondary)
+        layer.borderWidth = 1
+        alpha = 0.5
     }
     
     private func configureLayout(size: CGFloat) {
-        imageView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+        snp.makeConstraints { make in
             make.size.equalTo(size)
         }
     }
