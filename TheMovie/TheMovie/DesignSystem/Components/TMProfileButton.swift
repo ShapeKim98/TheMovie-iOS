@@ -10,8 +10,14 @@ import UIKit
 import SnapKit
 
 final class TMProfileButton: UIButton {
+    private let profileImageView: TMProfileImageView
+    private let cameraIconView = UIView()
+    
     init(_ profileImage: TMImage, size: CGFloat) {
+        profileImageView = TMProfileImageView(profileImage, size: size)
+        
         super.init(frame: .zero)
+        
         configureUI(profileImage, size: size)
         
         configureLayout(size: size)
@@ -23,54 +29,52 @@ final class TMProfileButton: UIButton {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setCameraIcon(_ superView: UIView) {
-        let background = UIView()
-        let image = UIImageView(image: UIImage(systemName: "camera.fill"))
-        image.tintColor = .white
-        image.contentMode = .scaleAspectFit
-        background.addSubview(image)
-        image.snp.makeConstraints { $0.edges.equalToSuperview().inset(4) }
-        
-        background.backgroundColor = .tm(.brand)
-        background.layer.cornerRadius = 14
-        superView.addSubview(background)
-        
-        background.snp.makeConstraints { make in
-            make.bottom.trailing.equalTo(self)
-            make.size.equalTo(28)
-        }
+    func setProfile(_ profileImage: TMImage) {
+        profileImageView.setProfileImage(profileImage)
     }
     
     private func configureUI(_ profileImage: TMImage, size: CGFloat) {
-        setImage(profileImage.uiImage, for: .normal)
-        imageView?.contentMode = .scaleAspectFill
-        layer.cornerRadius = size / 2
-        clipsToBounds = true
+        addSubview(profileImageView)
         
         var configuration = UIButton.Configuration.plain()
         configuration.title = nil
         self.configuration = configuration
+        
+        let image = UIImageView(image: UIImage(systemName: "camera.fill"))
+        image.tintColor = .white
+        image.contentMode = .scaleAspectFit
+        cameraIconView.addSubview(image)
+        image.snp.makeConstraints { $0.edges.equalToSuperview().inset(4) }
+        
+        cameraIconView.backgroundColor = .tm(.brand)
+        cameraIconView.layer.cornerRadius = 14
+        addSubview(cameraIconView)
     }
     
     private func configureLayout(size: CGFloat) {
         snp.makeConstraints { make in
             make.size.equalTo(size)
         }
-        imageView?.snp.makeConstraints { make in
+        
+        profileImageView.snp.makeConstraints { make in
             make.size.equalTo(size)
+        }
+        
+        cameraIconView.snp.makeConstraints { make in
+            make.bottom.trailing.equalTo(self)
+            make.size.equalTo(28)
         }
     }
     
     private func configureUpdateHandler() {
-        configurationUpdateHandler = { button in
+        configurationUpdateHandler = { [weak self] button in
+            guard let `self` else { return }
             switch button.state {
-            case .selected, .disabled:
-                button.layer.borderColor = .tm(.brand)
-                button.layer.borderWidth = 3
+            case .selected:
+                profileImageView.isSelected(true)
+                button.configuration?.background.backgroundColor = .clear
             default:
-                button.layer.borderColor = .tm(.graySecondary)
-                button.layer.borderWidth = 1
-                button.imageView?.alpha = 0.5
+                profileImageView.isSelected(false)
             }
         }
     }
@@ -78,5 +82,7 @@ final class TMProfileButton: UIButton {
 
 @available(iOS 17.0, *)
 #Preview {
-    TMProfileButton(.profile(id: 0), size: 100)
+    let button = TMProfileButton(.profile(id: 0), size: 100)
+    button.isSelected = true
+    return button
 }

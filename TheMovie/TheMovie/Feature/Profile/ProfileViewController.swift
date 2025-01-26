@@ -81,8 +81,6 @@ private extension ProfileViewController {
             for: .touchUpInside
         )
         view.addSubview(profileButton)
-        
-        profileButton.setCameraIcon(view)
     }
     
     func configureNicknameTextField() {
