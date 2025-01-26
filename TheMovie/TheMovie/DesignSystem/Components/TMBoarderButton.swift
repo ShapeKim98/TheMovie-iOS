@@ -29,7 +29,7 @@ final class TMBoarderButton: UIButton {
         configuration.cornerStyle = .capsule
         
         var titleContainer = AttributeContainer()
-        titleContainer.font = .systemFont(ofSize: 14, weight: .bold)
+        titleContainer.font = .systemFont(ofSize: 16, weight: .bold)
         titleContainer.foregroundColor = .tm(.brand)
         configuration.attributedTitle = AttributedString(title, attributes: titleContainer)
         
