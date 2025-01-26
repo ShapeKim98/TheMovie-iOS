@@ -14,6 +14,8 @@ final class TMBoarderButton: UIButton {
         super.init(frame: .zero)
         
         configureUI(title: title)
+        
+        configureUpdateHandler()
     }
     
     required init?(coder: NSCoder) {
@@ -34,6 +36,26 @@ final class TMBoarderButton: UIButton {
         configuration.attributedTitle = AttributedString(title, attributes: titleContainer)
         
         self.configuration = configuration
+    }
+    
+    private func configureUpdateHandler() {
+        configurationUpdateHandler = { [weak self] button in
+            guard let `self` else { return }
+            switch button.state {
+            case .disabled:
+                updateState(color: .tm(.gray))
+            default:
+                updateState(color: .tm(.brand))
+            }
+        }
+    }
+    
+    private func updateState(color: UIColor) {
+        configuration?.background.strokeColor = color
+        configuration?.attributedTitle?.setAttributes(AttributeContainer([
+            .font: UIFont.systemFont(ofSize: 16, weight: .bold),
+            .foregroundColor: color
+        ]))
     }
 }
 

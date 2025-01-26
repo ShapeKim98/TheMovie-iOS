@@ -11,7 +11,7 @@ import SnapKit
 
 final class ProfileViewController: UIViewController {
     private lazy var profileButton = TMProfileButton(
-        .profile(id: profileImageId ?? 0),
+        profileImageId ?? 0,
         size: 100
     )
     private let nicknameTextField = NicknameTextField()
@@ -24,6 +24,12 @@ final class ProfileViewController: UIViewController {
     private var profileImageId: Int?
     @UserDefaults(forKey: .userDefaults(.nickname))
     private var nickname: String?
+    @UserDefaults(forKey: .userDefaults(.profileCompleted))
+    private var isProfileCompleted: Bool?
+    
+    private var isValidNickname = false {
+        didSet { didSetIsValidNickname() }
+    }
     private let mode: Mode
     
     init(mode: Mode) {
@@ -71,7 +77,7 @@ private extension ProfileViewController {
         }
         
         completeButton.snp.makeConstraints { make in
-            make.top.equalTo(nicknameTextField.snp.bottom).offset(40)
+            make.top.equalTo(nicknameTextField.stateLabel.snp.bottom).offset(32)
             make.horizontalEdges.equalToSuperview().inset(16)
         }
     }
@@ -91,16 +97,28 @@ private extension ProfileViewController {
     }
     
     func configureNicknameTextField() {
+        nicknameTextField.textField.text = nickname
         nicknameTextField.textField.delegate = self
+        if let nickname {
+            updateTextFieldState(nickname)
+        }
         view.addSubview(nicknameTextField)
     }
     
     func configureCompleteButton() {
+        completeButton.isEnabled = nickname != nil
         completeButton.addAction(
             UIAction(handler: completeButtonTouchUpInside),
             for: .touchUpInside
         )
         view.addSubview(completeButton)
+    }
+}
+
+// MARK: Data Bindings
+private extension ProfileViewController {
+    func didSetIsValidNickname() {
+        completeButton.isEnabled = isValidNickname
     }
 }
 
@@ -117,13 +135,38 @@ private extension ProfileViewController {
     }
     
     func completeButtonTouchUpInside(_ action: UIAction) {
-        print(#function)
+        guard let text = nicknameTextField.textField.text else {
+            return
+        }
+        nickname = text
+        profileImageId = profileButton.id
+        isProfileCompleted = true
+        
+        switchRoot(UIViewController())
+    }
+    
+    func updateTextFieldState(_ text: String) {
+        isValidNickname = false
+        guard (2 <= text.count && text.count < 10) else {
+            nicknameTextField.updateState(.글자수_조건에_맞지_않는_경우)
+            return
+        }
+        guard !text.contains(/[@#$%]/) else {
+            nicknameTextField.updateState(.특수문자_조건에_맞지_않는_경우)
+            return
+        }
+        guard !text.contains(/\d/) else {
+            nicknameTextField.updateState(.숫자_조건에_맞지_않는_경우)
+            return
+        }
+        isValidNickname = true
+        nicknameTextField.updateState(.조건에_맞는_경우)
     }
 }
 
 extension ProfileViewController: ProfileImageViewControllerDelegate {
     func didSetSelectedId(selectedId: Int) {
-        profileButton.setProfile(.profile(id: selectedId))
+        profileButton.setProfile(id: selectedId)
     }
 }
 
@@ -131,19 +174,8 @@ extension ProfileViewController: UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         guard let text = textField.text else { return true }
         let newText = text.prefix(range.location) + string
-        guard (2 <= newText.count && newText.count < 10) else {
-            nicknameTextField.updateState(.글자수_조건에_맞지_않는_경우)
-            return true
-        }
-        guard !newText.contains(/[@#$%]/) else {
-            nicknameTextField.updateState(.특수문자_조건에_맞지_않는_경우)
-            return true
-        }
-        guard !newText.contains(/\d/) else {
-            nicknameTextField.updateState(.숫자_조건에_맞지_않는_경우)
-            return true
-        }
-        nicknameTextField.updateState(.조건에_맞는_경우)
+        
+        updateTextFieldState(String(newText))
         return true
     }
 }
@@ -171,8 +203,9 @@ extension ProfileViewController {
         }
         
         let textField = UITextField()
-        let background = UIView()
         let stateLabel = UILabel()
+        
+        private let background = UIView()
         
         init() {
             super.init(frame: .zero)
@@ -198,9 +231,9 @@ extension ProfileViewController {
             background.backgroundColor = .white
             addSubview(background)
             
+            stateLabel.text = State.글자수_조건에_맞지_않는_경우.text
             stateLabel.textColor = .tm(.brand)
             stateLabel.font = .tm(.body)
-            stateLabel.isHidden = true
             addSubview(stateLabel)
         }
         

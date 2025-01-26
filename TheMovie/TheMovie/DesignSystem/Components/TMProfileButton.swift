@@ -13,12 +13,15 @@ final class TMProfileButton: UIButton {
     private let profileImageView: TMProfileImageView
     private let cameraIconView = UIView()
     
-    init(_ profileImage: TMImage, size: CGFloat) {
-        profileImageView = TMProfileImageView(profileImage, size: size)
+    var id: Int
+    
+    init(_ profileImageId: Int, size: CGFloat) {
+        self.id = profileImageId
+        profileImageView = TMProfileImageView(.profile(id: id), size: size)
         
         super.init(frame: .zero)
         
-        configureUI(profileImage, size: size)
+        configureUI(size: size)
         
         configureLayout(size: size)
         
@@ -29,11 +32,11 @@ final class TMProfileButton: UIButton {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setProfile(_ profileImage: TMImage) {
-        profileImageView.setProfileImage(profileImage)
+    func setProfile(id: Int) {
+        profileImageView.setProfileImage(.profile(id: id))
     }
     
-    private func configureUI(_ profileImage: TMImage, size: CGFloat) {
+    private func configureUI(size: CGFloat) {
         addSubview(profileImageView)
         
         var configuration = UIButton.Configuration.plain()
@@ -78,7 +81,7 @@ final class TMProfileButton: UIButton {
 
 @available(iOS 17.0, *)
 #Preview {
-    let button = TMProfileButton(.profile(id: 0), size: 100)
+    let button = TMProfileButton(0, size: 100)
     button.isSelected = true
     return button
 }

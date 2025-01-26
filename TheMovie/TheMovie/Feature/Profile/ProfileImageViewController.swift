@@ -28,7 +28,7 @@ final class ProfileImageViewController: UIViewController {
     init(selectedId: Int, title: String) {
         self.selectedId = selectedId
         self.selectedProfileView = TMProfileButton(
-            .profile(id: selectedId),
+            selectedId,
             size: 100
         )
         super.init(nibName: nil, bundle: nil)
@@ -104,7 +104,7 @@ private extension ProfileImageViewController {
 // MARK: Data Bindings
 private extension ProfileImageViewController {
     func didSetSelectedId() {
-        selectedProfileView.setProfile(.profile(id: selectedId))
+        selectedProfileView.setProfile(id: selectedId)
         delegate?.didSetSelectedId(selectedId: selectedId)
     }
 }
