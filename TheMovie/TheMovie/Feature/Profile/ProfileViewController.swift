@@ -50,6 +50,8 @@ private extension ProfileViewController {
     func configureUI() {
         view.backgroundColor = .tm(.black)
         
+        configureNavigation()
+        
         configureProfileButton()
         
         configureNicknameTextField()
@@ -72,6 +74,11 @@ private extension ProfileViewController {
             make.top.equalTo(nicknameTextField.snp.bottom).offset(40)
             make.horizontalEdges.equalToSuperview().inset(16)
         }
+    }
+    
+    func configureNavigation() {
+        navigationItem.title = mode.title
+        setTMBackButton()
     }
     
     func configureProfileButton() {
@@ -101,7 +108,10 @@ private extension ProfileViewController {
 private extension ProfileViewController {
     func profileButtonTouchUpInside(_ action: UIAction) {
         guard let profileImageId else { return }
-        let viewController = ProfileImageViewController(selectedId: profileImageId)
+        let viewController = ProfileImageViewController(
+            selectedId: profileImageId,
+            title: mode.profileImage
+        )
         viewController.delegate = self
         push(viewController)
     }
@@ -228,6 +238,14 @@ extension ProfileViewController {
             case .setting: return "프로필 설정"
             case .edit:
                 return "프로필 편집"
+            }
+        }
+        
+        var profileImage: String {
+            switch self {
+            case .setting: return "프로필 이미지 설정"
+            case .edit:
+                return "프로필 이미지 편집"
             }
         }
     }

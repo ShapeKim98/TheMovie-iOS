@@ -29,6 +29,8 @@ private extension OnboardViewController {
     func configureUI() {
         view.backgroundColor = .black
         
+        configureNavigation()
+        
         configureOnBoardImageView()
         
         configureOnBoardLabel()
@@ -60,6 +62,10 @@ private extension OnboardViewController {
         }
     }
     
+    func configureNavigation() {
+        setTMBackButton()
+    }
+    
     func configureOnBoardImageView() {
         onboardImageView.image = .tm(.onboarding)
         onboardImageView.contentMode = .scaleAspectFit
@@ -83,8 +89,8 @@ private extension OnboardViewController {
     }
     
     func configureStartButton() {
-        startButton.addTarget(
-            self, action: #selector(startButtonTouchUpInside),
+        startButton.addAction(
+            UIAction(handler: startButtonTouchUpInside),
             for: .touchUpInside
         )
         view.addSubview(startButton)
@@ -93,9 +99,8 @@ private extension OnboardViewController {
 
 // MARK: Functions
 private extension OnboardViewController {
-    @objc
-    func startButtonTouchUpInside() {
-        
+    func startButtonTouchUpInside(_ action: UIAction) {
+        push(ProfileViewController(mode: .setting))
     }
 }
 

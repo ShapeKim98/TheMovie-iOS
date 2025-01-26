@@ -25,13 +25,15 @@ final class ProfileImageViewController: UIViewController {
         didSet { didSetSelectedId() }
     }
     
-    init(selectedId: Int) {
+    init(selectedId: Int, title: String) {
         self.selectedId = selectedId
         self.selectedProfileView = TMProfileButton(
             .profile(id: selectedId),
             size: 100
         )
         super.init(nibName: nil, bundle: nil)
+        navigationItem.title = title
+        navigationController?.navigationBar.topItem?.title = ""
     }
     
     required init?(coder: NSCoder) {
@@ -136,5 +138,5 @@ extension ProfileImageViewController: UICollectionViewDataSource,
 
 @available(iOS 17.0, *)
 #Preview {
-    ProfileImageViewController(selectedId: 0)
+    ProfileImageViewController(selectedId: 0, title: "프로필 이미지 설정")
 }
