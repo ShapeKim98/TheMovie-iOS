@@ -103,6 +103,7 @@ private extension ProfileViewController {
     }
     
     func configureNicknameTextField() {
+        nicknameTextField.textField.delegate = self
         view.addSubview(nicknameTextField)
     }
     
@@ -123,6 +124,27 @@ private extension ProfileViewController {
     
     func completeButtonTouchUpInside(_ sender: UIAction) {
         
+    }
+}
+
+extension ProfileViewController: UITextFieldDelegate {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        guard let text = textField.text else { return true }
+        let newText = text.prefix(range.location) + string
+        guard (2 <= newText.count && newText.count < 10) else {
+            nicknameTextField.updateState(.글자수_조건에_맞지_않는_경우)
+            return true
+        }
+        guard !newText.contains(/[@#$%]/) else {
+            nicknameTextField.updateState(.특수문자_조건에_맞지_않는_경우)
+            return true
+        }
+        guard !newText.contains(/\d/) else {
+            nicknameTextField.updateState(.숫자_조건에_맞지_않는_경우)
+            return true
+        }
+        nicknameTextField.updateState(.조건에_맞는_경우)
+        return true
     }
 }
 
@@ -166,6 +188,7 @@ extension ProfileViewController {
         
         private func configureUI() {
             textField.font = .tm(.body)
+            textField.textColor = .tm(.white)
             textField.attributedPlaceholder = NSAttributedString(
                 string: "닉네임을 입력해주세요.",
                 attributes: [.foregroundColor: UIColor.tm(.gray)]
@@ -178,12 +201,12 @@ extension ProfileViewController {
             stateLabel.textColor = .tm(.brand)
             stateLabel.font = .tm(.body)
             stateLabel.isHidden = true
+            addSubview(stateLabel)
         }
         
         private func configureLayout() {
             textField.snp.makeConstraints { make in
-                make.verticalEdges.equalToSuperview().inset(16)
-                make.horizontalEdges.equalToSuperview().inset(16)
+                make.edges.equalToSuperview().inset(16)
             }
             
             background.snp.makeConstraints { make in
@@ -191,9 +214,15 @@ extension ProfileViewController {
                 make.bottom.equalToSuperview()
                 make.height.equalTo(1)
             }
+            
+            stateLabel.snp.makeConstraints { make in
+                make.top.equalTo(background.snp.bottom).offset(16)
+                make.horizontalEdges.equalToSuperview().inset(16)
+            }
         }
         
         func updateState(_ state: State) {
+            stateLabel.isHidden = false
             stateLabel.text = state.text
         }
     }
