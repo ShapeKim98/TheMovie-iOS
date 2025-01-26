@@ -14,7 +14,6 @@ final class ProfileViewController: UIViewController {
         .profile(id: profileImageId ?? 0),
         size: 100
     )
-    private let cameraIconView = UIView()
     private let nicknameTextField = NicknameTextField()
     private let completeButton = TMBoarderButton(title: "완료")
     
@@ -53,8 +52,6 @@ private extension ProfileViewController {
         
         configureProfileButton()
         
-        configureCameraImageView()
-        
         configureNicknameTextField()
         
         configureCompleteButton()
@@ -64,11 +61,6 @@ private extension ProfileViewController {
         profileButton.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide).offset(20)
             make.centerX.equalToSuperview()
-        }
-        
-        cameraIconView.snp.makeConstraints { make in
-            make.bottom.trailing.equalTo(profileButton)
-            make.size.equalTo(28)
         }
         
         nicknameTextField.snp.makeConstraints { make in
@@ -89,17 +81,8 @@ private extension ProfileViewController {
             for: .touchUpInside
         )
         view.addSubview(profileButton)
-    }
-    
-    func configureCameraImageView() {
-        let image = UIImageView(image: UIImage(systemName: "camera.fill"))
-        image.tintColor = .white
-        image.contentMode = .scaleAspectFit
-        cameraIconView.addSubview(image)
-        image.snp.makeConstraints { $0.edges.equalToSuperview().inset(4) }
-        cameraIconView.backgroundColor = .tm(.brand)
-        cameraIconView.layer.cornerRadius = 14
-        view.addSubview(cameraIconView)
+        
+        profileButton.setCameraIcon(view)
     }
     
     func configureNicknameTextField() {

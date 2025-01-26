@@ -23,6 +23,24 @@ final class TMProfileButton: UIButton {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func setCameraIcon(_ superView: UIView) {
+        let background = UIView()
+        let image = UIImageView(image: UIImage(systemName: "camera.fill"))
+        image.tintColor = .white
+        image.contentMode = .scaleAspectFit
+        background.addSubview(image)
+        image.snp.makeConstraints { $0.edges.equalToSuperview().inset(4) }
+        
+        background.backgroundColor = .tm(.brand)
+        background.layer.cornerRadius = 14
+        superView.addSubview(background)
+        
+        background.snp.makeConstraints { make in
+            make.bottom.trailing.equalTo(self)
+            make.size.equalTo(28)
+        }
+    }
+    
     private func configureUI(_ profileImage: TMImage, size: CGFloat) {
         setImage(profileImage.uiImage, for: .normal)
         imageView?.contentMode = .scaleAspectFill
