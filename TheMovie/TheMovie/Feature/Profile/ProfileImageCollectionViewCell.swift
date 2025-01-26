@@ -24,12 +24,11 @@ final class ProfileImageCollectionViewCell: UICollectionViewCell {
             make.edges.equalToSuperview()
         }
         
-        configurationUpdateHandler = { cell, state in
+        configurationUpdateHandler = { _, state in
             UIView.animate(withDuration: 0.3) { [weak self] in
                 guard let `self` else { return }
                 profileImageView.isSelected(state.isSelected)
                 profileImageView.layoutIfNeeded()
-                print(state.isSelected)
             }
         }
     }
