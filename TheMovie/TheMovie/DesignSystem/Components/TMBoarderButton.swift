@@ -25,14 +25,14 @@ final class TMBoarderButton: UIButton {
     private func configureUI(title: String) {
         var configuration = UIButton.Configuration.plain()
         configuration.background.backgroundColor = .clear
-        configuration.background.strokeColor = .tm(.brand)
+        configuration.background.strokeColor = .tm(.semantic(.border(.brand)))
         configuration.background.strokeWidth = 2
         configuration.contentInsets = .init(top: 12, leading: 16, bottom: 12, trailing: 16)
         configuration.cornerStyle = .capsule
         
         var titleContainer = AttributeContainer()
         titleContainer.font = .systemFont(ofSize: 16, weight: .bold)
-        titleContainer.foregroundColor = .tm(.brand)
+        titleContainer.foregroundColor = .tm(.semantic(.text(.brand)))
         configuration.attributedTitle = AttributedString(title, attributes: titleContainer)
         
         self.configuration = configuration
@@ -43,18 +43,24 @@ final class TMBoarderButton: UIButton {
             guard let `self` else { return }
             switch button.state {
             case .disabled:
-                updateState(color: .tm(.gray))
+                updateState(
+                    strokeColor: .tm(.semantic(.border(.tertiary))),
+                    textColor: .tm(.semantic(.text(.tertiary)))
+                )
             default:
-                updateState(color: .tm(.brand))
+                updateState(
+                    strokeColor: .tm(.semantic(.border(.brand))),
+                    textColor: .tm(.semantic(.text(.brand)))
+                )
             }
         }
     }
     
-    private func updateState(color: UIColor) {
-        configuration?.background.strokeColor = color
+    private func updateState(strokeColor: UIColor, textColor: UIColor) {
+        configuration?.background.strokeColor = strokeColor
         configuration?.attributedTitle?.setAttributes(AttributeContainer([
             .font: UIFont.systemFont(ofSize: 16, weight: .bold),
-            .foregroundColor: color
+            .foregroundColor: textColor
         ]))
     }
 }

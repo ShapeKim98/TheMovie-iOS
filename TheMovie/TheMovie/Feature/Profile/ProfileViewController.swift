@@ -54,7 +54,7 @@ final class ProfileViewController: UIViewController {
 // MARK: Configure Views
 private extension ProfileViewController {
     func configureUI() {
-        view.backgroundColor = .tm(.black)
+        view.backgroundColor = .tm(.semantic(.background(.primary)))
         
         configureNavigation()
         
@@ -221,10 +221,10 @@ extension ProfileViewController {
         
         private func configureUI() {
             textField.font = .tm(.body)
-            textField.textColor = .tm(.white)
+            textField.textColor = .tm(.semantic(.text(.primary)))
             textField.attributedPlaceholder = NSAttributedString(
                 string: "닉네임을 입력해주세요.",
-                attributes: [.foregroundColor: UIColor.tm(.gray)]
+                attributes: [.foregroundColor: UIColor.tm(.semantic(.text(.tertiary)))]
             )
             addSubview(textField)
             
@@ -232,7 +232,7 @@ extension ProfileViewController {
             addSubview(background)
             
             stateLabel.text = State.글자수_조건에_맞지_않는_경우.text
-            stateLabel.textColor = .tm(.brand)
+            stateLabel.textColor = .tm(.semantic(.text(.brand)))
             stateLabel.font = .tm(.body)
             addSubview(stateLabel)
         }

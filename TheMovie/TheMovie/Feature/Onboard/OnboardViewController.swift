@@ -75,13 +75,13 @@ private extension OnboardViewController {
     func configureOnBoardLabel() {
         onboardLabel.text = "Onboarding"
         onboardLabel.font = .italicBoldSystemFont(ofSize: 28)
-        onboardLabel.textColor = .tm(.white)
+        onboardLabel.textColor = .tm(.semantic(.text(.primary)))
         view.addSubview(onboardLabel)
     }
     
     func configureDescriptionLabel() {
         descriptionLabel.text = "당신만의 영화세상,\nThe Movie를 시작해보세요."
-        descriptionLabel.textColor = .tm(.white)
+        descriptionLabel.textColor = .tm(.semantic(.text(.primary)))
         descriptionLabel.textAlignment = .center
         descriptionLabel.numberOfLines = 0
         descriptionLabel.font = .tm(.subheadline)
