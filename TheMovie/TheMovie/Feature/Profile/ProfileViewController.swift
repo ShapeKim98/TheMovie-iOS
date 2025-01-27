@@ -18,7 +18,7 @@ final class ProfileViewController: UIViewController {
     private let completeButton = TMBoarderButton(title: "완료")
     
     @UserDefaults(
-        forKey: .userDefaults(.profileImage),
+        forKey: .userDefaults(.profileImageId),
         defaultValue: (0...11).randomElement() ?? 0
     )
     private var profileImageId: Int?
@@ -26,6 +26,8 @@ final class ProfileViewController: UIViewController {
     private var nickname: String?
     @UserDefaults(forKey: .userDefaults(.profileCompleted))
     private var isProfileCompleted: Bool?
+    @UserDefaults(forKey: .userDefaults(.profileDate))
+    private var profileDate: String?
     
     private var isValidNickname = false {
         didSet { didSetIsValidNickname() }
@@ -141,6 +143,7 @@ private extension ProfileViewController {
         nickname = text
         profileImageId = profileButton.id
         isProfileCompleted = true
+        profileDate = Date.now.toString(format: .yy_o_MM_o_dd)
         
         switchRoot(UIViewController())
     }
