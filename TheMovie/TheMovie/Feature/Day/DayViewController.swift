@@ -39,6 +39,8 @@ private extension DayViewController {
     func configureUI() {
         view.backgroundColor = .tm(.semantic(.background(.primary)))
         
+        configureNavigation()
+        
         configureActivityIndicatorView()
         
         configureProfileView()
@@ -67,6 +69,11 @@ private extension DayViewController {
         activityIndicatorView.snp.makeConstraints { make in
             make.center.equalTo(dayCollectionView)
         }
+    }
+    
+    func configureNavigation() {
+        navigationItem.title = "오늘의 영화"
+        setTMBackButton()
     }
     
     func configureProfileView() {

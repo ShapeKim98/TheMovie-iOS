@@ -80,7 +80,7 @@ final class ProfileView: UIView {
             .foregroundColor: UIColor.tm(.semantic(.text(.primary))),
             .font: UIFont.tm(.title)
         ])
-        configuration.attributedSubtitle = .make(profileDate ?? "" + " 가입", [
+        configuration.attributedSubtitle = .make("\(profileDate ?? "") 가입", [
             .foregroundColor: UIColor.tm(.semantic(.text(.secondary))),
             .font: UIFont.tm(.caption),
         ])
