@@ -17,6 +17,12 @@ final class DayViewController: UIViewController {
     }()
     private let activityIndicatorView = UIActivityIndicatorView(style: .large)
     
+    @UserDefaults(
+        forKey: .userDefaults(.movieBox),
+        defaultValue: [String: Int]()
+    )
+    private var movieBox: [String: Int]?
+    
     private let dayClient = DayClient.shared
     
     private var domain: Day? {
@@ -162,8 +168,23 @@ extension DayViewController: UICollectionViewDataSource,
             let cell = cell as? DayCollectionViewCell,
             let movie = domain?.results[indexPath.item]
         else { return UICollectionViewCell() }
-        cell.forItemAt(movie)
+        let isSelected = movieBox?.contains(where: { $0.key == String(movie.id) }) ?? false
+        cell.forItemAt(movie, isSelected: isSelected)
+        cell.delegate = self
         return cell
+    }
+}
+
+extension DayViewController: DayCollectionViewCellDelegate {
+    func favoritButtonTouchUpInside(_ movieId: Int) {
+        let movieIdString = String(movieId)
+        if movieBox?.contains(where: { $0.key == movieIdString }) ?? false {
+            movieBox?.removeValue(forKey: movieIdString)
+        } else {
+            movieBox?.updateValue(movieId, forKey: movieIdString)
+        }
+        profileView.updateMovieBoxLabel()
+        print(movieBox)
     }
 }
 

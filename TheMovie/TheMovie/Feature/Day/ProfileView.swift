@@ -11,7 +11,8 @@ import SnapKit
 
 final class ProfileView: UIView {
     private let button = UIButton()
-    private let movieBoxLabel = UIView()
+    private let movieBoxLabel = UILabel()
+    private let movieBoxLabelBackground = UIView()
     private lazy var profileImageView = TMProfileImageView(
         .profile(id: profileImageId ?? 0),
         size: 40
@@ -24,7 +25,7 @@ final class ProfileView: UIView {
     @UserDefaults(forKey: .userDefaults(.profileImageId))
     private var profileImageId: Int?
     @UserDefaults(forKey: .userDefaults(.movieBox))
-    private var movieBox: Set<Int>?
+    private var movieBox: [String: Int]?
     
     init() {
         super.init(frame: .zero)
@@ -40,6 +41,10 @@ final class ProfileView: UIView {
     
     func addButtonAction(_ action: @escaping (UIAction) -> Void) {
         button.addAction(UIAction(handler: action), for: .touchUpInside)
+    }
+    
+    func updateMovieBoxLabel() {
+        movieBoxLabel.text = "\(movieBox?.count ?? 0)개의 무비박스 보관중"
     }
     
     private func configureUI() {
@@ -63,9 +68,12 @@ final class ProfileView: UIView {
             make.centerY.equalTo(profileImageView)
         }
         
-        movieBoxLabel.snp.makeConstraints { make in
+        movieBoxLabelBackground.snp.makeConstraints { make in
             make.top.equalTo(profileImageView.snp.bottom).offset(12)
             make.bottom.horizontalEdges.equalToSuperview().inset(12)
+        }
+        movieBoxLabel.snp.makeConstraints { make in
+            make.edges.equalToSuperview().inset(8)
         }
     }
     
@@ -76,7 +84,7 @@ final class ProfileView: UIView {
     
     private func configureButton() {
         var configuration = UIButton.Configuration.plain()
-        configuration.attributedTitle = .make(nickname ?? "닉네임", [
+        configuration.attributedTitle = .make(nickname ?? "", [
             .foregroundColor: UIColor.tm(.semantic(.text(.primary))),
             .font: UIFont.tm(.title)
         ])
@@ -98,16 +106,14 @@ final class ProfileView: UIView {
     }
     
     private func configureMovieBoxLabel() {
-        let label = UILabel()
-        label.text = "\(movieBox?.count ?? 0)개의 무비박스 보관중"
-        label.font = .systemFont(ofSize: 14, weight: .bold)
-        label.textColor = .tm(.semantic(.text(.primary)))
-        label.textAlignment = .center
-        movieBoxLabel.addSubview(label)
-        label.snp.makeConstraints { $0.edges.equalToSuperview().inset(8) }
-        movieBoxLabel.backgroundColor = .tm(.semantic(.background(.brand)))
-        movieBoxLabel.layer.cornerRadius = 8
-        addSubview(movieBoxLabel)
+        movieBoxLabel.text = "\(movieBox?.count ?? 0)개의 무비박스 보관중"
+        movieBoxLabel.font = .systemFont(ofSize: 14, weight: .bold)
+        movieBoxLabel.textColor = .tm(.semantic(.text(.primary)))
+        movieBoxLabel.textAlignment = .center
+        movieBoxLabelBackground.addSubview(movieBoxLabel)
+        movieBoxLabelBackground.backgroundColor = .tm(.semantic(.background(.brand)))
+        movieBoxLabelBackground.layer.cornerRadius = 8
+        addSubview(movieBoxLabelBackground)
     }
 }
 

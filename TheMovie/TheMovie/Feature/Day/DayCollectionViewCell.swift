@@ -10,17 +10,17 @@ import UIKit
 import Kingfisher
 import SnapKit
 
+protocol DayCollectionViewCellDelegate: AnyObject {
+    func favoritButtonTouchUpInside(_ movieId: Int)
+}
+
 final class DayCollectionViewCell: UICollectionViewCell {
     private let posterImageView = UIImageView()
     private let titleLabel = UILabel()
     private let overviewLabel = UILabel()
     private let favoriteButton = TMFavoriteButton()
     
-    @UserDefaults(
-        forKey: .userDefaults(.movieBox),
-        defaultValue: [String: Int]()
-    )
-    private var movieBox: [String: Int]?
+    weak var delegate: (any DayCollectionViewCellDelegate)?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -43,7 +43,12 @@ final class DayCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    func forItemAt(_ movie: Movie) {
+    override func prepareForReuse() {
+        favoriteButton.isSelected = false
+        delegate = nil
+    }
+    
+    func forItemAt(_ movie: Movie, isSelected: Bool) {
         let url = URL(string: .imageBaseURL + "/w500" + movie.posterPath)
         posterImageView.kf.indicatorType = .activity
         posterImageView.kf.setImage(
@@ -55,7 +60,6 @@ final class DayCollectionViewCell: UICollectionViewCell {
         
         titleLabel.text = movie.title
         overviewLabel.text = movie.overview
-        let isSelected = movieBox?.contains(where: { $0.key == String(movie.id) }) ?? false
         favoriteButton.isSelected = isSelected
         favoriteButton.tag = movie.id
     }
@@ -136,15 +140,8 @@ private extension DayCollectionViewCell {
 private extension DayCollectionViewCell {
     func favoritButtonTouchUpInside(_ action: UIAction) {
         guard let button = action.sender as? UIButton else { return }
-        let movieId = String(button.tag)
-        if movieBox?.contains(where: { $0.key == movieId }) ?? false {
-            movieBox?.removeValue(forKey: movieId)
-            favoriteButton.isSelected = false
-        } else {
-            movieBox?.updateValue(button.tag, forKey: movieId)
-            favoriteButton.isSelected = true
-        }
-        print(movieBox)
+        favoriteButton.isSelected.toggle()
+        delegate?.favoritButtonTouchUpInside(button.tag)
     }
 }
 
