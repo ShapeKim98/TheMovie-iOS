@@ -21,10 +21,7 @@ final class RecentQueryView: UIView {
     private let scrollView = UIScrollView()
     private var queryButtons = [QueryButton]()
     
-    @UserDefaults(
-        forKey: .userDefaults(.recentQueries),
-        defaultValue: ["스파이더", "해리포터", "소방관", "해리포터", "소방관", "해리포터", "소방관", "해리포터", "소방관", "해리포터", "소방관", "해리포터", "소방관"]
-    )
+    @UserDefaults(forKey: .userDefaults(.recentQueries))
     private var recentQueries: [String]? {
         didSet { didSetRecentQueries() }
     }
@@ -33,8 +30,6 @@ final class RecentQueryView: UIView {
     
     init() {
         super.init(frame: .zero)
-        
-        recentQueries = ["스파이더", "해리포터", "소방관", "해리포터", "소방관", "해리포터", "소방관", "해리포터", "소방관", "해리포터", "소방관", "해리포터", "소방관"]
         
         configureUI()
         
