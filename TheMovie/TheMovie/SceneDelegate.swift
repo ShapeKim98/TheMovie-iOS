@@ -26,7 +26,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         var viewController: UIViewController
         if let isProfileCompleted, isProfileCompleted {
-            viewController = UIViewController()
+            viewController = DayViewController()
         } else {
             viewController = OnboardViewController()
         }

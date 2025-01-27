@@ -145,7 +145,7 @@ private extension ProfileViewController {
         isProfileCompleted = true
         profileDate = Date.now.toString(format: .yy_o_MM_o_dd)
         
-        switchRoot(UIViewController())
+        switchRoot(DayViewController())
     }
     
     func updateTextFieldState(_ text: String) {
