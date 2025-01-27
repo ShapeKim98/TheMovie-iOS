@@ -274,12 +274,13 @@ extension DayViewController {
         
         private func configureLayout() {
             textButton.snp.makeConstraints { make in
-                make.leading.verticalEdges.equalToSuperview().inset(6)
+                make.verticalEdges.equalToSuperview().inset(6)
+                make.leading.equalToSuperview().inset(12)
             }
             
             removeButton.snp.makeConstraints { make in
                 make.centerY.equalTo(textButton)
-                make.trailing.equalToSuperview().inset(6)
+                make.trailing.equalToSuperview().inset(12)
                 make.leading.equalTo(textButton.snp.trailing).offset(8)
                 make.size.equalTo(12)
             }
