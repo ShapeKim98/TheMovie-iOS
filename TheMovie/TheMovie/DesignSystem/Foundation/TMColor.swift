@@ -52,12 +52,14 @@ extension TMColor {
         case background(SemanticType)
         case text(SemanticType)
         case border(SemanticType)
+        case icon(SemanticType)
         
         enum SemanticType {
             case brand
             case primary
             case secondary
             case tertiary
+            case quaternary
         }
         
         var uiColor: UIColor {
@@ -68,6 +70,7 @@ extension TMColor {
                 case .primary: return UIColor(resource: .black)
                 case .secondary: return UIColor(resource: .gray)
                 case .tertiary: return UIColor(resource: .graySecondary)
+                case .quaternary: return UIColor(resource: .white)
                 }
             case let .text(type):
                 switch type {
@@ -75,6 +78,7 @@ extension TMColor {
                 case .primary: return UIColor(resource: .white)
                 case .secondary: return UIColor(resource: .graySecondary)
                 case .tertiary: return UIColor(resource: .gray)
+                case .quaternary: return UIColor(resource: .black)
                 }
             case let .border(type):
                 switch type {
@@ -82,6 +86,15 @@ extension TMColor {
                 case .primary: return UIColor(resource: .white)
                 case .secondary: return UIColor(resource: .graySecondary)
                 case .tertiary: return UIColor(resource: .gray)
+                case .quaternary: return UIColor(resource: .black)
+                }
+            case let .icon(type):
+                switch type {
+                case .brand: return UIColor(resource: .brand)
+                case .primary: return UIColor(resource: .white)
+                case .secondary: return UIColor(resource: .graySecondary)
+                case .tertiary: return UIColor(resource: .gray)
+                case .quaternary: return UIColor(resource: .black)
                 }
             }
         }
