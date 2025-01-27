@@ -44,6 +44,7 @@ final class DayCollectionViewCell: UICollectionViewCell {
     }
     
     override func prepareForReuse() {
+        super.prepareForReuse()
         favoriteButton.isSelected = false
         delegate = nil
     }
