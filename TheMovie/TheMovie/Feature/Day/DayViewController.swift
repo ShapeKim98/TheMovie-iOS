@@ -15,8 +15,13 @@ final class DayViewController: UIViewController {
     private lazy var dayCollectionView = {
         return configureDayCollectionView()
     }()
+    private let activityIndicatorView = UIActivityIndicatorView(style: .large)
     
-    private var domain: Day? = .mock
+    private let dayClient = DayClient.shared
+    
+    private var domain: Day? {
+        didSet { didSetDomain() }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,6 +29,8 @@ final class DayViewController: UIViewController {
         configureUI()
         
         configureLayout()
+        
+        fetchDay()
     }
 }
 
@@ -31,6 +38,8 @@ final class DayViewController: UIViewController {
 private extension DayViewController {
     func configureUI() {
         view.backgroundColor = .tm(.semantic(.background(.primary)))
+        
+        configureActivityIndicatorView()
         
         configureProfileView()
         
@@ -53,6 +62,10 @@ private extension DayViewController {
             make.top.equalTo(recentQueryView.snp.bottom).offset(16)
             make.horizontalEdges.equalToSuperview()
             make.height.equalTo(364)
+        }
+        
+        activityIndicatorView.snp.makeConstraints { make in
+            make.center.equalTo(dayCollectionView)
         }
     }
     
@@ -82,11 +95,49 @@ private extension DayViewController {
         
         return collectionView
     }
+    
+    func configureActivityIndicatorView() {
+        activityIndicatorView.startAnimating()
+        activityIndicatorView.hidesWhenStopped = true
+        activityIndicatorView.color = .tm(.semantic(.icon(.brand)))
+        view.addSubview(activityIndicatorView)
+    }
+}
+
+// MARK: Data Bindings
+private extension DayViewController {
+    func didSetDomain() {
+        dayCollectionView.reloadData()
+        
+        let isLoading = domain == nil
+        UIView.fadeAnimate { [weak self] in
+            guard let `self` else { return }
+            activityIndicatorView.alpha = isLoading ? 1 : 0
+            dayCollectionView.alpha = isLoading ? 0 : 1
+        } completion: { [weak self] _ in
+            guard let `self` else { return }
+            if isLoading {
+                activityIndicatorView.startAnimating()
+            } else {
+                activityIndicatorView.stopAnimating()
+            }
+        }
+    }
 }
 
 // MARK: Functions
 private extension DayViewController {
-    
+    func fetchDay() {
+        dayClient.fetchDay(DayRequest(page: 1)) { [weak self] result in
+            guard let `self` else { return }
+            switch result {
+            case .success(let success):
+                domain = success
+            case .failure(let failure):
+                handleFailure(failure)
+            }
+        }
+    }
 }
 
 extension DayViewController: UICollectionViewDataSource,

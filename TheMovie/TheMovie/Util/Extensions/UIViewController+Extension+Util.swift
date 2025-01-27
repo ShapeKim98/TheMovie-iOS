@@ -32,4 +32,24 @@ extension UIViewController {
         window.rootViewController = viewController
         window.makeKeyAndVisible()
     }
+    
+    func handleFailure(_ failure: Error) {
+        if let baseError = failure as? BaseError {
+            let message =  baseError.statusMessage
+            presentAlert(title: "오류", message: message)
+        } else {
+            print(failure)
+        }
+    }
+    
+    func presentAlert(title: String?, message: String? = nil) {
+        let alert = UIAlertController(
+            title: title,
+            message: message,
+            preferredStyle: .alert
+        )
+        let confirm = UIAlertAction(title: "확인", style: .default)
+        alert.addAction(confirm)
+        present(alert, animated: true)
+    }
 }
