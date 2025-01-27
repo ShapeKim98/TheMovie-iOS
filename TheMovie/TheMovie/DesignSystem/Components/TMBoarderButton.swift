@@ -30,10 +30,10 @@ final class TMBoarderButton: UIButton {
         configuration.contentInsets = .init(top: 12, leading: 16, bottom: 12, trailing: 16)
         configuration.cornerStyle = .capsule
         
-        var titleContainer = AttributeContainer()
-        titleContainer.font = .systemFont(ofSize: 16, weight: .bold)
-        titleContainer.foregroundColor = .tm(.semantic(.text(.brand)))
-        configuration.attributedTitle = AttributedString(title, attributes: titleContainer)
+        configuration.attributedTitle = .make(title, [
+            .foregroundColor: UIColor.tm(.semantic(.text(.brand))),
+            .font: UIFont.tm(.title)
+        ])
         
         self.configuration = configuration
     }
