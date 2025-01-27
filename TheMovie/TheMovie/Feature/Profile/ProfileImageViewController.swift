@@ -52,7 +52,7 @@ final class ProfileImageViewController: UIViewController {
 // MARK: Configure Views
 private extension ProfileImageViewController {
     func configureUI() {
-        view.backgroundColor = .tm(.black)
+        view.backgroundColor = .tm(.semantic(.background(.primary)))
         
         configureSelectedProfileView()
     }

@@ -32,9 +32,12 @@ struct UserDefaults<T> {
 }
 
 enum UserDefaultsKey: String {
-    case profileImage = "ProfileImage"
+    case profileImageId = "ProfileImageId"
     case nickname = "Nickname"
     case profileCompleted = "ProfileCompleted"
+    case profileDate = "ProfileDate"
+    case movieBox = "MovieBox"
+    case recentQueries = "RecentQueries"
 }
 
 extension String {

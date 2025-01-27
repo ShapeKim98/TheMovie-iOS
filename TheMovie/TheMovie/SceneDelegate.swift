@@ -26,7 +26,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         var viewController: UIViewController
         if let isProfileCompleted, isProfileCompleted {
-            viewController = UIViewController()
+            viewController = DayViewController()
         } else {
             viewController = OnboardViewController()
         }
@@ -35,9 +35,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             rootViewController: viewController
         )
         root.navigationBar.titleTextAttributes = [
-            .foregroundColor: UIColor.tm(.white)
+            .foregroundColor: UIColor.tm(.semantic(.text(.primary)))
         ]
-        root.navigationBar.tintColor = .tm(.brand)
+        root.navigationBar.tintColor = .tm(.primitive(.blue))
         window?.rootViewController = root
         window?.makeKeyAndVisible()
     }

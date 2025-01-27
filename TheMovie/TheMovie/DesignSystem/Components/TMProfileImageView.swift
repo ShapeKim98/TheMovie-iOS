@@ -25,10 +25,10 @@ final class TMProfileImageView: UIImageView {
     func isSelected(_ isSelected: Bool) {
         if isSelected {
             layer.borderWidth = 3
-            layer.borderColor = .tm(.brand)
+            layer.borderColor = .tm(.semantic(.border(.brand)))
             alpha = 1
         } else {
-            layer.borderColor = .tm(.graySecondary)
+            layer.borderColor = .tm(.semantic(.border(.secondary)))
             layer.borderWidth = 1
             alpha = 0.5
         }
@@ -45,7 +45,7 @@ final class TMProfileImageView: UIImageView {
         contentMode = .scaleAspectFill
         layer.cornerRadius = size / 2
         clipsToBounds = true
-        layer.borderColor = .tm(.graySecondary)
+        layer.borderColor = .tm(.semantic(.border(.secondary)))
         layer.borderWidth = 1
         alpha = 0.5
     }

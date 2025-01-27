@@ -49,7 +49,7 @@ final class TMProfileButton: UIButton {
         cameraIconView.addSubview(image)
         image.snp.makeConstraints { $0.edges.equalToSuperview().inset(4) }
         
-        cameraIconView.backgroundColor = .tm(.brand)
+        cameraIconView.backgroundColor = .tm(.semantic(.background(.brand)))
         cameraIconView.layer.cornerRadius = 14
         addSubview(cameraIconView)
     }
