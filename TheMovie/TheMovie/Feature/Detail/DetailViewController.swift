@@ -237,6 +237,7 @@ extension DetailViewController: UICollectionViewDelegate,
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard scrollView.tag == 0 else { return }
         let index = round(scrollView.contentOffset.x / view.frame.width)
         backdropPageControl.currentPage = Int(index)
     }

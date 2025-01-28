@@ -61,11 +61,13 @@ private extension CastCollectionViewCell {
         nameLabel.snp.makeConstraints { make in
             make.top.equalToSuperview().inset(8)
             make.leading.equalTo(profileImageView.snp.trailing).offset(6)
+            make.trailing.equalToSuperview()
         }
         
         characterLabel.snp.makeConstraints { make in
             make.bottom.equalToSuperview().inset(8)
             make.leading.equalTo(profileImageView.snp.trailing).offset(6)
+            make.trailing.equalToSuperview()
         }
     }
     
