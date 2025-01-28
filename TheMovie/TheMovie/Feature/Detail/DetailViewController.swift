@@ -14,6 +14,9 @@ final class DetailViewController: UIViewController {
         configureBackdropCollectionView()
     }()
     private let backdropPageControl = UIPageControl()
+    private let movieInfoLabel = UILabel()
+    private let movieInfoLabels = [MovieInfoLabel]()
+    private let hstack = UIStackView()
     
     private var domain: Detail? = .mock
     private var backdropImages: [String] {
@@ -39,6 +42,10 @@ private extension DetailViewController {
         view.addSubview(backdropCollectionView)
         
         configureBackdropPageControll()
+        
+        configureHStack()
+        
+        configureMovieInfoLabel()
     }
     
     func configureLayout() {
@@ -50,6 +57,11 @@ private extension DetailViewController {
         backdropPageControl.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.bottom.equalTo(backdropCollectionView).inset(12)
+        }
+        
+        hstack.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.top.equalTo(backdropCollectionView.snp.bottom).offset(16)
         }
     }
     
@@ -94,6 +106,34 @@ private extension DetailViewController {
         backdropPageControl.currentPage = 0
         view.addSubview(backdropPageControl)
     }
+    
+    func configureMovieInfoLabel() {
+        guard let movie = domain?.movie else { return }
+        let releaseDate = movie.releaseDate
+        let voteAverage = String(format: "%.1f", movie.voteAverage)
+        var genres = movie.genreIds.map(\.title).prefix(2)
+        if movie.genreIds.count > 2 {
+            genres.append("+\(movie.genreIds.count - 2)")
+        }
+        let releaseLabel = MovieInfoLabel(image: "calendar", text: releaseDate)
+        let voteLabel = MovieInfoLabel(image: "star.fill", text: voteAverage)
+        let genresLabel = MovieInfoLabel(
+            image: "film",
+            text: genres.joined(separator: ", "),
+            isSeparator: false
+        )
+        
+        hstack.addArrangedSubview(releaseLabel)
+        hstack.addArrangedSubview(voteLabel)
+        hstack.addArrangedSubview(genresLabel)
+    }
+    
+    func configureHStack() {
+        hstack.axis = .horizontal
+        hstack.spacing = 8
+        hstack.distribution = .fillProportionally
+        view.addSubview(hstack)
+    }
 }
 
 extension DetailViewController: UICollectionViewDelegate,
@@ -123,6 +163,61 @@ extension DetailViewController: UICollectionViewDelegate,
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let index = round(scrollView.contentOffset.x / view.frame.width)
         backdropPageControl.currentPage = Int(index)
+    }
+}
+
+private extension DetailViewController {
+    final class MovieInfoLabel: UIView {
+        private let image = UIImageView()
+        private let label = UILabel()
+        
+        init(image: String, text: String, isSeparator: Bool = true) {
+            super.init(frame: .zero)
+            
+            let font = UIFont.tm(.caption)
+            let height = font.lineHeight
+            let color = UIColor.tm(.semantic(.text(.tertiary)))
+            
+            self.image.image = UIImage(systemName: image)
+            self.image.tintColor = color
+            addSubview(self.image)
+            
+            self.label.text = text
+            self.label.textColor = color
+            self.label.font = font
+            addSubview(label)
+            
+            self.image.snp.makeConstraints { make in
+                make.leading.equalToSuperview()
+                make.verticalEdges.equalToSuperview()
+                make.size.equalTo(height)
+            }
+            
+            self.label.snp.makeConstraints { make in
+                make.centerY.equalTo(self.image)
+                make.leading.equalTo(self.image.snp.trailing).offset(4)
+                if !isSeparator {
+                    make.trailing.equalToSuperview()
+                }
+            }
+            
+            if isSeparator {
+                let separator = UIView()
+                separator.backgroundColor = color
+                addSubview(separator)
+                
+                separator.snp.makeConstraints { make in
+                    make.width.equalTo(1)
+                    make.height.equalTo(height)
+                    make.trailing.equalToSuperview()
+                    make.leading.equalTo(self.label.snp.trailing).offset(8)
+                }
+            }
+        }
+        
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
     }
 }
 
