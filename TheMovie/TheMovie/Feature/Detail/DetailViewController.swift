@@ -24,6 +24,10 @@ final class DetailViewController: UIViewController {
     private lazy var castCollectionView: UICollectionView = {
         configureCastCollectionView()
     }()
+    private let posterLabel = UILabel()
+    private lazy var posterCollectionView: UICollectionView = {
+        configurePosterCollectionView()
+    }()
     
     private var domain: Detail? = .mock
     private var backdropImages: [String] {
@@ -59,6 +63,10 @@ private extension DetailViewController {
         configureCastLabel()
         
         view.addSubview(castCollectionView)
+        
+        configurePosterLabel()
+        
+        view.addSubview(posterCollectionView)
     }
     
     func configureLayout() {
@@ -89,8 +97,19 @@ private extension DetailViewController {
         
         castCollectionView.snp.makeConstraints { make in
             make.horizontalEdges.equalToSuperview()
-            make.top.equalTo(castLabel.snp.bottom).offset(8)
+            make.top.equalTo(castLabel.snp.bottom)
             make.height.equalTo(120 + 16 + 24)
+        }
+        
+        posterLabel.snp.makeConstraints { make in
+            make.top.equalTo(castCollectionView.snp.bottom).offset(20)
+            make.leading.equalToSuperview().inset(16)
+        }
+        
+        posterCollectionView.snp.makeConstraints { make in
+            make.horizontalEdges.equalToSuperview()
+            make.top.equalTo(posterLabel.snp.bottom)
+            make.height.equalTo(180 + 24)
         }
     }
     
@@ -133,6 +152,27 @@ private extension DetailViewController {
             forCellWithReuseIdentifier: .castCollectionCell
         )
         collectionView.tag = 1
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.backgroundColor = .clear
+        collectionView.showsHorizontalScrollIndicator = false
+        
+        return collectionView
+    }
+    
+    func configurePosterCollectionView() -> UICollectionView {
+        let layout = UICollectionViewFlowLayout()
+        layout.itemSize = CGSize(width: 100, height: 180)
+        layout.scrollDirection = .horizontal
+        layout.minimumInteritemSpacing = 12
+        layout.sectionInset = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
+        
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.register(
+            PosterCollectionViewCell.self,
+            forCellWithReuseIdentifier: .posterCollectionCell
+        )
+        collectionView.tag = 2
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.backgroundColor = .clear
@@ -210,6 +250,26 @@ private extension DetailViewController {
         cell.forItemAt(cast)
         return cell
     }
+    
+    func configurePosterLabel() {
+        posterLabel.text = "Poster"
+        posterLabel.textColor = .tm(.semantic(.text(.primary)))
+        posterLabel.font = .tm(.headline)
+        view.addSubview(posterLabel)
+    }
+    
+    func configurePosterCell(_ collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: .posterCollectionCell,
+            for: indexPath
+        ) as? PosterCollectionViewCell
+        guard
+            let cell,
+            let path = domain?.images?.posters[indexPath.item]
+        else { return UICollectionViewCell() }
+        cell.forItemAt(path.filePath)
+        return cell
+    }
 }
 
 extension DetailViewController: UICollectionViewDelegate,
@@ -218,7 +278,7 @@ extension DetailViewController: UICollectionViewDelegate,
         switch collectionView.tag {
         case 0: return backdropImages.count
         case 1: return domain?.credits?.cast.count ?? 0
-        case 2: return 0
+        case 2: return domain?.images?.posters.count ?? 0
         default: return 0
         }
     }
@@ -230,7 +290,7 @@ extension DetailViewController: UICollectionViewDelegate,
         case 1:
             return configureCastCell(collectionView, indexPath: indexPath)
         case 2:
-            return UICollectionViewCell()
+            return configurePosterCell(collectionView, indexPath: indexPath)
         default:
             return UICollectionViewCell()
         }
