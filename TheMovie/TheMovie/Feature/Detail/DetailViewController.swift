@@ -17,6 +17,9 @@ final class DetailViewController: UIViewController {
     private let movieInfoLabel = UILabel()
     private let movieInfoLabels = [MovieInfoLabel]()
     private let hstack = UIStackView()
+    private lazy var synopsisView: SynopsisView = {
+        SynopsisView(overview: domain?.movie.overview ?? "")
+    }()
     
     private var domain: Detail? = .mock
     private var backdropImages: [String] {
@@ -46,6 +49,8 @@ private extension DetailViewController {
         configureHStack()
         
         configureMovieInfoLabel()
+        
+        view.addSubview(synopsisView)
     }
     
     func configureLayout() {
@@ -62,6 +67,11 @@ private extension DetailViewController {
         hstack.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.top.equalTo(backdropCollectionView.snp.bottom).offset(16)
+        }
+        
+        synopsisView.snp.makeConstraints { make in
+            make.top.equalTo(hstack.snp.bottom).offset(16)
+            make.horizontalEdges.equalToSuperview().inset(16)
         }
     }
     
@@ -163,61 +173,6 @@ extension DetailViewController: UICollectionViewDelegate,
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let index = round(scrollView.contentOffset.x / view.frame.width)
         backdropPageControl.currentPage = Int(index)
-    }
-}
-
-private extension DetailViewController {
-    final class MovieInfoLabel: UIView {
-        private let image = UIImageView()
-        private let label = UILabel()
-        
-        init(image: String, text: String, isSeparator: Bool = true) {
-            super.init(frame: .zero)
-            
-            let font = UIFont.tm(.caption)
-            let height = font.lineHeight
-            let color = UIColor.tm(.semantic(.text(.tertiary)))
-            
-            self.image.image = UIImage(systemName: image)
-            self.image.tintColor = color
-            addSubview(self.image)
-            
-            self.label.text = text
-            self.label.textColor = color
-            self.label.font = font
-            addSubview(label)
-            
-            self.image.snp.makeConstraints { make in
-                make.leading.equalToSuperview()
-                make.verticalEdges.equalToSuperview()
-                make.size.equalTo(height)
-            }
-            
-            self.label.snp.makeConstraints { make in
-                make.centerY.equalTo(self.image)
-                make.leading.equalTo(self.image.snp.trailing).offset(4)
-                if !isSeparator {
-                    make.trailing.equalToSuperview()
-                }
-            }
-            
-            if isSeparator {
-                let separator = UIView()
-                separator.backgroundColor = color
-                addSubview(separator)
-                
-                separator.snp.makeConstraints { make in
-                    make.width.equalTo(1)
-                    make.height.equalTo(height)
-                    make.trailing.equalToSuperview()
-                    make.leading.equalTo(self.label.snp.trailing).offset(8)
-                }
-            }
-        }
-        
-        required init?(coder: NSCoder) {
-            fatalError("init(coder:) has not been implemented")
-        }
     }
 }
 
