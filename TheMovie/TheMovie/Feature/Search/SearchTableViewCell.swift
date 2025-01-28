@@ -47,12 +47,14 @@ final class SearchTableViewCell: UITableViewCell {
     }
     
     func forRowAt(_ movie: Movie, isSelected: Bool) {
-        let url = URL(string: .imageBaseURL + "/w300" + (movie.posterPath ?? ""))
-        posterImageView.kf.indicatorType = .activity
-        posterImageView.kf.setImage(
-            with: url,
-            options: [.transition(.fade(0.3))]
-        )
+        if let path = movie.posterPath {
+            let url = URL(string: .imageBaseURL + "/w300" + path)
+            posterImageView.kf.indicatorType = .activity
+            posterImageView.kf.setImage(
+                with: url,
+                options: [.transition(.fade(0.3))]
+            )
+        }
         
         titleLabel.text = movie.title
         let date = movie.releaseDate.date(format: .yyyy_MM_dd)
@@ -78,6 +80,10 @@ final class SearchTableViewCell: UITableViewCell {
     
     func cancelImageDownload() {
         posterImageView.kf.cancelDownloadTask()
+    }
+    
+    func updateFavoriteButton() {
+        favoriteButton.isSelected.toggle()
     }
 }
 
@@ -167,7 +173,7 @@ private extension SearchTableViewCell {
 private extension SearchTableViewCell {
     func favoritButtonTouchUpInside(_ action: UIAction) {
         guard let button = action.sender as? UIButton else { return }
-        favoriteButton.isSelected.toggle()
+        button.isSelected.toggle()
         delegate?.favoritButtonTouchUpInside(button.tag)
     }
 }

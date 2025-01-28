@@ -30,7 +30,7 @@ final class SearchViewController: UIViewController {
         didSet { didSetDomain() }
     }
     private var isPaging: Bool = false
-    private let firstQuery: String
+    private var firstQuery: String
     
     weak var delegate: (any SearchViewControllerDelegate)?
     
@@ -57,6 +57,7 @@ final class SearchViewController: UIViewController {
         
         if !firstQuery.isEmpty {
             fetchSearch(query: firstQuery)
+            firstQuery = ""
         }
         
         searchController.isActive = true
@@ -96,6 +97,7 @@ private extension SearchViewController {
     
     func configureNavigation() {
         navigationItem.title = "영화 검색"
+        setTMBackButton()
     }
     
     func configureSearchController() {
@@ -266,6 +268,16 @@ extension SearchViewController: UITableViewDelegate,
         return cell
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let movie = domain?.results[indexPath.row] else {
+            return
+        }
+        let vieController = DetailViewController(movie)
+        vieController.delegate = self
+        push(vieController)
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         guard domain?.results.count == indexPath.row + 2 else { return }
         paginationSearch()
@@ -293,7 +305,16 @@ extension SearchViewController: SearchTableViewCellDelegate {
         } else {
             movieBox?.updateValue(movieId, forKey: movieIdString)
         }
-        print(movieBox)
+    }
+}
+
+extension SearchViewController: DetailViewControllerDelegate {
+    func favoriteButtonTouchUpInside(movieId: Int) {
+        let index = domain?.results.firstIndex(where: { $0.id == movieId })
+        guard let index else { return }
+        let indexPath = IndexPath(row: index, section: 0)
+        let cell = searchTableView.cellForRow(at: indexPath)
+        (cell as? SearchTableViewCell)?.updateFavoriteButton()
     }
 }
 
