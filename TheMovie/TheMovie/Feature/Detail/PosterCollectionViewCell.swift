@@ -19,9 +19,8 @@ class PosterCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(imageView)
         
         imageView.snp.makeConstraints { make in
+            make.height.equalTo(contentView.snp.width).multipliedBy(1.8)
             make.edges.equalToSuperview()
-            make.width.equalTo(100)
-            make.height.equalTo(100).multipliedBy(1.8)
         }
     }
     

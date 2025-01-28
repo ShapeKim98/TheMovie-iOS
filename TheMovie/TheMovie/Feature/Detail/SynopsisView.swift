@@ -105,5 +105,5 @@ private extension SynopsisView {
 
 @available(iOS 17.0, *)
 #Preview {
-    DetailViewController()
+    DetailViewController(.mock)
 }

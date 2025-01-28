@@ -20,7 +20,7 @@ final class DetailViewController: UIViewController {
     private let movieInfoLabels = [MovieInfoLabel]()
     private let hstack = UIStackView()
     private lazy var synopsisView: SynopsisView = {
-        SynopsisView(overview: domain?.movie.overview ?? "")
+        SynopsisView(overview: domain.movie.overview)
     }()
     private let castLabel = UILabel()
     private lazy var castCollectionView: UICollectionView = {
@@ -31,12 +31,27 @@ final class DetailViewController: UIViewController {
         configurePosterCollectionView()
     }()
     
-    private var domain: Detail? = .mock
+    private let imagesClient = ImagesClient.shared
+    private let creditsClient = CreditsClient.shared
+    
+    private var domain: Detail {
+        didSet { didSetDomain() }
+    }
     private var backdropImages: [String] {
-        let images = domain?.images?.backdrops.map(\.filePath)
+        let images = domain.images?.backdrops.map(\.filePath)
         return Array(images?.prefix(5) ?? [])
     }
+    private let activityIndicatorView = UIActivityIndicatorView(style: .large)
     
+    init(_ movie: Movie) {
+        self.domain = Detail(movie: movie)
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,6 +59,10 @@ final class DetailViewController: UIViewController {
         configureUI()
         
         configureLayout()
+        
+        fetchImages()
+        
+        fetchCredits()
     }
 }
 
@@ -73,6 +92,8 @@ private extension DetailViewController {
         configurePosterLabel()
         
         contentView.addSubview(posterCollectionView)
+        
+        configureActivityIndicatorView()
     }
     
     func configureLayout() {
@@ -92,7 +113,7 @@ private extension DetailViewController {
         
         backdropPageControl.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.bottom.equalTo(backdropCollectionView).inset(12)
+            make.bottom.equalTo(backdropCollectionView.snp.bottom).inset(12)
         }
         
         hstack.snp.makeConstraints { make in
@@ -126,6 +147,10 @@ private extension DetailViewController {
             make.top.equalTo(posterLabel.snp.bottom)
             make.height.equalTo(180 + 24)
             make.bottom.equalToSuperview()
+        }
+        
+        activityIndicatorView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
         }
     }
     
@@ -215,12 +240,11 @@ private extension DetailViewController {
     }
     
     func configureMovieInfoLabel() {
-        guard let movie = domain?.movie else { return }
-        let releaseDate = movie.releaseDate
-        let voteAverage = String(format: "%.1f", movie.voteAverage)
-        var genres = movie.genreIds.map(\.title).prefix(2)
-        if movie.genreIds.count > 2 {
-            genres.append("+\(movie.genreIds.count - 2)")
+        let releaseDate = domain.movie.releaseDate
+        let voteAverage = String(format: "%.1f", domain.movie.voteAverage)
+        var genres = domain.movie.genreIds.map(\.title).prefix(2)
+        if domain.movie.genreIds.count > 2 {
+            genres.append("+\(domain.movie.genreIds.count - 2)")
         }
         let releaseLabel = MovieInfoLabel(image: "calendar", text: releaseDate)
         let voteLabel = MovieInfoLabel(image: "star.fill", text: voteAverage)
@@ -261,7 +285,7 @@ private extension DetailViewController {
         ) as? CastCollectionViewCell
         guard
             let cell,
-            let cast = domain?.credits?.cast[indexPath.item]
+            let cast = domain.credits?.cast[indexPath.item]
         else { return UICollectionViewCell() }
         cell.forItemAt(cast)
         return cell
@@ -281,10 +305,64 @@ private extension DetailViewController {
         ) as? PosterCollectionViewCell
         guard
             let cell,
-            let path = domain?.images?.posters[indexPath.item]
+            let path = domain.images?.posters[indexPath.item]
         else { return UICollectionViewCell() }
         cell.forItemAt(path.filePath)
         return cell
+    }
+    
+    func configureActivityIndicatorView() {
+        activityIndicatorView.startAnimating()
+        activityIndicatorView.hidesWhenStopped = true
+        activityIndicatorView.color = .tm(.semantic(.icon(.brand)))
+        view.addSubview(activityIndicatorView)
+    }
+}
+
+// MARK: Data Bindins
+private extension DetailViewController {
+    func didSetDomain() {
+        let isLoading = domain.images == nil || domain.credits == nil
+        guard !isLoading else { return }
+        backdropCollectionView.reloadData()
+        castCollectionView.reloadData()
+        posterCollectionView.reloadData()
+        backdropPageControl.numberOfPages = backdropImages.count
+        UIView.fadeAnimate { [weak self] in
+            guard let `self` else { return }
+            activityIndicatorView.alpha = 0
+        } completion: { [weak self] _ in
+            guard let `self` else { return }
+            activityIndicatorView.stopAnimating()
+        }
+    }
+}
+
+// MARK: Functions
+private extension DetailViewController {
+    func fetchCredits() {
+        let request = CreditsRequest(id: domain.movie.id)
+        creditsClient.fetchCredits(request) { [weak self] result in
+            guard let `self` else { return }
+            switch result {
+            case .success(let success):
+                domain.credits = success
+            case .failure(let failure):
+                handleFailure(failure)
+            }
+        }
+    }
+    
+    func fetchImages() {
+        imagesClient.fetchImages(domain.movie.id) { [weak self] result in
+            guard let `self` else { return }
+            switch result {
+            case .success(let success):
+                domain.images = success
+            case .failure(let failure):
+                handleFailure(failure)
+            }
+        }
     }
 }
 
@@ -293,8 +371,8 @@ extension DetailViewController: UICollectionViewDelegate,
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         switch collectionView.tag {
         case 0: return backdropImages.count
-        case 1: return domain?.credits?.cast.count ?? 0
-        case 2: return domain?.images?.posters.count ?? 0
+        case 1: return domain.credits?.cast.count ?? 0
+        case 2: return domain.images?.posters.count ?? 0
         default: return 0
         }
     }
@@ -330,5 +408,5 @@ extension DetailViewController: SynopsisViewDelegate {
 
 @available(iOS 17.0, *)
 #Preview {
-    DetailViewController()
+    DetailViewController(.mock)
 }

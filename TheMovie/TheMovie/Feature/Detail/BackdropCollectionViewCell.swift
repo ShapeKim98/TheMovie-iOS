@@ -16,11 +16,12 @@ final class BackdropCollectionViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        imageView.contentMode = .scaleAspectFill
         contentView.addSubview(imageView)
         
         imageView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
-            make.height.equalTo(imageView.snp.width).multipliedBy(0.7)
+            make.height.equalTo(contentView.snp.width).multipliedBy(0.7)
         }
     }
     
