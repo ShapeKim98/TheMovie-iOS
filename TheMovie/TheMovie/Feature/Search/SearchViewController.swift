@@ -11,14 +11,29 @@ import SnapKit
 
 final class SearchViewController: UIViewController {
     private let searchTableView = UITableView()
+    private let searchController = UISearchController()
+    private let activityIndicatorView = UIActivityIndicatorView(style: .large)
     
-    @UserDefaults(
-        forKey: .userDefaults(.movieBox),
-        defaultValue: [String: Int]()
-    )
+    @UserDefaults(forKey: .userDefaults(.movieBox))
     private var movieBox: [String: Int]?
     
-    private var domain: Search? = .mock
+    private let searchClient = SearchClient.shared
+    
+    private var domain: Search? {
+        didSet { didSetDomain() }
+    }
+    
+    init(query: String = "") {
+        searchController.searchBar.text = query
+        super.init(nibName: nil, bundle: nil)
+        if !query.isEmpty {
+            fetchSearch(query: query)
+        }
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,6 +51,8 @@ private extension SearchViewController {
         
         configureNavigation()
         
+        configureActivityIndicatorView()
+        
         configureSearchController()
         
         configureTableView()
@@ -46,6 +63,10 @@ private extension SearchViewController {
             make.verticalEdges.equalTo(view.safeAreaLayoutGuide)
             make.horizontalEdges.equalToSuperview().inset(16)
         }
+        
+        activityIndicatorView.snp.makeConstraints { make in
+            make.center.equalTo(searchTableView)
+        }
     }
     
     func configureNavigation() {
@@ -53,7 +74,6 @@ private extension SearchViewController {
     }
     
     func configureSearchController() {
-        let searchController = UISearchController()
         searchController.searchBar.placeholder = "영화를 검색해보세요."
         searchController.automaticallyShowsCancelButton = false
         searchController.searchBar.delegate = self
@@ -80,11 +100,57 @@ private extension SearchViewController {
         searchTableView.separatorInset = .zero
         view.addSubview(searchTableView)
     }
+    
+    func configureActivityIndicatorView() {
+        activityIndicatorView.stopAnimating()
+        activityIndicatorView.hidesWhenStopped = true
+        activityIndicatorView.color = .tm(.semantic(.icon(.brand)))
+        view.addSubview(activityIndicatorView)
+    }
+}
+
+// MARK: Data Bindings
+private extension SearchViewController {
+    func didSetDomain() {
+        searchTableView.reloadData()
+        
+        let isLoading = domain == nil
+        UIView.fadeAnimate { [weak self] in
+            guard let `self` else { return }
+            activityIndicatorView.alpha = isLoading ? 1 : 0
+            searchTableView.alpha = isLoading ? 0 : 1
+        } completion: { [weak self] _ in
+            guard let `self` else { return }
+            if isLoading {
+                activityIndicatorView.startAnimating()
+            } else {
+                activityIndicatorView.stopAnimating()
+            }
+        }
+    }
+}
+
+// MARK: Functions
+private extension SearchViewController {
+    func fetchSearch(query: String) {
+        let request = SearchRequest(query: query, page: 1)
+        searchClient.fetchSearch(request) { [weak self] result in
+            guard let `self` else { return }
+            switch result {
+            case .success(let success):
+                domain = success
+            case .failure(let failure):
+                handleFailure(failure)
+            }
+        }
+    }
 }
 
 extension SearchViewController: UISearchBarDelegate {
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
-        
+        guard let text = searchBar.text else { return }
+        domain = nil
+        fetchSearch(query: text)
     }
 }
 
