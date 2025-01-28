@@ -9,7 +9,7 @@ import Foundation
 
 struct SearchRequest {
     let query: String
-    let includeAdult: Bool = false
+    let include_adult: Bool = false
     let language: String = "ko-KR"
     let page: Int
 }

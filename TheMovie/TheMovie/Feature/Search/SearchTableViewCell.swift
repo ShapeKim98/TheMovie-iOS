@@ -47,7 +47,7 @@ final class SearchTableViewCell: UITableViewCell {
     }
     
     func forRowAt(_ movie: Movie, isSelected: Bool) {
-        let url = URL(string: .imageBaseURL + "/w300" + movie.posterPath)
+        let url = URL(string: .imageBaseURL + "/w300" + (movie.posterPath ?? ""))
         posterImageView.kf.indicatorType = .activity
         posterImageView.kf.setImage(
             with: url,
@@ -74,6 +74,10 @@ final class SearchTableViewCell: UITableViewCell {
             genreLabels.append(label)
             hstack.addArrangedSubview(label)
         }
+    }
+    
+    func cancelImageDownload() {
+        posterImageView.kf.cancelDownloadTask()
     }
 }
 
