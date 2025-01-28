@@ -64,6 +64,10 @@ final class DayCollectionViewCell: UICollectionViewCell {
         favoriteButton.isSelected = isSelected
         favoriteButton.tag = movie.id
     }
+    
+    func updateFavoriteButton() {
+        favoriteButton.isSelected.toggle()
+    }
 }
 
 // MARK: Configure Views

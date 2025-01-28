@@ -193,6 +193,17 @@ extension DayViewController: UICollectionViewDataSource,
         cell.delegate = self
         return cell
     }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let movie = domain?.results[indexPath.item] else {
+            return
+        }
+        let cell = collectionView.cellForItem(at: indexPath)
+        let viewController = DetailViewController(movie)
+        viewController.delegate = self
+        push(viewController, source: cell)
+        collectionView.deselectItem(at: indexPath, animated: true)
+    }
 }
 
 extension DayViewController: RecentQueryViewDelegate {
@@ -211,6 +222,17 @@ extension DayViewController: SearchViewControllerDelegate {
     }
 }
 
+extension DayViewController: DetailViewControllerDelegate {
+    func favoriteButtonTouchUpInside(movieId: Int) {
+        let index = domain?.results.firstIndex(where: { $0.id == movieId })
+        guard let index else { return }
+        let indexPath = IndexPath(row: index, section: 0)
+        let cell = dayCollectionView.cellForItem(at: indexPath)
+        (cell as? DayCollectionViewCell)?.updateFavoriteButton()
+        profileView.updateMovieBoxLabel()
+    }
+}
+
 extension DayViewController: DayCollectionViewCellDelegate {
     func favoritButtonTouchUpInside(_ movieId: Int) {
         let movieIdString = String(movieId)
@@ -220,7 +242,6 @@ extension DayViewController: DayCollectionViewCellDelegate {
             movieBox?.updateValue(movieId, forKey: movieIdString)
         }
         profileView.updateMovieBoxLabel()
-        print(movieBox)
     }
 }
 

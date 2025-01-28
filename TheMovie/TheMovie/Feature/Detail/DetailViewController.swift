@@ -9,6 +9,10 @@ import UIKit
 
 import SnapKit
 
+protocol DetailViewControllerDelegate: AnyObject {
+    func favoriteButtonTouchUpInside(movieId: Int)
+}
+
 final class DetailViewController: UIViewController {
     private let scrollView = UIScrollView()
     private let contentView = UIView()
@@ -46,6 +50,8 @@ final class DetailViewController: UIViewController {
         let images = domain.images?.backdrops.map(\.filePath)
         return Array(images?.prefix(5) ?? [])
     }
+    
+    weak var delegate: (any DetailViewControllerDelegate)?
     
     init(_ movie: Movie) {
         self.domain = Detail(movie: movie)
@@ -392,6 +398,7 @@ private extension DetailViewController {
         } else {
             movieBox?.updateValue(domain.movie.id, forKey: movieIdString)
         }
+        delegate?.favoriteButtonTouchUpInside(movieId: domain.movie.id)
     }
 }
 

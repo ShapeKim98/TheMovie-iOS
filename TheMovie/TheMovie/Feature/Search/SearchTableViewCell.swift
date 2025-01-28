@@ -81,6 +81,10 @@ final class SearchTableViewCell: UITableViewCell {
     func cancelImageDownload() {
         posterImageView.kf.cancelDownloadTask()
     }
+    
+    func updateFavoriteButton() {
+        favoriteButton.isSelected.toggle()
+    }
 }
 
 // MARK: Configure Views
