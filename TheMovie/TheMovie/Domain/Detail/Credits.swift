@@ -16,7 +16,7 @@ extension Credits {
     struct Cast: Decodable {
         let name: String
         let character: String
-        let profilePath: String
+        let profilePath: String?
         
         enum CodingKeys: String, CodingKey {
             case name, character

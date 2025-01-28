@@ -29,7 +29,7 @@ final class BackdropCollectionViewCell: UICollectionViewCell {
     }
     
     func forItemAt(_ path: String) {
-        let url = URL(string: "https://image.tmdb.org/t/p/w1280\(path)")
+        let url = URL(string: .imageBaseURL + "/w1280" + path)
         imageView.kf.indicatorType = .activity
         imageView.kf.setImage(
             with: url,
