@@ -79,9 +79,10 @@ private extension SearchViewController {
         searchController.searchBar.delegate = self
         searchController.searchBar.barStyle = .black
         searchController.searchBar.tintColor = .tm(.semantic(.text(.primary)))
-        let backgroundColor = UIColor.tm(.semantic(.background(.secondary))).withAlphaComponent(0.2)
-        searchController.searchBar.searchTextField.backgroundColor = backgroundColor
-        searchController.searchBar.searchTextField.leftView?.tintColor = .tm(.semantic(.icon(.tertiary)))
+        let textField = searchController.searchBar.searchTextField
+        let backgroundColor = UIColor.tm(.semantic(.background(.secondary)), alpha: 0.2)
+        textField.backgroundColor = backgroundColor
+        textField.leftView?.tintColor = .tm(.semantic(.icon(.tertiary)))
         
         navigationItem.hidesSearchBarWhenScrolling = false
         navigationItem.searchController = searchController

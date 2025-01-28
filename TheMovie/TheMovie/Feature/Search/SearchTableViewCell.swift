@@ -174,7 +174,7 @@ private extension SearchTableViewCell {
         
         init(genre: String) {
             super.init(frame: .zero)
-            backgroundColor = .tm(.semantic(.background(.secondary))).withAlphaComponent(0.6)
+            backgroundColor = .tm(.semantic(.background(.secondary)), alpha: 0.6)
             layer.cornerRadius = 4
             label.text = genre
             label.font = .tm(.caption)
