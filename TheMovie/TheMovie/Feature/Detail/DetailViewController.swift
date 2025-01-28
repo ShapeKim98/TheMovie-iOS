@@ -20,6 +20,7 @@ final class DetailViewController: UIViewController {
     private lazy var synopsisView: SynopsisView = {
         SynopsisView(overview: domain?.movie.overview ?? "")
     }()
+    private let castLabel = UILabel()
     private lazy var castCollectionView: UICollectionView = {
         configureCastCollectionView()
     }()
@@ -55,6 +56,8 @@ private extension DetailViewController {
         
         configureSynopsisView()
         
+        configureCastLabel()
+        
         view.addSubview(castCollectionView)
     }
     
@@ -79,9 +82,14 @@ private extension DetailViewController {
             make.horizontalEdges.equalToSuperview().inset(16)
         }
         
+        castLabel.snp.makeConstraints { make in
+            make.top.equalTo(synopsisView.snp.bottom).offset(20)
+            make.leading.equalToSuperview().inset(16)
+        }
+        
         castCollectionView.snp.makeConstraints { make in
             make.horizontalEdges.equalToSuperview()
-            make.top.equalTo(synopsisView.snp.bottom).offset(8)
+            make.top.equalTo(castLabel.snp.bottom).offset(8)
             make.height.equalTo(120 + 16 + 24)
         }
     }
@@ -176,6 +184,13 @@ private extension DetailViewController {
         hstack.spacing = 8
         hstack.distribution = .fillProportionally
         view.addSubview(hstack)
+    }
+    
+    func configureCastLabel() {
+        castLabel.text = "Cast"
+        castLabel.textColor = .tm(.semantic(.text(.primary)))
+        castLabel.font = .tm(.headline)
+        view.addSubview(castLabel)
     }
     
     func configureSynopsisView() {
