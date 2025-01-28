@@ -51,7 +51,7 @@ struct NetworkProvider<E: EndPoint>: Sendable {
 }
 
 extension String {
-    static let baseURL = "https://api.themoviedb.org/3/trending/movie"
+    static let baseURL = "https://api.themoviedb.org/3"
     
     static let imageBaseURL = "https://image.tmdb.org/t/p"
 }

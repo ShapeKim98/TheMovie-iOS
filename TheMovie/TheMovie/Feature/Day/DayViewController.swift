@@ -51,7 +51,7 @@ private extension DayViewController {
         
         configureProfileView()
         
-        view.addSubview(recentQueryView)
+        configureRecentQueryView()
     }
     
     func configureLayout() {
@@ -79,6 +79,11 @@ private extension DayViewController {
     
     func configureNavigation() {
         navigationItem.title = "오늘의 영화"
+        let image = UIImage(systemName: "magnifyingglass")
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            image: image,
+            primaryAction: UIAction(handler: searchButtonTouchUpInside)
+        )
         setTMBackButton()
     }
     
@@ -114,6 +119,11 @@ private extension DayViewController {
         activityIndicatorView.hidesWhenStopped = true
         activityIndicatorView.color = .tm(.semantic(.icon(.brand)))
         view.addSubview(activityIndicatorView)
+    }
+    
+    func configureRecentQueryView() {
+        recentQueryView.delegate = self
+        view.addSubview(recentQueryView)
     }
 }
 
@@ -151,6 +161,16 @@ private extension DayViewController {
             }
         }
     }
+    
+    func searchButtonTouchUpInside(_ action: UIAction) {
+        let viewController = SearchViewController()
+        viewController.delegate = self
+        push(viewController)
+    }
+    
+    func profileViewButtonTouchUpInside(_ action: UIAction) {
+        
+    }
 }
 
 extension DayViewController: UICollectionViewDataSource,
@@ -175,6 +195,22 @@ extension DayViewController: UICollectionViewDataSource,
     }
 }
 
+extension DayViewController: RecentQueryViewDelegate {
+    func textButtonTouchUpInside(text: String) {
+        let viewController = SearchViewController(query: text)
+        viewController.delegate = self
+        push(viewController)
+    }
+}
+
+extension DayViewController: SearchViewControllerDelegate {
+    func updateRecentQueries() {
+        print(#function)
+        recentQueryView.updateQueryButton()
+        recentQueryView.layoutIfNeeded()
+    }
+}
+
 extension DayViewController: DayCollectionViewCellDelegate {
     func favoritButtonTouchUpInside(_ movieId: Int) {
         let movieIdString = String(movieId)
@@ -185,13 +221,6 @@ extension DayViewController: DayCollectionViewCellDelegate {
         }
         profileView.updateMovieBoxLabel()
         print(movieBox)
-    }
-}
-
-// MARK: Functions
-private extension DayViewController {
-    func profileViewButtonTouchUpInside(_ action: UIAction) {
-        
     }
 }
 

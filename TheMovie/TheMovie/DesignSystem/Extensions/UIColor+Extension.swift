@@ -8,7 +8,7 @@
 import UIKit
 
 extension UIColor {
-    static func tm(_ tmColor: TMColor) -> UIColor {
-        return tmColor.uiColor
+    static func tm(_ tmColor: TMColor, alpha: CGFloat = 1.0) -> UIColor {
+        return tmColor.uiColor.withAlphaComponent(alpha)
     }
 }

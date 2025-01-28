@@ -48,7 +48,7 @@ final class ProfileView: UIView {
     }
     
     private func configureUI() {
-        backgroundColor = .tm(.semantic(.background(.secondary))).withAlphaComponent(0.3)
+        backgroundColor = .tm(.semantic(.background(.secondary)), alpha: 0.3)
         layer.cornerRadius = 16
         
         configureProfileImageView()

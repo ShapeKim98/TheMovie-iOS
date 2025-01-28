@@ -38,6 +38,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             .foregroundColor: UIColor.tm(.semantic(.text(.primary)))
         ]
         root.navigationBar.tintColor = .tm(.primitive(.blue))
+        root.navigationBar.barTintColor = .tm(.primitive(.black))
         window?.rootViewController = root
         window?.makeKeyAndVisible()
     }

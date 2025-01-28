@@ -44,12 +44,13 @@ final class DayCollectionViewCell: UICollectionViewCell {
     }
     
     override func prepareForReuse() {
+        super.prepareForReuse()
         favoriteButton.isSelected = false
         delegate = nil
     }
     
     func forItemAt(_ movie: Movie, isSelected: Bool) {
-        let url = URL(string: .imageBaseURL + "/w500" + movie.posterPath)
+        let url = URL(string: .imageBaseURL + "/w500" + (movie.posterPath ?? ""))
         posterImageView.kf.indicatorType = .activity
         posterImageView.kf.setImage(
             with: url,
@@ -62,10 +63,6 @@ final class DayCollectionViewCell: UICollectionViewCell {
         overviewLabel.text = movie.overview
         favoriteButton.isSelected = isSelected
         favoriteButton.tag = movie.id
-    }
-    
-    func cancelImageDownload() {
-        posterImageView.kf.cancelDownloadTask()
     }
 }
 
