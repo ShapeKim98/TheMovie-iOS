@@ -10,6 +10,8 @@ import UIKit
 import SnapKit
 
 final class DetailViewController: UIViewController {
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
     private lazy var backdropCollectionView: UICollectionView = {
         configureBackdropCollectionView()
     }()
@@ -50,7 +52,11 @@ private extension DetailViewController {
     func configureUI() {
         view.backgroundColor = .tm(.semantic(.background(.primary)))
         
-        view.addSubview(backdropCollectionView)
+        view.addSubview(scrollView)
+        
+        scrollView.addSubview(contentView)
+        
+        contentView.addSubview(backdropCollectionView)
         
         configureBackdropPageControll()
         
@@ -62,17 +68,26 @@ private extension DetailViewController {
         
         configureCastLabel()
         
-        view.addSubview(castCollectionView)
+        contentView.addSubview(castCollectionView)
         
         configurePosterLabel()
         
-        view.addSubview(posterCollectionView)
+        contentView.addSubview(posterCollectionView)
     }
     
     func configureLayout() {
+        scrollView.snp.makeConstraints { make in
+            make.edges.equalTo(view.safeAreaLayoutGuide)
+        }
+        
+        contentView.snp.makeConstraints { make in
+            make.width.equalToSuperview()
+            make.verticalEdges.equalToSuperview()
+        }
+        
         backdropCollectionView.snp.makeConstraints { make in
-            make.top.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
-            make.height.equalTo(view.snp.width).multipliedBy(0.7)
+            make.top.horizontalEdges.equalToSuperview()
+            make.height.equalTo(contentView.snp.width).multipliedBy(0.7)
         }
         
         backdropPageControl.snp.makeConstraints { make in
@@ -110,6 +125,7 @@ private extension DetailViewController {
             make.horizontalEdges.equalToSuperview()
             make.top.equalTo(posterLabel.snp.bottom)
             make.height.equalTo(180 + 24)
+            make.bottom.equalToSuperview()
         }
     }
     
@@ -195,7 +211,7 @@ private extension DetailViewController {
     func configureBackdropPageControll() {
         backdropPageControl.numberOfPages = backdropImages.count
         backdropPageControl.currentPage = 0
-        view.addSubview(backdropPageControl)
+        contentView.addSubview(backdropPageControl)
     }
     
     func configureMovieInfoLabel() {
@@ -223,19 +239,19 @@ private extension DetailViewController {
         hstack.axis = .horizontal
         hstack.spacing = 8
         hstack.distribution = .fillProportionally
-        view.addSubview(hstack)
+        contentView.addSubview(hstack)
     }
     
     func configureCastLabel() {
         castLabel.text = "Cast"
         castLabel.textColor = .tm(.semantic(.text(.primary)))
         castLabel.font = .tm(.headline)
-        view.addSubview(castLabel)
+        contentView.addSubview(castLabel)
     }
     
     func configureSynopsisView() {
         synopsisView.delegate = self
-        view.addSubview(synopsisView)
+        contentView.addSubview(synopsisView)
     }
     
     func configureCastCell(_ collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell {
@@ -255,7 +271,7 @@ private extension DetailViewController {
         posterLabel.text = "Poster"
         posterLabel.textColor = .tm(.semantic(.text(.primary)))
         posterLabel.font = .tm(.headline)
-        view.addSubview(posterLabel)
+        contentView.addSubview(posterLabel)
     }
     
     func configurePosterCell(_ collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell {
