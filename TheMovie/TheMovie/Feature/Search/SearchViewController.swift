@@ -22,6 +22,7 @@ final class SearchViewController: UIViewController {
     private var domain: Search? {
         didSet { didSetDomain() }
     }
+    private var isPaging: Bool = false
     
     init(query: String = "") {
         searchController.searchBar.text = query
@@ -91,6 +92,7 @@ private extension SearchViewController {
     func configureTableView() {
         searchTableView.delegate = self
         searchTableView.dataSource = self
+        searchTableView.prefetchDataSource = self
         searchTableView.backgroundColor = .clear
         searchTableView.register(
             SearchTableViewCell.self,
@@ -145,6 +147,28 @@ private extension SearchViewController {
             }
         }
     }
+    
+    func paginationSearch() {
+        guard
+            let domain,
+            domain.totalPages > domain.page,
+            !isPaging,
+            let text = searchController.searchBar.text
+        else { return }
+        let request = SearchRequest(query: text, page: domain.page + 1)
+        searchClient.fetchSearch(request) { [weak self] result in
+            guard let `self` else { return }
+            switch result {
+            case .success(let success):
+                self.domain?.page = success.page
+                self.domain?.totalPages = success.totalPages
+                self.domain?.totalResults = success.totalResults
+                self.domain?.results += success.results
+            case .failure(let failure):
+                handleFailure(failure)
+            }
+        }
+    }
 }
 
 extension SearchViewController: UISearchBarDelegate {
@@ -156,7 +180,8 @@ extension SearchViewController: UISearchBarDelegate {
 }
 
 extension SearchViewController: UITableViewDelegate,
-                                UITableViewDataSource {
+                                UITableViewDataSource,
+                                UITableViewDataSourcePrefetching {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         domain?.results.count ?? 0
     }
@@ -174,6 +199,24 @@ extension SearchViewController: UITableViewDelegate,
         cell.delegate = self
         cell.forRowAt(movie, isSelected: isSelected)
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        guard domain?.results.count == indexPath.row + 2 else { return }
+        paginationSearch()
+    }
+    
+    func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
+        for indexPath in indexPaths {
+            guard
+                domain?.results.count == indexPath.row + 2
+            else { continue }
+            paginationSearch()
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        (cell as? SearchTableViewCell)?.cancelImageDownload()
     }
 }
 

@@ -8,10 +8,10 @@
 import Foundation
 
 struct Search: Decodable {
-    let page: Int
-    let results: [Movie]
-    let totalPages: Int
-    let totalResults: Int
+    var page: Int
+    var results: [Movie]
+    var totalPages: Int
+    var totalResults: Int
 }
 
 extension Search {
