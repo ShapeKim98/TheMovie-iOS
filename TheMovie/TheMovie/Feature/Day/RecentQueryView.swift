@@ -47,6 +47,21 @@ final class RecentQueryView: UIView {
             button.layoutIfNeeded()
         }
     }
+    
+    func updateQueryButton() {
+        for button in queryButtons {
+            contentView.removeArrangedSubview(button)
+            button.removeFromSuperview()
+        }
+        queryButtons.removeAll()
+        for query in recentQueries ?? [] {
+            let button = QueryButton(text: query)
+            button.delegate = self
+            queryButtons.append(button)
+            contentView.addArrangedSubview(button)
+        }
+        contentView.layoutIfNeeded()
+    }
 }
 
 // MARK: Configure Views

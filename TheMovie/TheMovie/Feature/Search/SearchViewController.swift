@@ -9,6 +9,10 @@ import UIKit
 
 import SnapKit
 
+protocol SearchViewControllerDelegate: AnyObject {
+    func updateRecentQueries()
+}
+
 final class SearchViewController: UIViewController {
     private let searchTableView = UITableView()
     private let searchController = UISearchController()
@@ -17,6 +21,8 @@ final class SearchViewController: UIViewController {
     
     @UserDefaults(forKey: .userDefaults(.movieBox))
     private var movieBox: [String: Int]?
+    @UserDefaults(forKey: .userDefaults(.recentQueries))
+    private var recentQueries: [String]?
     
     private let searchClient = SearchClient.shared
     
@@ -24,13 +30,14 @@ final class SearchViewController: UIViewController {
         didSet { didSetDomain() }
     }
     private var isPaging: Bool = false
+    private let firstQuery: String
+    
+    weak var delegate: (any SearchViewControllerDelegate)?
     
     init(query: String = "") {
         searchController.searchBar.text = query
+        self.firstQuery = query
         super.init(nibName: nil, bundle: nil)
-        if !query.isEmpty {
-            fetchSearch(query: query)
-        }
     }
     
     required init?(coder: NSCoder) {
@@ -43,6 +50,16 @@ final class SearchViewController: UIViewController {
         configureUI()
         
         configureLayout()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        if !firstQuery.isEmpty {
+            fetchSearch(query: firstQuery)
+        }
+        
+        searchController.isActive = true
     }
 }
 
@@ -84,9 +101,12 @@ private extension SearchViewController {
     func configureSearchController() {
         searchController.searchBar.placeholder = "영화를 검색해보세요."
         searchController.automaticallyShowsCancelButton = false
-        searchController.searchBar.delegate = self
+        searchController.searchBar.searchTextField.delegate = self
+        searchController.delegate = self
+        searchController.searchBar.searchTextField.keyboardAppearance = .dark
         searchController.searchBar.barStyle = .black
         searchController.searchBar.tintColor = .tm(.semantic(.text(.primary)))
+        searchController.hidesNavigationBarDuringPresentation = false
         let textField = searchController.searchBar.searchTextField
         let backgroundColor = UIColor.tm(.semantic(.background(.secondary)), alpha: 0.2)
         textField.backgroundColor = backgroundColor
@@ -154,6 +174,9 @@ private extension SearchViewController {
 // MARK: Functions
 private extension SearchViewController {
     func fetchSearch(query: String) {
+        guard !query.isEmpty else { return }
+        
+        updateRecentQueries(query: query)
         let request = SearchRequest(query: query, page: 1)
         searchClient.fetchSearch(request) { [weak self] result in
             guard let `self` else { return }
@@ -187,13 +210,37 @@ private extension SearchViewController {
             }
         }
     }
+    
+    func updateRecentQueries(query: String) {
+        defer { delegate?.updateRecentQueries() }
+        guard let recentQueries else {
+            self.recentQueries = [query]
+            return
+        }
+        guard let index = recentQueries.firstIndex(of: query) else {
+            self.recentQueries?.insert(query, at: 0)
+            return
+        }
+        self.recentQueries?.remove(at: index)
+        self.recentQueries?.insert(query, at: 0)
+    }
 }
 
-extension SearchViewController: UISearchBarDelegate {
-    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
-        guard let text = searchBar.text else { return }
+extension SearchViewController: UITextFieldDelegate, UISearchControllerDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        guard let text = textField.text, !text.isEmpty else { return true }
         domain = nil
         fetchSearch(query: text)
+        searchController.searchBar.searchTextField.resignFirstResponder()
+        return true
+    }
+    
+    func didPresentSearchController(_ searchController: UISearchController) {
+        DispatchQueue.main.async {
+            if searchController.searchBar.text?.isEmpty ?? true {
+                searchController.searchBar.searchTextField.becomeFirstResponder()
+            }
+        }
     }
 }
 
