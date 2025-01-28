@@ -13,6 +13,7 @@ final class SearchViewController: UIViewController {
     private let searchTableView = UITableView()
     private let searchController = UISearchController()
     private let activityIndicatorView = UIActivityIndicatorView(style: .large)
+    private let emptyLabel = UILabel()
     
     @UserDefaults(forKey: .userDefaults(.movieBox))
     private var movieBox: [String: Int]?
@@ -56,6 +57,8 @@ private extension SearchViewController {
         
         configureSearchController()
         
+        configureEmptyLabel()
+        
         configureTableView()
     }
     
@@ -66,6 +69,10 @@ private extension SearchViewController {
         }
         
         activityIndicatorView.snp.makeConstraints { make in
+            make.center.equalTo(searchTableView)
+        }
+        
+        emptyLabel.snp.makeConstraints { make in
             make.center.equalTo(searchTableView)
         }
     }
@@ -110,6 +117,14 @@ private extension SearchViewController {
         activityIndicatorView.color = .tm(.semantic(.icon(.brand)))
         view.addSubview(activityIndicatorView)
     }
+    
+    func configureEmptyLabel() {
+        emptyLabel.isHidden = true
+        emptyLabel.text = "원하는 검색결과를 찾지 못했습니다."
+        emptyLabel.textColor = .tm(.semantic(.text(.tertiary)))
+        emptyLabel.font = .tm(.caption)
+        view.addSubview(emptyLabel)
+    }
 }
 
 // MARK: Data Bindings
@@ -118,8 +133,10 @@ private extension SearchViewController {
         searchTableView.reloadData()
         
         let isLoading = domain == nil
+        let isEmpty = domain?.results.isEmpty ?? true
         UIView.fadeAnimate { [weak self] in
             guard let `self` else { return }
+            emptyLabel.alpha = isEmpty ? 1 : 0
             activityIndicatorView.alpha = isLoading ? 1 : 0
             searchTableView.alpha = isLoading ? 0 : 1
         } completion: { [weak self] _ in
@@ -129,6 +146,7 @@ private extension SearchViewController {
             } else {
                 activityIndicatorView.stopAnimating()
             }
+            emptyLabel.isHidden = !isEmpty
         }
     }
 }
