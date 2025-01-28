@@ -52,4 +52,14 @@ extension UIViewController {
         alert.addAction(confirm)
         present(alert, animated: true)
     }
+    
+    func navigation(_ viewController: UIViewController) -> UINavigationController {
+        let navigation = UINavigationController(rootViewController: viewController)
+        navigation.navigationBar.titleTextAttributes = [
+            .foregroundColor: UIColor.tm(.semantic(.text(.primary)))
+        ]
+        navigation.navigationBar.tintColor = .tm(.primitive(.blue))
+        navigation.navigationBar.barTintColor = .tm(.primitive(.black))
+        return navigation
+    }
 }
