@@ -169,7 +169,7 @@ private extension SearchTableViewCell {
 private extension SearchTableViewCell {
     func favoritButtonTouchUpInside(_ action: UIAction) {
         guard let button = action.sender as? UIButton else { return }
-        favoriteButton.isSelected.toggle()
+        button.isSelected.toggle()
         delegate?.favoritButtonTouchUpInside(button.tag)
     }
 }

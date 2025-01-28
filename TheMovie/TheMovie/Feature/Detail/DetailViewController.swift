@@ -30,9 +30,14 @@ final class DetailViewController: UIViewController {
     private lazy var posterCollectionView: UICollectionView = {
         configurePosterCollectionView()
     }()
+    private let activityIndicatorView = UIActivityIndicatorView(style: .large)
+    private let favoriteButton = TMFavoriteButton()
     
     private let imagesClient = ImagesClient.shared
     private let creditsClient = CreditsClient.shared
+    
+    @UserDefaults(forKey: .userDefaults(.movieBox))
+    private var movieBox: [String: Int]?
     
     private var domain: Detail {
         didSet { didSetDomain() }
@@ -41,7 +46,6 @@ final class DetailViewController: UIViewController {
         let images = domain.images?.backdrops.map(\.filePath)
         return Array(images?.prefix(5) ?? [])
     }
-    private let activityIndicatorView = UIActivityIndicatorView(style: .large)
     
     init(_ movie: Movie) {
         self.domain = Detail(movie: movie)
@@ -70,6 +74,8 @@ final class DetailViewController: UIViewController {
 private extension DetailViewController {
     func configureUI() {
         view.backgroundColor = .tm(.semantic(.background(.primary)))
+        
+        configureNavigation()
         
         view.addSubview(scrollView)
         
@@ -222,6 +228,17 @@ private extension DetailViewController {
         return collectionView
     }
     
+    func configureNavigation() {
+        navigationItem.title = domain.movie.title
+        let isSelected = movieBox?.contains(where: { $0.key == "\(domain.movie.id)" }) ?? false
+        favoriteButton.isSelected = isSelected
+        favoriteButton.addAction(
+            UIAction(handler: favoriteButtonTouchUpInside),
+            for: .touchUpInside
+        )
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: favoriteButton)
+    }
+    
     func configureBackdropCell(_ collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: .backdropCollectionCell,
@@ -362,6 +379,18 @@ private extension DetailViewController {
             case .failure(let failure):
                 handleFailure(failure)
             }
+        }
+    }
+    
+    func favoriteButtonTouchUpInside(_ action: UIAction) {
+        guard let button = action.sender as? UIButton else { return }
+        button.isSelected.toggle()
+        
+        let movieIdString = String(domain.movie.id)
+        if movieBox?.contains(where: { $0.key == movieIdString }) ?? false {
+            movieBox?.removeValue(forKey: movieIdString)
+        } else {
+            movieBox?.updateValue(domain.movie.id, forKey: movieIdString)
         }
     }
 }
