@@ -169,7 +169,10 @@ private extension DayViewController {
     }
     
     func profileViewButtonTouchUpInside(_ action: UIAction) {
-        
+        let viewController = ProfileViewController(mode: .edit)
+        viewController.delegate = self
+        let navigation = navigation(viewController)
+        present(navigation, animated: true)
     }
 }
 
@@ -219,6 +222,12 @@ extension DayViewController: SearchViewControllerDelegate {
         print(#function)
         recentQueryView.updateQueryButton()
         recentQueryView.layoutIfNeeded()
+    }
+}
+
+extension DayViewController: ProfileViewControllerDelegate {
+    func dismiss() {
+        profileView.updateProfile()
     }
 }
 

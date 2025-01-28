@@ -9,6 +9,10 @@ import UIKit
 
 import SnapKit
 
+protocol ProfileViewControllerDelegate: AnyObject {
+    func dismiss()
+}
+
 final class ProfileViewController: UIViewController {
     private lazy var profileButton = TMProfileButton(
         profileImageId ?? 0,
@@ -33,6 +37,8 @@ final class ProfileViewController: UIViewController {
         didSet { didSetIsValidNickname() }
     }
     private let mode: Mode
+    
+    weak var delegate: (any ProfileViewControllerDelegate)?
     
     init(mode: Mode) {
         self.mode = mode
@@ -86,6 +92,17 @@ private extension ProfileViewController {
     
     func configureNavigation() {
         navigationItem.title = mode.title
+        if mode == .edit {
+            navigationItem.leftBarButtonItem = UIBarButtonItem(
+                image: UIImage(systemName: "xmark"),
+                primaryAction: UIAction(handler: backButtonTouchUpInside)
+            )
+            
+            navigationItem.rightBarButtonItem = UIBarButtonItem(
+                title: "저장",
+                primaryAction: UIAction(handler: saveButtonTouchUpInside)
+            )
+        }
         setTMBackButton()
     }
     
@@ -108,6 +125,7 @@ private extension ProfileViewController {
     }
     
     func configureCompleteButton() {
+        completeButton.isHidden = mode == .edit
         completeButton.isEnabled = nickname != nil
         completeButton.addAction(
             UIAction(handler: completeButtonTouchUpInside),
@@ -121,6 +139,7 @@ private extension ProfileViewController {
 private extension ProfileViewController {
     func didSetIsValidNickname() {
         completeButton.isEnabled = isValidNickname
+        navigationItem.rightBarButtonItem?.isEnabled = isValidNickname
     }
 }
 
@@ -165,11 +184,29 @@ private extension ProfileViewController {
         isValidNickname = true
         nicknameTextField.updateState(.조건에_맞는_경우)
     }
+    
+    func backButtonTouchUpInside(_ action: UIAction) {
+        dismiss(animated: true)
+    }
+    
+    func saveButtonTouchUpInside(_ action: UIAction) {
+        guard let text = nicknameTextField.textField.text else {
+            return
+        }
+        nickname = text
+        profileImageId = profileButton.id
+        isProfileCompleted = true
+        dismiss(animated: true) { [weak self] in
+            guard let `self` else { return }
+            delegate?.dismiss()
+        }
+    }
 }
 
 extension ProfileViewController: ProfileImageViewControllerDelegate {
     func didSetSelectedId(selectedId: Int) {
         profileButton.setProfile(id: selectedId)
+        profileButton.id = selectedId
     }
 }
 

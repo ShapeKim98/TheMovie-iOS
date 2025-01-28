@@ -43,6 +43,14 @@ final class ProfileView: UIView {
         button.addAction(UIAction(handler: action), for: .touchUpInside)
     }
     
+    func updateProfile() {
+        button.configuration?.attributedTitle = .make(nickname ?? "", [
+            .foregroundColor: UIColor.tm(.semantic(.text(.primary))),
+            .font: UIFont.tm(.title)
+        ])
+        profileImageView.setProfileImage(.profile(id: profileImageId ?? 0))
+    }
+    
     func updateMovieBoxLabel() {
         movieBoxLabel.text = "\(movieBox?.count ?? 0)개의 무비박스 보관중"
     }

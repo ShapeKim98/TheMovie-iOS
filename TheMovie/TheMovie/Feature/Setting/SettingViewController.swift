@@ -69,8 +69,10 @@ private extension SettingViewController {
 // MARK: Functions
 private extension SettingViewController {
     func profileViewButtonTouchUpInside(_ action: UIAction) {
-        let viewController = navigation(ProfileViewController(mode: .edit))
-        present(viewController, animated: true)
+        let viewController = ProfileViewController(mode: .edit)
+        viewController.delegate = self
+        let navigation = navigation(viewController)
+        present(navigation, animated: true)
     }
     
     func withdrawButtonTouchUpInside(_ action: UIAlertAction) {
@@ -120,6 +122,12 @@ extension SettingViewController: UITableViewDelegate,
         tableView.deselectRow(at: indexPath, animated: true)
         guard item == .탈퇴하기 else { return }
         presentWithdrawAlert()
+    }
+}
+
+extension SettingViewController: ProfileViewControllerDelegate {
+    func dismiss() {
+        profileView.updateProfile()
     }
 }
 
