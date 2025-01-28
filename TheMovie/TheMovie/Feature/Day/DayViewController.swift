@@ -17,7 +17,7 @@ final class DayViewController: UIViewController {
     }()
     private let activityIndicatorView = UIActivityIndicatorView(style: .large)
     
-    @UserDefaults(
+    @UserDefault(
         forKey: .userDefaults(.movieBox),
         defaultValue: [String: Int]()
     )

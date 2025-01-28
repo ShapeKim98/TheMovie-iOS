@@ -18,13 +18,13 @@ final class ProfileView: UIView {
         size: 40
     )
     
-    @UserDefaults(forKey: .userDefaults(.nickname))
+    @UserDefault(forKey: .userDefaults(.nickname))
     private var nickname: String?
-    @UserDefaults(forKey: .userDefaults(.profileDate))
+    @UserDefault(forKey: .userDefaults(.profileDate))
     private var profileDate: String?
-    @UserDefaults(forKey: .userDefaults(.profileImageId))
+    @UserDefault(forKey: .userDefaults(.profileImageId))
     private var profileImageId: Int?
-    @UserDefaults(forKey: .userDefaults(.movieBox))
+    @UserDefault(forKey: .userDefaults(.movieBox))
     private var movieBox: [String: Int]?
     
     init() {

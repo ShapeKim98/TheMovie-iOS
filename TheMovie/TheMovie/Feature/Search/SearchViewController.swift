@@ -19,9 +19,9 @@ final class SearchViewController: UIViewController {
     private let activityIndicatorView = UIActivityIndicatorView(style: .large)
     private let emptyLabel = UILabel()
     
-    @UserDefaults(forKey: .userDefaults(.movieBox))
+    @UserDefault(forKey: .userDefaults(.movieBox))
     private var movieBox: [String: Int]?
-    @UserDefaults(forKey: .userDefaults(.recentQueries))
+    @UserDefault(forKey: .userDefaults(.recentQueries))
     private var recentQueries: [String]?
     
     private let searchClient = SearchClient.shared

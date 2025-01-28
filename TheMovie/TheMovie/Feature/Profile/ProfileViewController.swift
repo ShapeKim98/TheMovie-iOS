@@ -17,16 +17,16 @@ final class ProfileViewController: UIViewController {
     private let nicknameTextField = NicknameTextField()
     private let completeButton = TMBoarderButton(title: "완료")
     
-    @UserDefaults(
+    @UserDefault(
         forKey: .userDefaults(.profileImageId),
         defaultValue: (0...11).randomElement() ?? 0
     )
     private var profileImageId: Int?
-    @UserDefaults(forKey: .userDefaults(.nickname))
+    @UserDefault(forKey: .userDefaults(.nickname))
     private var nickname: String?
-    @UserDefaults(forKey: .userDefaults(.profileCompleted))
+    @UserDefault(forKey: .userDefaults(.profileCompleted))
     private var isProfileCompleted: Bool?
-    @UserDefaults(forKey: .userDefaults(.profileDate))
+    @UserDefault(forKey: .userDefaults(.profileDate))
     private var profileDate: String?
     
     private var isValidNickname = false {
