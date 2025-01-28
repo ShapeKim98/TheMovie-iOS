@@ -98,6 +98,10 @@ private extension SynopsisView {
             guard let `self` else { return }
             overviewLabel.alpha = 0
             overviewLabel.alpha = 1
+            moreButton.configuration?.attributedTitle = .make(lines == 3 ? "Less" : "More", [
+                .font: UIFont.systemFont(ofSize: 14, weight: .semibold),
+                .foregroundColor: UIColor.tm(.semantic(.text(.brand)))
+            ])
         }
         delegate?.moreButtonTouchUpInside()
     }
