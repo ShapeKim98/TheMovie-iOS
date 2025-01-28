@@ -9,10 +9,16 @@ import UIKit
 
 import SnapKit
 
+protocol SynopsisViewDelegate: AnyObject {
+    func moreButtonTouchUpInside()
+}
+
 final class SynopsisView: UIView {
     private let titleLabel = UILabel()
     private let moreButton = UIButton()
     private let overviewLabel = UILabel()
+    
+    weak var delegate: (any SynopsisViewDelegate)?
     
     init(overview: String) {
         super.init(frame: .zero)
@@ -87,12 +93,13 @@ private extension SynopsisView {
 private extension SynopsisView {
     func moreButtonTouchUpInside(_ action: UIAction) {
         let lines = overviewLabel.numberOfLines
-        UIView.fadeAnimate { [weak self] in
+        overviewLabel.numberOfLines = lines == 3 ? 0 : 3
+        UIView.fadeAnimate(duration: 0.4) { [weak self] in
             guard let `self` else { return }
             overviewLabel.alpha = 0
-            overviewLabel.numberOfLines = lines == 3 ? 0 : 3
             overviewLabel.alpha = 1
         }
+        delegate?.moreButtonTouchUpInside()
     }
 }
 

@@ -7,6 +7,7 @@
 
 import UIKit
 
+import SnapKit
 
 final class MovieInfoLabel: UIView {
     private let image = UIImageView()
