@@ -20,6 +20,9 @@ final class DetailViewController: UIViewController {
     private lazy var synopsisView: SynopsisView = {
         SynopsisView(overview: domain?.movie.overview ?? "")
     }()
+    private lazy var castCollectionView: UICollectionView = {
+        configureCastCollectionView()
+    }()
     
     private var domain: Detail? = .mock
     private var backdropImages: [String] {
@@ -50,7 +53,9 @@ private extension DetailViewController {
         
         configureMovieInfoLabel()
         
-        view.addSubview(synopsisView)
+        configureSynopsisView()
+        
+        view.addSubview(castCollectionView)
     }
     
     func configureLayout() {
@@ -72,6 +77,12 @@ private extension DetailViewController {
         synopsisView.snp.makeConstraints { make in
             make.top.equalTo(hstack.snp.bottom).offset(16)
             make.horizontalEdges.equalToSuperview().inset(16)
+        }
+        
+        castCollectionView.snp.makeConstraints { make in
+            make.horizontalEdges.equalToSuperview()
+            make.top.equalTo(synopsisView.snp.bottom).offset(8)
+            make.height.equalTo(120 + 16 + 24)
         }
     }
     
@@ -96,6 +107,28 @@ private extension DetailViewController {
         collectionView.backgroundColor = .clear
         collectionView.delegate = self
         collectionView.dataSource = self
+        
+        return collectionView
+    }
+    
+    func configureCastCollectionView() -> UICollectionView {
+        let layout = UICollectionViewFlowLayout()
+        layout.itemSize = CGSize(width: 160, height: 60)
+        layout.scrollDirection = .horizontal
+        layout.minimumLineSpacing = 16
+        layout.minimumInteritemSpacing = 16
+        layout.sectionInset = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
+        
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.register(
+            CastCollectionViewCell.self,
+            forCellWithReuseIdentifier: .castCollectionCell
+        )
+        collectionView.tag = 1
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.backgroundColor = .clear
+        collectionView.showsHorizontalScrollIndicator = false
         
         return collectionView
     }
@@ -144,6 +177,24 @@ private extension DetailViewController {
         hstack.distribution = .fillProportionally
         view.addSubview(hstack)
     }
+    
+    func configureSynopsisView() {
+        synopsisView.delegate = self
+        view.addSubview(synopsisView)
+    }
+    
+    func configureCastCell(_ collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: .castCollectionCell,
+            for: indexPath
+        ) as? CastCollectionViewCell
+        guard
+            let cell,
+            let cast = domain?.credits?.cast[indexPath.item]
+        else { return UICollectionViewCell() }
+        cell.forItemAt(cast)
+        return cell
+    }
 }
 
 extension DetailViewController: UICollectionViewDelegate,
@@ -151,7 +202,7 @@ extension DetailViewController: UICollectionViewDelegate,
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         switch collectionView.tag {
         case 0: return backdropImages.count
-        case 1: return 0
+        case 1: return domain?.credits?.cast.count ?? 0
         case 2: return 0
         default: return 0
         }
@@ -162,7 +213,7 @@ extension DetailViewController: UICollectionViewDelegate,
         case 0:
             return configureBackdropCell(collectionView, indexPath: indexPath)
         case 1:
-            return UICollectionViewCell()
+            return configureCastCell(collectionView, indexPath: indexPath)
         case 2:
             return UICollectionViewCell()
         default:
@@ -173,6 +224,15 @@ extension DetailViewController: UICollectionViewDelegate,
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let index = round(scrollView.contentOffset.x / view.frame.width)
         backdropPageControl.currentPage = Int(index)
+    }
+}
+
+extension DetailViewController: SynopsisViewDelegate {
+    func moreButtonTouchUpInside() {
+        UIView.springAnimate { [weak self] in
+            guard let `self` else { return }
+            view.layoutIfNeeded()
+        }
     }
 }
 
