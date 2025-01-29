@@ -10,7 +10,7 @@ import UIKit
 import SnapKit
 
 final class DayViewController: UIViewController {
-    private let profileView = ProfileView()
+    private let profileView = TMProfileView()
     private let recentQueryView = RecentQueryView()
     private lazy var dayCollectionView = {
         return configureDayCollectionView()

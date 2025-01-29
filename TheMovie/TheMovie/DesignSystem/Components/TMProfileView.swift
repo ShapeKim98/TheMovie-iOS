@@ -9,7 +9,7 @@ import UIKit
 
 import SnapKit
 
-final class ProfileView: UIView {
+final class TMProfileView: UIView {
     private let button = UIButton()
     private let movieBoxLabel = UILabel()
     private let movieBoxLabelBackground = UIView()
