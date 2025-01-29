@@ -8,9 +8,7 @@
 import Foundation
 
 @propertyWrapper
-struct UserDefaults<T> {
-    typealias FDUserDefaults = Foundation.UserDefaults
-    
+struct UserDefault<T> {
     let key: String
     let defaultValue: T?
     
@@ -20,18 +18,18 @@ struct UserDefaults<T> {
     }
     
     var wrappedValue: T? {
-        get { (FDUserDefaults.standard.object(forKey: key) as? T) ?? defaultValue }
+        get { (UserDefaults.standard.object(forKey: key) as? T) ?? defaultValue }
         set {
             if newValue == nil {
-                FDUserDefaults.standard.removeObject(forKey: key)
+                UserDefaults.standard.removeObject(forKey: key)
             } else {
-                FDUserDefaults.standard.set(newValue, forKey: key)
+                UserDefaults.standard.set(newValue, forKey: key)
             }
         }
     }
 }
 
-enum UserDefaultsKey: String {
+enum UserDefaultsKey: String, CaseIterable {
     case profileImageId = "ProfileImageId"
     case nickname = "Nickname"
     case profileCompleted = "ProfileCompleted"

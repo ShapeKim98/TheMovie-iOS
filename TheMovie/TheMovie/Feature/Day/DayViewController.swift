@@ -10,14 +10,14 @@ import UIKit
 import SnapKit
 
 final class DayViewController: UIViewController {
-    private let profileView = ProfileView()
+    private let profileView = TMProfileView()
     private let recentQueryView = RecentQueryView()
     private lazy var dayCollectionView = {
         return configureDayCollectionView()
     }()
     private let activityIndicatorView = UIActivityIndicatorView(style: .large)
     
-    @UserDefaults(
+    @UserDefault(
         forKey: .userDefaults(.movieBox),
         defaultValue: [String: Int]()
     )
@@ -169,7 +169,10 @@ private extension DayViewController {
     }
     
     func profileViewButtonTouchUpInside(_ action: UIAction) {
-        
+        let viewController = ProfileViewController(mode: .edit)
+        viewController.delegate = self
+        let navigation = navigation(viewController)
+        present(navigation, animated: true)
     }
 }
 
@@ -219,6 +222,12 @@ extension DayViewController: SearchViewControllerDelegate {
         print(#function)
         recentQueryView.updateQueryButton()
         recentQueryView.layoutIfNeeded()
+    }
+}
+
+extension DayViewController: ProfileViewControllerDelegate {
+    func dismiss() {
+        profileView.updateProfile()
     }
 }
 

@@ -21,7 +21,7 @@ final class RecentQueryView: UIView {
     private let scrollView = UIScrollView()
     private var queryButtons = [QueryButton]()
     
-    @UserDefaults(forKey: .userDefaults(.recentQueries))
+    @UserDefault(forKey: .userDefaults(.recentQueries))
     private var recentQueries: [String]? {
         didSet { didSetRecentQueries() }
     }

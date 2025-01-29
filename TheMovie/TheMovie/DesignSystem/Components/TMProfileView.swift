@@ -9,7 +9,7 @@ import UIKit
 
 import SnapKit
 
-final class ProfileView: UIView {
+final class TMProfileView: UIView {
     private let button = UIButton()
     private let movieBoxLabel = UILabel()
     private let movieBoxLabelBackground = UIView()
@@ -18,13 +18,13 @@ final class ProfileView: UIView {
         size: 40
     )
     
-    @UserDefaults(forKey: .userDefaults(.nickname))
+    @UserDefault(forKey: .userDefaults(.nickname))
     private var nickname: String?
-    @UserDefaults(forKey: .userDefaults(.profileDate))
+    @UserDefault(forKey: .userDefaults(.profileDate))
     private var profileDate: String?
-    @UserDefaults(forKey: .userDefaults(.profileImageId))
+    @UserDefault(forKey: .userDefaults(.profileImageId))
     private var profileImageId: Int?
-    @UserDefaults(forKey: .userDefaults(.movieBox))
+    @UserDefault(forKey: .userDefaults(.movieBox))
     private var movieBox: [String: Int]?
     
     init() {
@@ -41,6 +41,14 @@ final class ProfileView: UIView {
     
     func addButtonAction(_ action: @escaping (UIAction) -> Void) {
         button.addAction(UIAction(handler: action), for: .touchUpInside)
+    }
+    
+    func updateProfile() {
+        button.configuration?.attributedTitle = .make(nickname ?? "", [
+            .foregroundColor: UIColor.tm(.semantic(.text(.primary))),
+            .font: UIFont.tm(.title)
+        ])
+        profileImageView.setProfileImage(.profile(id: profileImageId ?? 0))
     }
     
     func updateMovieBoxLabel() {
@@ -65,6 +73,7 @@ final class ProfileView: UIView {
         
         button.snp.makeConstraints { make in
             make.leading.equalTo(profileImageView.snp.trailing).offset(12)
+            make.trailing.equalToSuperview().inset(12)
             make.centerY.equalTo(profileImageView)
         }
         
@@ -98,6 +107,7 @@ final class ProfileView: UIView {
         addSubview(button)
         let image = UIImageView(image: UIImage(systemName: "chevron.right"))
         button.addSubview(image)
+        button.contentHorizontalAlignment = .leading
         image.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
             make.trailing.equalTo(self).inset(12)

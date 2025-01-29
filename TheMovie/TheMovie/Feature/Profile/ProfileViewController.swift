@@ -9,6 +9,10 @@ import UIKit
 
 import SnapKit
 
+protocol ProfileViewControllerDelegate: AnyObject {
+    func dismiss()
+}
+
 final class ProfileViewController: UIViewController {
     private lazy var profileButton = TMProfileButton(
         profileImageId ?? 0,
@@ -17,22 +21,24 @@ final class ProfileViewController: UIViewController {
     private let nicknameTextField = NicknameTextField()
     private let completeButton = TMBoarderButton(title: "완료")
     
-    @UserDefaults(
+    @UserDefault(
         forKey: .userDefaults(.profileImageId),
         defaultValue: (0...11).randomElement() ?? 0
     )
     private var profileImageId: Int?
-    @UserDefaults(forKey: .userDefaults(.nickname))
+    @UserDefault(forKey: .userDefaults(.nickname))
     private var nickname: String?
-    @UserDefaults(forKey: .userDefaults(.profileCompleted))
+    @UserDefault(forKey: .userDefaults(.profileCompleted))
     private var isProfileCompleted: Bool?
-    @UserDefaults(forKey: .userDefaults(.profileDate))
+    @UserDefault(forKey: .userDefaults(.profileDate))
     private var profileDate: String?
     
     private var isValidNickname = false {
         didSet { didSetIsValidNickname() }
     }
     private let mode: Mode
+    
+    weak var delegate: (any ProfileViewControllerDelegate)?
     
     init(mode: Mode) {
         self.mode = mode
@@ -51,6 +57,12 @@ final class ProfileViewController: UIViewController {
         
         configureLayout()
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        nicknameTextField.textField.becomeFirstResponder()
+    }
 }
 
 // MARK: Configure Views
@@ -65,6 +77,8 @@ private extension ProfileViewController {
         configureNicknameTextField()
         
         configureCompleteButton()
+        
+        configureGestureRecognizer()
     }
     
     func configureLayout() {
@@ -86,6 +100,17 @@ private extension ProfileViewController {
     
     func configureNavigation() {
         navigationItem.title = mode.title
+        if mode == .edit {
+            navigationItem.leftBarButtonItem = UIBarButtonItem(
+                image: UIImage(systemName: "xmark"),
+                primaryAction: UIAction(handler: backButtonTouchUpInside)
+            )
+            
+            navigationItem.rightBarButtonItem = UIBarButtonItem(
+                title: "저장",
+                primaryAction: UIAction(handler: saveButtonTouchUpInside)
+            )
+        }
         setTMBackButton()
     }
     
@@ -108,6 +133,7 @@ private extension ProfileViewController {
     }
     
     func configureCompleteButton() {
+        completeButton.isHidden = mode == .edit
         completeButton.isEnabled = nickname != nil
         completeButton.addAction(
             UIAction(handler: completeButtonTouchUpInside),
@@ -115,12 +141,22 @@ private extension ProfileViewController {
         )
         view.addSubview(completeButton)
     }
+    
+    func configureGestureRecognizer() {
+        view.gestureRecognizers = [
+            UITapGestureRecognizer(
+                target: self,
+                action: #selector(tapGestureRecognizer)
+            )
+        ]
+    }
 }
 
 // MARK: Data Bindings
 private extension ProfileViewController {
     func didSetIsValidNickname() {
         completeButton.isEnabled = isValidNickname
+        navigationItem.rightBarButtonItem?.isEnabled = isValidNickname
     }
 }
 
@@ -165,11 +201,34 @@ private extension ProfileViewController {
         isValidNickname = true
         nicknameTextField.updateState(.조건에_맞는_경우)
     }
+    
+    func backButtonTouchUpInside(_ action: UIAction) {
+        dismiss(animated: true)
+    }
+    
+    func saveButtonTouchUpInside(_ action: UIAction) {
+        guard let text = nicknameTextField.textField.text else {
+            return
+        }
+        nickname = text
+        profileImageId = profileButton.id
+        isProfileCompleted = true
+        dismiss(animated: true) { [weak self] in
+            guard let `self` else { return }
+            delegate?.dismiss()
+        }
+    }
+    
+    @objc
+    func tapGestureRecognizer(_ action: UITapGestureRecognizer) {
+        nicknameTextField.textField.resignFirstResponder()
+    }
 }
 
 extension ProfileViewController: ProfileImageViewControllerDelegate {
     func didSetSelectedId(selectedId: Int) {
         profileButton.setProfile(id: selectedId)
+        profileButton.id = selectedId
     }
 }
 
@@ -229,6 +288,7 @@ extension ProfileViewController {
                 string: "닉네임을 입력해주세요.",
                 attributes: [.foregroundColor: UIColor.tm(.semantic(.text(.tertiary)))]
             )
+            textField.keyboardAppearance = .dark
             addSubview(textField)
             
             background.backgroundColor = .white
