@@ -73,6 +73,7 @@ final class TMProfileView: UIView {
         
         button.snp.makeConstraints { make in
             make.leading.equalTo(profileImageView.snp.trailing).offset(12)
+            make.trailing.equalToSuperview().inset(12)
             make.centerY.equalTo(profileImageView)
         }
         
@@ -106,6 +107,7 @@ final class TMProfileView: UIView {
         addSubview(button)
         let image = UIImageView(image: UIImage(systemName: "chevron.right"))
         button.addSubview(image)
+        button.contentHorizontalAlignment = .leading
         image.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
             make.trailing.equalTo(self).inset(12)
