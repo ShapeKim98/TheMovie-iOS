@@ -57,6 +57,12 @@ final class ProfileViewController: UIViewController {
         
         configureLayout()
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        nicknameTextField.textField.becomeFirstResponder()
+    }
 }
 
 // MARK: Configure Views
@@ -71,6 +77,8 @@ private extension ProfileViewController {
         configureNicknameTextField()
         
         configureCompleteButton()
+        
+        configureGestureRecognizer()
     }
     
     func configureLayout() {
@@ -132,6 +140,15 @@ private extension ProfileViewController {
             for: .touchUpInside
         )
         view.addSubview(completeButton)
+    }
+    
+    func configureGestureRecognizer() {
+        view.gestureRecognizers = [
+            UITapGestureRecognizer(
+                target: self,
+                action: #selector(tapGestureRecognizer)
+            )
+        ]
     }
 }
 
@@ -201,6 +218,11 @@ private extension ProfileViewController {
             delegate?.dismiss()
         }
     }
+    
+    @objc
+    func tapGestureRecognizer(_ action: UITapGestureRecognizer) {
+        nicknameTextField.textField.resignFirstResponder()
+    }
 }
 
 extension ProfileViewController: ProfileImageViewControllerDelegate {
@@ -266,6 +288,7 @@ extension ProfileViewController {
                 string: "닉네임을 입력해주세요.",
                 attributes: [.foregroundColor: UIColor.tm(.semantic(.text(.tertiary)))]
             )
+            textField.keyboardAppearance = .dark
             addSubview(textField)
             
             background.backgroundColor = .white
