@@ -11,7 +11,7 @@ import Kingfisher
 import SnapKit
 
 protocol DayCollectionViewCellDelegate: AnyObject {
-    func favoritButtonTouchUpInside(_ movieId: Int)
+    func favoriteButtonTouchUpInside(_ movieId: Int)
 }
 
 final class DayCollectionViewCell: UICollectionViewCell {
@@ -142,7 +142,7 @@ private extension DayCollectionViewCell {
     func favoritButtonTouchUpInside(_ action: UIAction) {
         guard let button = action.sender as? UIButton else { return }
         favoriteButton.isSelected.toggle()
-        delegate?.favoritButtonTouchUpInside(button.tag)
+        delegate?.favoriteButtonTouchUpInside(button.tag)
     }
 }
 

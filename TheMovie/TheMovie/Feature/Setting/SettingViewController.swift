@@ -22,6 +22,13 @@ final class SettingViewController: UIViewController {
         
         configureLayout()
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        profileView.updateProfile()
+        profileView.updateMovieBoxLabel()
+    }
 }
 
 // MARK: Configure Views

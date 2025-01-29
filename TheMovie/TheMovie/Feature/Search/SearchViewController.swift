@@ -11,6 +11,7 @@ import SnapKit
 
 protocol SearchViewControllerDelegate: AnyObject {
     func updateRecentQueries()
+    func favoriteButtonTouchUpInsideFromSearch(_ movieId: Int)
 }
 
 final class SearchViewController: UIViewController {
@@ -215,16 +216,20 @@ private extension SearchViewController {
     
     func updateRecentQueries(query: String) {
         defer { delegate?.updateRecentQueries() }
+        
         guard let recentQueries else {
             self.recentQueries = [query]
+            print(#function, 1)
             return
         }
         guard let index = recentQueries.firstIndex(of: query) else {
             self.recentQueries?.insert(query, at: 0)
+            print(#function, 2)
             return
         }
         self.recentQueries?.remove(at: index)
         self.recentQueries?.insert(query, at: 0)
+        print(#function, 3)
     }
 }
 
@@ -305,11 +310,14 @@ extension SearchViewController: SearchTableViewCellDelegate {
         } else {
             movieBox?.updateValue(movieId, forKey: movieIdString)
         }
+        delegate?.favoriteButtonTouchUpInsideFromSearch(movieId)
     }
 }
 
 extension SearchViewController: DetailViewControllerDelegate {
     func favoriteButtonTouchUpInside(movieId: Int) {
+        delegate?.favoriteButtonTouchUpInsideFromSearch(movieId)
+        
         let index = domain?.results.firstIndex(where: { $0.id == movieId })
         guard let index else { return }
         let indexPath = IndexPath(row: index, section: 0)

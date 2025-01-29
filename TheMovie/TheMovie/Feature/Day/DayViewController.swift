@@ -38,6 +38,12 @@ final class DayViewController: UIViewController {
         
         fetchDay()
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        profileView.updateProfile()
+    }
 }
 
 // MARK: Configure Views
@@ -174,6 +180,16 @@ private extension DayViewController {
         let navigation = navigation(viewController)
         present(navigation, animated: true)
     }
+    
+    func updateMovieBox(_ movieId: Int) {
+        profileView.updateMovieBoxLabel()
+        
+        let index = domain?.results.firstIndex(where: { $0.id == movieId })
+        guard let index else { return }
+        let indexPath = IndexPath(row: index, section: 0)
+        let cell = dayCollectionView.cellForItem(at: indexPath)
+        (cell as? DayCollectionViewCell)?.updateFavoriteButton()
+    }
 }
 
 extension DayViewController: UICollectionViewDataSource,
@@ -223,6 +239,11 @@ extension DayViewController: SearchViewControllerDelegate {
         recentQueryView.updateQueryButton()
         recentQueryView.layoutIfNeeded()
     }
+    
+    func favoriteButtonTouchUpInsideFromSearch(_ movieId: Int) {
+        print(#function)
+        updateMovieBox(movieId)
+    }
 }
 
 extension DayViewController: ProfileViewControllerDelegate {
@@ -233,17 +254,12 @@ extension DayViewController: ProfileViewControllerDelegate {
 
 extension DayViewController: DetailViewControllerDelegate {
     func favoriteButtonTouchUpInside(movieId: Int) {
-        let index = domain?.results.firstIndex(where: { $0.id == movieId })
-        guard let index else { return }
-        let indexPath = IndexPath(row: index, section: 0)
-        let cell = dayCollectionView.cellForItem(at: indexPath)
-        (cell as? DayCollectionViewCell)?.updateFavoriteButton()
-        profileView.updateMovieBoxLabel()
+        updateMovieBox(movieId)
     }
 }
 
 extension DayViewController: DayCollectionViewCellDelegate {
-    func favoritButtonTouchUpInside(_ movieId: Int) {
+    func favoriteButtonTouchUpInside(_ movieId: Int) {
         let movieIdString = String(movieId)
         if movieBox?.contains(where: { $0.key == movieIdString }) ?? false {
             movieBox?.removeValue(forKey: movieIdString)
