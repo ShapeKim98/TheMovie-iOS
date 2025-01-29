@@ -167,69 +167,49 @@ private extension DetailViewController {
     }
     
     func configureBackdropCollectionView() -> UICollectionView {
-        let layout = UICollectionViewFlowLayout()
         let width = view.frame.width
         
+        let layout = configureFlowLayout(spacing: 0)
         layout.itemSize = CGSize(width: width, height: width * 0.7)
-        layout.scrollDirection = .horizontal
-        layout.minimumLineSpacing = 0
-        layout.minimumInteritemSpacing = 0
         layout.sectionInset = .zero
         
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(
+        let collectionView = configureCollectionView(
             BackdropCollectionViewCell.self,
-            forCellWithReuseIdentifier: .backdropCollectionCell
+            identifier: .backdropCollectionCell,
+            layout: layout
         )
         collectionView.isPagingEnabled = true
-        collectionView.showsHorizontalScrollIndicator = false
         collectionView.tag = 0
-        collectionView.backgroundColor = .clear
-        collectionView.delegate = self
-        collectionView.dataSource = self
         
         return collectionView
     }
     
     func configureCastCollectionView() -> UICollectionView {
-        let layout = UICollectionViewFlowLayout()
+        let layout = configureFlowLayout(spacing: 16)
         layout.itemSize = CGSize(width: 160, height: 60)
-        layout.scrollDirection = .horizontal
-        layout.minimumLineSpacing = 16
-        layout.minimumInteritemSpacing = 16
         layout.sectionInset = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
         
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(
+        let collectionView = configureCollectionView(
             CastCollectionViewCell.self,
-            forCellWithReuseIdentifier: .castCollectionCell
+            identifier: .castCollectionCell,
+            layout: layout
         )
         collectionView.tag = 1
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        collectionView.backgroundColor = .clear
-        collectionView.showsHorizontalScrollIndicator = false
         
         return collectionView
     }
     
     func configurePosterCollectionView() -> UICollectionView {
-        let layout = UICollectionViewFlowLayout()
+        let layout = configureFlowLayout(spacing: 12)
         layout.itemSize = CGSize(width: 100, height: 180)
-        layout.scrollDirection = .horizontal
-        layout.minimumInteritemSpacing = 12
         layout.sectionInset = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
         
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(
+        let collectionView = configureCollectionView(
             PosterCollectionViewCell.self,
-            forCellWithReuseIdentifier: .posterCollectionCell
+            identifier: .posterCollectionCell,
+            layout: layout
         )
         collectionView.tag = 2
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        collectionView.backgroundColor = .clear
-        collectionView.showsHorizontalScrollIndicator = false
         
         return collectionView
     }
@@ -245,7 +225,10 @@ private extension DetailViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: favoriteButton)
     }
     
-    func configureBackdropCell(_ collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell {
+    func configureBackdropCell(
+        _ collectionView: UICollectionView,
+        indexPath: IndexPath
+    ) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: .backdropCollectionCell,
             for: indexPath
@@ -301,7 +284,10 @@ private extension DetailViewController {
         contentView.addSubview(synopsisView)
     }
     
-    func configureCastCell(_ collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell {
+    func configureCastCell(
+        _ collectionView: UICollectionView,
+        indexPath: IndexPath
+    ) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: .castCollectionCell,
             for: indexPath
@@ -321,7 +307,10 @@ private extension DetailViewController {
         contentView.addSubview(posterLabel)
     }
     
-    func configurePosterCell(_ collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell {
+    func configurePosterCell(
+        _ collectionView: UICollectionView,
+        indexPath: IndexPath
+    ) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: .posterCollectionCell,
             for: indexPath
@@ -339,6 +328,30 @@ private extension DetailViewController {
         activityIndicatorView.hidesWhenStopped = true
         activityIndicatorView.color = .tm(.semantic(.icon(.brand)))
         view.addSubview(activityIndicatorView)
+    }
+    
+    func configureFlowLayout(spacing: CGFloat) -> UICollectionViewFlowLayout {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.minimumInteritemSpacing = spacing
+        layout.minimumLineSpacing = spacing
+        
+        return layout
+    }
+    
+    func configureCollectionView(
+        _ cellClass: AnyClass?,
+        identifier: String,
+        layout: UICollectionViewLayout
+    ) -> UICollectionView {
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.register(cellClass, forCellWithReuseIdentifier: identifier)
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.backgroundColor = .clear
+        collectionView.showsHorizontalScrollIndicator = false
+        
+        return collectionView
     }
 }
 

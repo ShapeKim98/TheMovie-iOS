@@ -18,7 +18,7 @@ final class SearchTableViewCell: UITableViewCell {
     private let posterImageView = UIImageView()
     private let titleLabel = UILabel()
     private let dateLabel = UILabel()
-    private var genreLabels = [GenreLabel]()
+    private var genreLabels = [UIView]()
     private let hstack = UIStackView()
     private let favoriteButton = TMFavoriteButton()
     
@@ -65,14 +65,14 @@ final class SearchTableViewCell: UITableViewCell {
         let genres = movie.genreIds.prefix(2)
         
         for genre in genres {
-            let label = GenreLabel(genre: genre.title)
+            let label = configureGenreLabel(genre.title)
             genreLabels.append(label)
             hstack.addArrangedSubview(label)
         }
         
         if movie.genreIds.count > 2 {
             let count = movie.genreIds.count - 2
-            let label = GenreLabel(genre: "+\(count)")
+            let label = configureGenreLabel("+\(count)")
             genreLabels.append(label)
             hstack.addArrangedSubview(label)
         }
@@ -167,6 +167,21 @@ private extension SearchTableViewCell {
         )
         contentView.addSubview(favoriteButton)
     }
+    
+    func configureGenreLabel(_ genre: String) -> UIView {
+        let container = UIView()
+        container.backgroundColor = .tm(.semantic(.background(.secondary)), alpha: 0.6)
+        container.layer.cornerRadius = 4
+        let label = UILabel()
+        label.text = genre
+        label.font = .tm(.caption)
+        label.textColor = .tm(.semantic(.text(.primary)))
+        container.addSubview(label)
+        
+        label.snp.makeConstraints { $0.edges.equalToSuperview().inset(4) }
+        
+        return container
+    }
 }
 
 // MARK: Functions
@@ -175,30 +190,6 @@ private extension SearchTableViewCell {
         guard let button = action.sender as? UIButton else { return }
         button.isSelected.toggle()
         delegate?.favoritButtonTouchUpInside(button.tag)
-    }
-}
-
-private extension SearchTableViewCell {
-    final class GenreLabel: UIView {
-        let label = UILabel()
-        
-        init(genre: String) {
-            super.init(frame: .zero)
-            backgroundColor = .tm(.semantic(.background(.secondary)), alpha: 0.6)
-            layer.cornerRadius = 4
-            label.text = genre
-            label.font = .tm(.caption)
-            label.textColor = .tm(.semantic(.text(.primary)))
-            addSubview(label)
-            
-            label.snp.makeConstraints { make in
-                make.edges.equalToSuperview().inset(4)
-            }
-        }
-        
-        required init?(coder: NSCoder) {
-            fatalError("init(coder:) has not been implemented")
-        }
     }
 }
 

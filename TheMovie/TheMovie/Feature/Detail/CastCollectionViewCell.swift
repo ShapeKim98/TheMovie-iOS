@@ -10,7 +10,7 @@ import UIKit
 import Kingfisher
 import SnapKit
 
-class CastCollectionViewCell: UICollectionViewCell {
+final class CastCollectionViewCell: UICollectionViewCell {
     private let profileImageView = UIImageView()
     private let nameLabel = UILabel()
     private let characterLabel = UILabel()

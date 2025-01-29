@@ -60,6 +60,7 @@ final class RecentQueryView: UIView {
             queryButtons.append(button)
             contentView.addArrangedSubview(button)
         }
+        didSetRecentQueries()
         contentView.layoutIfNeeded()
     }
 }
@@ -176,10 +177,12 @@ private extension RecentQueryView {
             guard let `self` else { return }
             scrollView.alpha = isEmpty ? 0 : 1
             emptyLabel.alpha = isEmpty ? 1 : 0
+            removeAllButton.alpha = isEmpty ? 0 : 1
         } completion: { [weak self] _ in
             guard let `self` else { return }
             scrollView.isHidden = isEmpty
             emptyLabel.isHidden = !isEmpty
+            removeAllButton.isHidden = isEmpty
         }
     }
 }

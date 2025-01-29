@@ -26,20 +26,21 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         var viewController: UIViewController
         if let isProfileCompleted, isProfileCompleted {
-            viewController = DayViewController()
+            viewController = ViewController()
         } else {
-            viewController = OnboardViewController()
+            let onboardViewController = UINavigationController(
+                rootViewController: OnboardViewController()
+            )
+            onboardViewController.navigationBar.titleTextAttributes = [
+                .foregroundColor: UIColor.tm(.semantic(.text(.primary)))
+            ]
+            onboardViewController.navigationBar.tintColor = .tm(.primitive(.blue))
+            onboardViewController.navigationBar.barTintColor = .tm(.primitive(.black))
+            
+            viewController = onboardViewController
         }
         
-        let root = UINavigationController(
-            rootViewController: viewController
-        )
-        root.navigationBar.titleTextAttributes = [
-            .foregroundColor: UIColor.tm(.semantic(.text(.primary)))
-        ]
-        root.navigationBar.tintColor = .tm(.primitive(.blue))
-        root.navigationBar.barTintColor = .tm(.primitive(.black))
-        window?.rootViewController = root
+        window?.rootViewController = viewController
         window?.makeKeyAndVisible()
     }
 
