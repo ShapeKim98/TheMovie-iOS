@@ -104,14 +104,16 @@ private extension SearchViewController {
     func configureSearchController() {
         searchController.searchBar.placeholder = "영화를 검색해보세요."
         searchController.automaticallyShowsCancelButton = false
-        searchController.searchBar.searchTextField.delegate = self
-        searchController.delegate = self
-        searchController.searchBar.searchTextField.keyboardAppearance = .dark
         searchController.searchBar.barStyle = .black
         searchController.searchBar.tintColor = .tm(.semantic(.text(.primary)))
         searchController.hidesNavigationBarDuringPresentation = false
+        searchController.delegate = self
+        
         let textField = searchController.searchBar.searchTextField
         let backgroundColor = UIColor.tm(.semantic(.background(.secondary)), alpha: 0.2)
+        
+        textField.delegate = self
+        textField.keyboardAppearance = .dark
         textField.backgroundColor = backgroundColor
         textField.leftView?.tintColor = .tm(.semantic(.icon(.tertiary)))
         
