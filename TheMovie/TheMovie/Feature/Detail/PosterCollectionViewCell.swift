@@ -10,7 +10,7 @@ import UIKit
 import Kingfisher
 import SnapKit
 
-class PosterCollectionViewCell: UICollectionViewCell {
+final class PosterCollectionViewCell: UICollectionViewCell {
     private let imageView = UIImageView()
     
     override init(frame: CGRect) {

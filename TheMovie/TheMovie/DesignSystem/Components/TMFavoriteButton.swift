@@ -9,7 +9,7 @@ import UIKit
 
 import SnapKit
 
-class TMFavoriteButton: UIButton {
+final class TMFavoriteButton: UIButton {
     init() {
         super.init(frame: .zero)
         
