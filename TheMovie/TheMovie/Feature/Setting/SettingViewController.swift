@@ -10,7 +10,7 @@ import UIKit
 import SnapKit
 
 final class SettingViewController: UIViewController {
-    private let profileView = ProfileView()
+    private let profileView = TMProfileView()
     private let tableView = UITableView()
     
     private let items = SettingItem.allCases
@@ -113,7 +113,11 @@ extension SettingViewController: UITableViewDelegate,
             for: indexPath
         ) as? SettingTableViewCell
         guard let cell else { return UITableViewCell() }
-        cell.forRowAt(items[indexPath.row].title)
+        let item = items[indexPath.row]
+        if item != .탈퇴하기 {
+            cell.selectionStyle = .none
+        }
+        cell.forRowAt(item.title)
         return cell
     }
     
