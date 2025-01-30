@@ -242,6 +242,8 @@ private extension DetailViewController {
     func configureBackdropPageControll() {
         backdropPageControl.numberOfPages = backdropImages.count
         backdropPageControl.currentPage = 0
+        backdropPageControl.overrideUserInterfaceStyle = .dark
+        backdropPageControl.backgroundStyle = .prominent
         contentView.addSubview(backdropPageControl)
     }
     
