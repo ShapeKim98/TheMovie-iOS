@@ -186,7 +186,7 @@ private extension DetailViewController {
     
     func configureCastCollectionView() -> UICollectionView {
         let layout = configureFlowLayout(spacing: 16)
-        layout.itemSize = CGSize(width: 160, height: 60)
+        layout.itemSize = CGSize(width: 160, height: 50)
         layout.sectionInset = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
         
         let collectionView = configureCollectionView(

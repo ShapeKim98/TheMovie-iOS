@@ -14,6 +14,7 @@ final class CastCollectionViewCell: UICollectionViewCell {
     private let profileImageView = UIImageView()
     private let nameLabel = UILabel()
     private let characterLabel = UILabel()
+    private let labelContainer = UIView()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -47,6 +48,8 @@ private extension CastCollectionViewCell {
     func configureUI() {
         configureProfileImageView()
         
+        contentView.addSubview(labelContainer)
+        
         configureNameLabel()
         
         configureCharacterLabel()
@@ -55,39 +58,45 @@ private extension CastCollectionViewCell {
     func configureLayout() {
         profileImageView.snp.makeConstraints { make in
             make.verticalEdges.leading.equalToSuperview()
-            make.size.equalTo(60)
+            make.size.equalTo(50)
+        }
+        
+        labelContainer.snp.makeConstraints { make in
+            make.leading.equalTo(profileImageView.snp.trailing).offset(6)
+            make.trailing.equalToSuperview()
+            make.centerY.equalTo(profileImageView)
         }
         
         nameLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().inset(8)
-            make.leading.equalTo(profileImageView.snp.trailing).offset(6)
-            make.trailing.equalToSuperview()
+            make.top.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
         }
         
         characterLabel.snp.makeConstraints { make in
-            make.bottom.equalToSuperview().inset(8)
-            make.leading.equalTo(profileImageView.snp.trailing).offset(6)
-            make.trailing.equalToSuperview()
+            make.bottom.equalToSuperview()
+            make.top.equalTo(nameLabel.snp.bottom).offset(6)
+            make.horizontalEdges.equalToSuperview()
         }
     }
     
     func configureProfileImageView() {
         profileImageView.contentMode = .scaleAspectFill
-        profileImageView.layer.cornerRadius = 30
+        profileImageView.layer.cornerRadius = 25
         profileImageView.clipsToBounds = true
         contentView.addSubview(profileImageView)
     }
     
     func configureNameLabel() {
-        nameLabel.font = .systemFont(ofSize: 14, weight: .bold)
+        nameLabel.font = .systemFont(ofSize: 13, weight: .bold)
         nameLabel.textColor = .tm(.semantic(.text(.primary)))
-        contentView.addSubview(nameLabel)
+        nameLabel.numberOfLines = 2
+        labelContainer.addSubview(nameLabel)
     }
     
     func configureCharacterLabel() {
         characterLabel.font = .tm(.caption)
         characterLabel.textColor = .tm(.semantic(.text(.tertiary)))
-        contentView.addSubview(characterLabel)
+        labelContainer.addSubview(characterLabel)
     }
 }
 
