@@ -114,6 +114,7 @@ private extension SearchTableViewCell {
         titleLabel.snp.makeConstraints { make in
             make.top.equalTo(posterImageView).offset(4)
             make.leading.equalTo(posterImageView.snp.trailing).offset(12)
+            make.trailing.equalToSuperview().inset(12)
         }
         
         dateLabel.snp.makeConstraints { make in
