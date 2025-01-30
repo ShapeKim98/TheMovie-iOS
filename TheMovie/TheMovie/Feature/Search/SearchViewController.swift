@@ -137,7 +137,11 @@ private extension SearchViewController {
     }
     
     func configureActivityIndicatorView() {
-        activityIndicatorView.stopAnimating()
+        if firstQuery.isEmpty {
+            activityIndicatorView.stopAnimating()
+        } else {
+            activityIndicatorView.startAnimating()
+        }
         activityIndicatorView.hidesWhenStopped = true
         activityIndicatorView.color = .tm(.semantic(.icon(.brand)))
         view.addSubview(activityIndicatorView)
