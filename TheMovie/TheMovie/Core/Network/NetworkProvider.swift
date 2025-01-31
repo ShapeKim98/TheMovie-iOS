@@ -33,7 +33,6 @@ struct NetworkProvider<E: EndPoint>: Sendable {
         .responseDecodable(of: T.self) { response in
             switch response.result {
             case .success(let data):
-                dump(data)
                 completion(.success(data))
             case .failure(let error):
                 if let data = response.data {
