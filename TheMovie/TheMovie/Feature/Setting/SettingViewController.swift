@@ -92,13 +92,13 @@ private extension SettingViewController {
     
     func presentWithdrawAlert() {
         let alert = UIAlertController(
-            title: "탈퇴하시겠어요?",
-            message: "모든 정보가 삭제됩니다.",
+            title: "탈퇴하기",
+            message: "탈퇴를 하면 데이터가 모두 초기화됩니다. 탈퇴 하시겠습니까?",
             preferredStyle: .alert
         )
         let confirm = UIAlertAction(
             title: "확인",
-            style: .default,
+            style: .destructive,
             handler: withdrawButtonTouchUpInside
         )
         let cancel = UIAlertAction(title: "취소", style: .cancel)
