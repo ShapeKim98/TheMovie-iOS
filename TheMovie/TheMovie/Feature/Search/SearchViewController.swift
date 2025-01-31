@@ -137,7 +137,11 @@ private extension SearchViewController {
     }
     
     func configureActivityIndicatorView() {
-        activityIndicatorView.stopAnimating()
+        if firstQuery.isEmpty {
+            activityIndicatorView.stopAnimating()
+        } else {
+            activityIndicatorView.startAnimating()
+        }
         activityIndicatorView.hidesWhenStopped = true
         activityIndicatorView.color = .tm(.semantic(.icon(.brand)))
         view.addSubview(activityIndicatorView)
@@ -221,17 +225,14 @@ private extension SearchViewController {
         
         guard let recentQueries else {
             self.recentQueries = [query]
-            print(#function, 1)
             return
         }
         guard let index = recentQueries.firstIndex(of: query) else {
             self.recentQueries?.insert(query, at: 0)
-            print(#function, 2)
             return
         }
         self.recentQueries?.remove(at: index)
         self.recentQueries?.insert(query, at: 0)
-        print(#function, 3)
     }
 }
 
@@ -271,7 +272,8 @@ extension SearchViewController: UITableViewDelegate,
         else { return UITableViewCell() }
         let isSelected = movieBox?.contains(where: { $0.key == String(movie.id) }) ?? false
         cell.delegate = self
-        cell.forRowAt(movie, isSelected: isSelected)
+        let query = searchController.searchBar.text ?? ""
+        cell.forRowAt(movie, isSelected: isSelected, query: query)
         return cell
     }
     

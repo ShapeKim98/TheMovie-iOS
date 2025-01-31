@@ -38,7 +38,7 @@ final class SearchTableViewCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        
+        posterImageView.image = nil
         for genre in genreLabels {
             hstack.removeArrangedSubview(genre)
             genre.removeFromSuperview()
@@ -46,33 +46,37 @@ final class SearchTableViewCell: UITableViewCell {
         genreLabels.removeAll()
     }
     
-    func forRowAt(_ movie: Movie, isSelected: Bool) {
-        if let path = movie.posterPath {
-            let url = URL(string: .imageBaseURL + "/w300" + path)
-            posterImageView.kf.indicatorType = .activity
-            posterImageView.kf.setImage(
-                with: url,
-                options: [.transition(.fade(0.3))]
-            )
-        }
+    func forRowAt(_ movie: Movie, isSelected: Bool, query: String) {
+        let url = URL(string: .imageBaseURL + "/w300" + (movie.posterPath ?? ""))
+        posterImageView.kf.indicatorType = .activity
+        posterImageView.kf.setImage(
+            with: url,
+            placeholder: TMImagePlaceholder(iconSize: 28),
+            options: [.transition(.fade(0.3))]
+        )
         
-        titleLabel.text = movie.title
-        let date = movie.releaseDate.date(format: .yyyy_MM_dd)
+        
+        titleLabel.attributedText = highlightAttributedString(
+            text: movie.title ?? "",
+            keyword: query
+        )
+        let date = movie.releaseDate?.date(format: .yyyy_MM_dd)
         dateLabel.text = date?.toString(format: .yyyy_o_MM_o_dd)
         favoriteButton.isSelected = isSelected
         favoriteButton.tag = movie.id
         
-        let genres = movie.genreIds.prefix(2)
+        let genres = movie.genreIds?.prefix(2) ?? []
         
         for genre in genres {
-            let label = configureGenreLabel(genre.title)
+            let label = configureGenreLabel(genre.title, query: query)
             genreLabels.append(label)
             hstack.addArrangedSubview(label)
         }
         
-        if movie.genreIds.count > 2 {
-            let count = movie.genreIds.count - 2
-            let label = configureGenreLabel("+\(count)")
+        let genresCount = movie.genreIds?.count ?? 0
+        if genresCount > 2 {
+            let count = genresCount - 2
+            let label = configureGenreLabel("+\(count)", query: "")
             genreLabels.append(label)
             hstack.addArrangedSubview(label)
         }
@@ -106,7 +110,7 @@ private extension SearchTableViewCell {
     func configureLayout() {
         posterImageView.snp.makeConstraints { make in
             make.width.equalTo(80)
-            make.height.equalTo(100)
+            make.height.equalTo(100).priority(.high)
             make.verticalEdges.equalToSuperview().inset(12)
             make.leading.equalToSuperview()
         }
@@ -114,6 +118,7 @@ private extension SearchTableViewCell {
         titleLabel.snp.makeConstraints { make in
             make.top.equalTo(posterImageView).offset(4)
             make.leading.equalTo(posterImageView.snp.trailing).offset(12)
+            make.trailing.equalToSuperview().inset(12)
         }
         
         dateLabel.snp.makeConstraints { make in
@@ -168,14 +173,14 @@ private extension SearchTableViewCell {
         contentView.addSubview(favoriteButton)
     }
     
-    func configureGenreLabel(_ genre: String) -> UIView {
+    func configureGenreLabel(_ genre: String, query: String) -> UIView {
         let container = UIView()
         container.backgroundColor = .tm(.semantic(.background(.secondary)), alpha: 0.6)
         container.layer.cornerRadius = 4
         let label = UILabel()
-        label.text = genre
         label.font = .tm(.caption)
         label.textColor = .tm(.semantic(.text(.primary)))
+        label.attributedText = highlightAttributedString(text: genre, keyword: query)
         container.addSubview(label)
         
         label.snp.makeConstraints { $0.edges.equalToSuperview().inset(4) }
@@ -190,6 +195,83 @@ private extension SearchTableViewCell {
         guard let button = action.sender as? UIButton else { return }
         button.isSelected.toggle()
         delegate?.favoritButtonTouchUpInside(button.tag)
+    }
+    
+    private func highlightAttributedString(text: String, keyword: String) -> NSAttributedString {
+        let lowercasedText = NSMutableAttributedString(
+            string: text.lowercased()
+        )
+        let attributedString = highlightWords(
+            text: text,
+            keyword: keyword,
+            lowercasedText: lowercasedText
+        )
+        guard let attributedString else {
+            return highlightCharacters(
+                text: text,
+                keyword: keyword,
+                lowercasedText: lowercasedText
+            )
+        }
+        return attributedString
+    }
+    
+    func highlightWords(
+        text: String,
+        keyword: String,
+        lowercasedText: NSMutableAttributedString
+    ) -> NSAttributedString? {
+        var matchCount = 0
+        let mutableAttributedString = NSMutableAttributedString(
+            string: text
+        )
+        
+        let keywords = keyword.lowercased().split(separator: " ").map { String($0) }
+        for keyword in keywords {
+            let range = lowercasedText.mutableString.range(
+                of: keyword
+            )
+            mutableAttributedString.addAttributes(
+                [.foregroundColor: UIColor.tm(.semantic(.text(.brand)))],
+                range: range
+            )
+            if range.length > 0 {
+                matchCount += 1
+            }
+        }
+        guard matchCount != keywords.count else { return mutableAttributedString }
+        return nil
+    }
+    
+    func highlightCharacters(
+        text: String,
+        keyword: String,
+        lowercasedText: NSMutableAttributedString
+    ) -> NSAttributedString {
+        var matchCount = 0
+        
+        let mutableAttributedString = NSMutableAttributedString(
+            string: text
+        )
+        
+        let characters = keyword.map { String($0).lowercased() }
+        for character in characters {
+            let range = lowercasedText.mutableString.range(
+                of: character
+            )
+            mutableAttributedString.addAttributes(
+                [.foregroundColor:UIColor.tm(.semantic(.text(.brand)))],
+                range: range
+            )
+            if range.length > 0 {
+                matchCount += 1
+            }
+        }
+        guard matchCount != characters.count else {
+            return mutableAttributedString
+        }
+        
+        return NSMutableAttributedString(string: text)
     }
 }
 

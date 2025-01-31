@@ -121,7 +121,7 @@ final class TMProfileView: UIView {
         movieBoxLabel.textColor = .tm(.semantic(.text(.primary)))
         movieBoxLabel.textAlignment = .center
         movieBoxLabelBackground.addSubview(movieBoxLabel)
-        movieBoxLabelBackground.backgroundColor = .tm(.semantic(.background(.brand)))
+        movieBoxLabelBackground.backgroundColor = .tm(.semantic(.background(.brand)), alpha: 0.7)
         movieBoxLabelBackground.layer.cornerRadius = 8
         addSubview(movieBoxLabelBackground)
     }

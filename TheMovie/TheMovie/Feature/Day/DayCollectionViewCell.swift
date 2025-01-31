@@ -46,6 +46,7 @@ final class DayCollectionViewCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         favoriteButton.isSelected = false
+        posterImageView.image = nil
         delegate = nil
     }
     
@@ -54,9 +55,8 @@ final class DayCollectionViewCell: UICollectionViewCell {
         posterImageView.kf.indicatorType = .activity
         posterImageView.kf.setImage(
             with: url,
-            options: [
-                .transition(.fade(0.3)),
-            ]
+            placeholder: TMImagePlaceholder(iconSize: 44),
+            options: [.transition(.fade(0.3))]
         )
         
         titleLabel.text = movie.title

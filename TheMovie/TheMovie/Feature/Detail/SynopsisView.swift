@@ -25,7 +25,7 @@ final class SynopsisView: UIView {
         
         configureUI(overview: overview)
         
-        configureLayout()
+        configureLayout(overview: overview)
     }
     
     required init?(coder: NSCoder) {
@@ -38,24 +38,26 @@ private extension SynopsisView {
     func configureUI(overview: String) {
         configureTitleLabel()
         
-        configureMoreButton()
-        
         configureOverviewLabel(overview: overview)
+        
+        guard !overview.isEmpty else { return }
+        configureMoreButton()
     }
     
-    func configureLayout() {
+    func configureLayout(overview: String) {
         titleLabel.snp.makeConstraints { make in
             make.top.leading.equalToSuperview()
         }
-        
-        moreButton.snp.makeConstraints { make in
-            make.centerY.equalTo(titleLabel)
-            make.trailing.equalToSuperview()
-        }
-        
+
         overviewLabel.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(12)
             make.horizontalEdges.bottom.equalToSuperview()
+        }
+        
+        guard !overview.isEmpty else { return }
+        moreButton.snp.makeConstraints { make in
+            make.centerY.equalTo(titleLabel)
+            make.trailing.equalToSuperview()
         }
     }
     
@@ -81,9 +83,15 @@ private extension SynopsisView {
     }
     
     func configureOverviewLabel(overview: String) {
-        overviewLabel.text = overview
-        overviewLabel.numberOfLines = 3
-        overviewLabel.textColor = .tm(.semantic(.text(.primary)))
+        if overview.isEmpty {
+            overviewLabel.text = "영화 줄거리가 없어요."
+            overviewLabel.textColor = .tm(.semantic(.text(.tertiary)))
+            overviewLabel.textAlignment = .center
+        } else {
+            overviewLabel.text = overview
+            overviewLabel.numberOfLines = 3
+            overviewLabel.textColor = .tm(.semantic(.text(.primary)))
+        }
         overviewLabel.font = .tm(.body)
         addSubview(overviewLabel)
     }

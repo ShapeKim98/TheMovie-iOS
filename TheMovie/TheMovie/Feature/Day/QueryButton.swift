@@ -80,13 +80,17 @@ final class QueryButton: UIView {
     
     private func configureRemoveButton() {
         var configuration = UIButton.Configuration.plain()
-        configuration.image = UIImage(systemName: "xmark")
+        let symbolConfiguration = UIImage.SymbolConfiguration(
+            pointSize: 10,
+            weight: .bold
+        )
+        configuration.image = UIImage(
+            systemName: "xmark",
+            withConfiguration: symbolConfiguration
+        )
         configuration.contentInsets = .zero
         removeButton.tintColor = .tm(.semantic(.icon(.quaternary)))
         removeButton.configuration = configuration
-        removeButton.imageView?.snp.makeConstraints { make in
-            make.size.equalTo(12)
-        }
         removeButton.addAction(
             UIAction(handler: removeButtonAddAction),
             for: .touchUpInside
