@@ -7,9 +7,10 @@
 
 import UIKit
 
+import Kingfisher
 import SnapKit
 
-final class TMImagePlaceholder: UIView {
+final class TMImagePlaceholder: UIView, Placeholder {
     private let icon = UIImageView(
         image: UIImage(systemName: "photo")
     )
@@ -27,7 +28,7 @@ final class TMImagePlaceholder: UIView {
     }
     
     private func configureUI() {
-        backgroundColor = .tm(.semantic(.background(.secondary)))
+        backgroundColor = .tm(.semantic(.background(.secondary)), alpha: 0.5)
         
         icon.contentMode = .scaleAspectFit
         icon.tintColor = .tm(.semantic(.icon(.secondary)))

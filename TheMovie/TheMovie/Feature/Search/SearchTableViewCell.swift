@@ -38,7 +38,7 @@ final class SearchTableViewCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        
+        posterImageView.image = nil
         for genre in genreLabels {
             hstack.removeArrangedSubview(genre)
             genre.removeFromSuperview()
@@ -47,14 +47,13 @@ final class SearchTableViewCell: UITableViewCell {
     }
     
     func forRowAt(_ movie: Movie, isSelected: Bool) {
-        if let path = movie.posterPath {
-            let url = URL(string: .imageBaseURL + "/w300" + path)
-            posterImageView.kf.indicatorType = .activity
-            posterImageView.kf.setImage(
-                with: url,
-                options: [.transition(.fade(0.3))]
-            )
-        }
+        let url = URL(string: .imageBaseURL + "/w300" + (movie.posterPath ?? ""))
+        posterImageView.kf.indicatorType = .activity
+        posterImageView.kf.setImage(
+            with: url,
+            placeholder: TMImagePlaceholder(iconSize: 28),
+            options: [.transition(.fade(0.3))]
+        )
         
         titleLabel.text = movie.title
         let date = movie.releaseDate.date(format: .yyyy_MM_dd)

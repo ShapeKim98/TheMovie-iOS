@@ -28,15 +28,19 @@ final class CastCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        profileImageView.image = nil
+    }
+    
     func forItemAt(_ cast: Credits.Cast) {
-        if let path = cast.profilePath {
-            let url = URL(string: .imageBaseURL + "/w185" + path)
-            profileImageView.kf.indicatorType = .activity
-            profileImageView.kf.setImage(
-                with: url,
-                options: [.transition(.fade(0.3))]
-            )
-        }
+        let url = URL(string: .imageBaseURL + "/w185" + (cast.profilePath ?? ""))
+        profileImageView.kf.indicatorType = .activity
+        profileImageView.kf.setImage(
+            with: url,
+            placeholder: TMImagePlaceholder(iconSize: 20),
+            options: [.transition(.fade(0.3))]
+        )
         
         nameLabel.text = cast.name
         characterLabel.text = cast.character
