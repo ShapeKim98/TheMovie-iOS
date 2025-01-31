@@ -178,9 +178,9 @@ private extension SearchTableViewCell {
         container.backgroundColor = .tm(.semantic(.background(.secondary)), alpha: 0.6)
         container.layer.cornerRadius = 4
         let label = UILabel()
-        label.attributedText = highlightAttributedString(text: genre, keyword: query)
         label.font = .tm(.caption)
         label.textColor = .tm(.semantic(.text(.primary)))
+        label.attributedText = highlightAttributedString(text: genre, keyword: query)
         container.addSubview(label)
         
         label.snp.makeConstraints { $0.edges.equalToSuperview().inset(4) }
@@ -232,7 +232,7 @@ private extension SearchTableViewCell {
                 of: keyword
             )
             mutableAttributedString.addAttributes(
-                [.foregroundColor: UIColor.systemBlue],
+                [.foregroundColor: UIColor.tm(.semantic(.text(.brand)))],
                 range: range
             )
             if range.length > 0 {
@@ -260,7 +260,7 @@ private extension SearchTableViewCell {
                 of: character
             )
             mutableAttributedString.addAttributes(
-                [.foregroundColor: UIColor.systemBlue],
+                [.foregroundColor:UIColor.tm(.semantic(.text(.brand)))],
                 range: range
             )
             if range.length > 0 {
