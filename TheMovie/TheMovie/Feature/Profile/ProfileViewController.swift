@@ -70,6 +70,8 @@ private extension ProfileViewController {
     func configureUI() {
         view.backgroundColor = .tm(.semantic(.background(.primary)))
         
+        configureSheet()
+        
         configureNavigation()
         
         configureProfileButton()
@@ -112,6 +114,13 @@ private extension ProfileViewController {
             )
         }
         setTMBackButton()
+    }
+    
+    func configureSheet() {
+        guard let sheet = sheetPresentationController else { return }
+        sheet.presentingViewController.overrideUserInterfaceStyle = .dark
+        sheet.detents = [.large(), .medium()]
+        sheet.prefersGrabberVisible = true
     }
     
     func configureProfileButton() {
