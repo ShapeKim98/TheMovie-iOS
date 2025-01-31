@@ -200,7 +200,6 @@ extension RecentQueryView: QueryButtonDelegate {
     }
     
     func removeButtonTouchUpInside(text: String) {
-        print(#function)
         recentQueries?.removeAll(where: { $0 == text })
         guard let index = queryButtons.firstIndex(where: { $0.text == text }) else {
             return

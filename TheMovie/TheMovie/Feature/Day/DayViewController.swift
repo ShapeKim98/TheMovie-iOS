@@ -235,13 +235,11 @@ extension DayViewController: RecentQueryViewDelegate {
 
 extension DayViewController: SearchViewControllerDelegate {
     func updateRecentQueries() {
-        print(#function)
         recentQueryView.updateQueryButton()
         recentQueryView.layoutIfNeeded()
     }
     
     func favoriteButtonTouchUpInsideFromSearch(_ movieId: Int) {
-        print(#function)
         updateMovieBox(movieId)
     }
 }

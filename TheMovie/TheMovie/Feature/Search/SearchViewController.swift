@@ -225,17 +225,14 @@ private extension SearchViewController {
         
         guard let recentQueries else {
             self.recentQueries = [query]
-            print(#function, 1)
             return
         }
         guard let index = recentQueries.firstIndex(of: query) else {
             self.recentQueries?.insert(query, at: 0)
-            print(#function, 2)
             return
         }
         self.recentQueries?.remove(at: index)
         self.recentQueries?.insert(query, at: 0)
-        print(#function, 3)
     }
 }
 
