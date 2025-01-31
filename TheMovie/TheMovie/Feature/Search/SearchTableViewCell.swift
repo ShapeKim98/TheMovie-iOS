@@ -110,7 +110,7 @@ private extension SearchTableViewCell {
     func configureLayout() {
         posterImageView.snp.makeConstraints { make in
             make.width.equalTo(80)
-            make.height.equalTo(100)
+            make.height.equalTo(100).priority(.high)
             make.verticalEdges.equalToSuperview().inset(12)
             make.leading.equalToSuperview()
         }
