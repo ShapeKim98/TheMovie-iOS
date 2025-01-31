@@ -55,6 +55,12 @@ final class SearchTableViewCell: UITableViewCell {
             options: [.transition(.fade(0.3))]
         )
         
+        
+        titleLabel.attributedText = highlightAttributedString(
+            text: movie.title ?? "",
+            keyword: query
+        )
+        let date = movie.releaseDate?.date(format: .yyyy_MM_dd)
         dateLabel.text = date?.toString(format: .yyyy_o_MM_o_dd)
         favoriteButton.isSelected = isSelected
         favoriteButton.tag = movie.id
@@ -167,12 +173,12 @@ private extension SearchTableViewCell {
         contentView.addSubview(favoriteButton)
     }
     
-    func configureGenreLabel(_ genre: String) -> UIView {
+    func configureGenreLabel(_ genre: String, query: String) -> UIView {
         let container = UIView()
         container.backgroundColor = .tm(.semantic(.background(.secondary)), alpha: 0.6)
         container.layer.cornerRadius = 4
         let label = UILabel()
-        label.text = genre
+        label.attributedText = highlightAttributedString(text: genre, keyword: query)
         label.font = .tm(.caption)
         label.textColor = .tm(.semantic(.text(.primary)))
         container.addSubview(label)
@@ -189,6 +195,83 @@ private extension SearchTableViewCell {
         guard let button = action.sender as? UIButton else { return }
         button.isSelected.toggle()
         delegate?.favoritButtonTouchUpInside(button.tag)
+    }
+    
+    private func highlightAttributedString(text: String, keyword: String) -> NSAttributedString {
+        let lowercasedText = NSMutableAttributedString(
+            string: text.lowercased()
+        )
+        let attributedString = highlightWords(
+            text: text,
+            keyword: keyword,
+            lowercasedText: lowercasedText
+        )
+        guard let attributedString else {
+            return highlightCharacters(
+                text: text,
+                keyword: keyword,
+                lowercasedText: lowercasedText
+            )
+        }
+        return attributedString
+    }
+    
+    func highlightWords(
+        text: String,
+        keyword: String,
+        lowercasedText: NSMutableAttributedString
+    ) -> NSAttributedString? {
+        var matchCount = 0
+        let mutableAttributedString = NSMutableAttributedString(
+            string: text
+        )
+        
+        let keywords = keyword.lowercased().split(separator: " ").map { String($0) }
+        for keyword in keywords {
+            let range = lowercasedText.mutableString.range(
+                of: keyword
+            )
+            mutableAttributedString.addAttributes(
+                [.foregroundColor: UIColor.systemBlue],
+                range: range
+            )
+            if range.length > 0 {
+                matchCount += 1
+            }
+        }
+        guard matchCount != keywords.count else { return mutableAttributedString }
+        return nil
+    }
+    
+    func highlightCharacters(
+        text: String,
+        keyword: String,
+        lowercasedText: NSMutableAttributedString
+    ) -> NSAttributedString {
+        var matchCount = 0
+        
+        let mutableAttributedString = NSMutableAttributedString(
+            string: text
+        )
+        
+        let characters = keyword.map { String($0).lowercased() }
+        for character in characters {
+            let range = lowercasedText.mutableString.range(
+                of: character
+            )
+            mutableAttributedString.addAttributes(
+                [.foregroundColor: UIColor.systemBlue],
+                range: range
+            )
+            if range.length > 0 {
+                matchCount += 1
+            }
+        }
+        guard matchCount != characters.count else {
+            return mutableAttributedString
+        }
+        
+        return NSMutableAttributedString(string: text)
     }
 }
 
