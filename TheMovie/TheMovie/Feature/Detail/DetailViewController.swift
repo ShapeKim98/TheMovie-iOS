@@ -181,6 +181,8 @@ private extension DetailViewController {
         collectionView.isPagingEnabled = true
         collectionView.tag = 0
         
+        collectionView.backgroundView = TMImagePlaceholder(iconSize: 40)
+        
         return collectionView
     }
     
@@ -196,6 +198,10 @@ private extension DetailViewController {
         )
         collectionView.tag = 1
         
+        collectionView.backgroundView = configurePlaceholderLabel(
+            "캐스트 정보가 없어요."
+        )
+        
         return collectionView
     }
     
@@ -210,6 +216,10 @@ private extension DetailViewController {
             layout: layout
         )
         collectionView.tag = 2
+        
+        collectionView.backgroundView = configurePlaceholderLabel(
+            "포스터 이미지가 존재하지 않아요."
+        )
         
         return collectionView
     }
@@ -355,6 +365,15 @@ private extension DetailViewController {
         
         return collectionView
     }
+    
+    func configurePlaceholderLabel(_ text: String) -> UILabel {
+        let label = UILabel()
+        label.text = text
+        label.font = .tm(.body)
+        label.textColor = .tm(.semantic(.text(.tertiary)))
+        label.textAlignment = .center
+        return label
+    }
 }
 
 // MARK: Data Bindins
@@ -366,9 +385,15 @@ private extension DetailViewController {
         castCollectionView.reloadData()
         posterCollectionView.reloadData()
         backdropPageControl.numberOfPages = backdropImages.count
+        let backdropIsEmpty = backdropImages.isEmpty
+        let castIsEmpty = domain.credits?.cast.isEmpty ?? true
+        let posterIsEmpty = domain.images?.posters.isEmpty ?? true
         UIView.fadeAnimate { [weak self] in
             guard let `self` else { return }
             activityIndicatorView.alpha = 0
+            backdropCollectionView.backgroundView?.alpha = backdropIsEmpty ? 1 : 0
+            castCollectionView.backgroundView?.alpha = castIsEmpty ? 1 : 0
+            posterCollectionView.backgroundView?.alpha = posterIsEmpty ? 1 : 0
         } completion: { [weak self] _ in
             guard let `self` else { return }
             activityIndicatorView.stopAnimating()
