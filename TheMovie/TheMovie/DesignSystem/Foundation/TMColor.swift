@@ -35,11 +35,11 @@ extension TMColor {
         
         var uiColor: UIColor {
             switch self {
-            case .blue: return UIColor(resource: .brand)
-            case .gray: return UIColor(resource: .gray)
-            case .graySecondary: return UIColor(resource: .graySecondary)
-            case .black: return UIColor(resource: .black)
-            case .white: return UIColor(resource: .white)
+            case .blue: return UIColor(resource: .tmBrand)
+            case .gray: return UIColor(resource: .tmGray)
+            case .graySecondary: return UIColor(resource: .tmGraySecondary)
+            case .black: return UIColor(resource: .tmBlack)
+            case .white: return UIColor(resource: .tmWhite)
             }
         }
         
@@ -66,35 +66,35 @@ extension TMColor {
             switch self {
             case let .background(type):
                 switch type {
-                case .brand: return UIColor(resource: .brand)
-                case .primary: return UIColor(resource: .black)
-                case .secondary: return UIColor(resource: .gray)
-                case .tertiary: return UIColor(resource: .graySecondary)
-                case .quaternary: return UIColor(resource: .white)
+                case .brand: return UIColor(resource: .tmBrand)
+                case .primary: return UIColor(resource: .tmBlack)
+                case .secondary: return UIColor(resource: .tmGray)
+                case .tertiary: return UIColor(resource: .tmGraySecondary)
+                case .quaternary: return UIColor(resource: .tmWhite)
                 }
             case let .text(type):
                 switch type {
-                case .brand: return UIColor(resource: .brand)
-                case .primary: return UIColor(resource: .white)
-                case .secondary: return UIColor(resource: .graySecondary)
-                case .tertiary: return UIColor(resource: .gray)
-                case .quaternary: return UIColor(resource: .black)
+                case .brand: return UIColor(resource: .tmBrand)
+                case .primary: return UIColor(resource: .tmWhite)
+                case .secondary: return UIColor(resource: .tmGraySecondary)
+                case .tertiary: return UIColor(resource: .tmGray)
+                case .quaternary: return UIColor(resource: .tmBlack)
                 }
             case let .border(type):
                 switch type {
-                case .brand: return UIColor(resource: .brand)
-                case .primary: return UIColor(resource: .white)
-                case .secondary: return UIColor(resource: .graySecondary)
-                case .tertiary: return UIColor(resource: .gray)
-                case .quaternary: return UIColor(resource: .black)
+                case .brand: return UIColor(resource: .tmBrand)
+                case .primary: return UIColor(resource: .tmWhite)
+                case .secondary: return UIColor(resource: .tmGraySecondary)
+                case .tertiary: return UIColor(resource: .tmGray)
+                case .quaternary: return UIColor(resource: .tmBlack)
                 }
             case let .icon(type):
                 switch type {
-                case .brand: return UIColor(resource: .brand)
-                case .primary: return UIColor(resource: .white)
-                case .secondary: return UIColor(resource: .graySecondary)
-                case .tertiary: return UIColor(resource: .gray)
-                case .quaternary: return UIColor(resource: .black)
+                case .brand: return UIColor(resource: .tmBrand)
+                case .primary: return UIColor(resource: .tmWhite)
+                case .secondary: return UIColor(resource: .tmGraySecondary)
+                case .tertiary: return UIColor(resource: .tmGray)
+                case .quaternary: return UIColor(resource: .tmBlack)
                 }
             }
         }
