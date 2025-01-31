@@ -25,6 +25,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.windowScene = scene
         
         var viewController: UIViewController
+        
         if let isProfileCompleted, isProfileCompleted {
             viewController = ViewController()
         } else {

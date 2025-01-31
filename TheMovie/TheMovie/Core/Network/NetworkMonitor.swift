@@ -11,6 +11,8 @@ import Network
 final class NetworkMonitor {
     private let monitor = NWPathMonitor()
     
+    deinit { monitor.cancel() }
+    
     func monitoringStart() {
         monitor.start(queue: DispatchQueue.global(qos: .background))
     }
