@@ -275,7 +275,9 @@ extension SearchViewController: UITableViewDelegate,
         else { return UITableViewCell() }
         let isSelected = movieBox?.contains(where: { $0.key == String(movie.id) }) ?? false
         cell.delegate = self
-        cell.forRowAt(movie, isSelected: isSelected)
+        let query = searchController.searchBar.text ?? ""
+        print(query)
+        cell.forRowAt(movie, isSelected: isSelected, query: query)
         return cell
     }
     

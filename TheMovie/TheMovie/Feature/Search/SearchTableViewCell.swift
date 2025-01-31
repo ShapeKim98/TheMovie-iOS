@@ -46,7 +46,7 @@ final class SearchTableViewCell: UITableViewCell {
         genreLabels.removeAll()
     }
     
-    func forRowAt(_ movie: Movie, isSelected: Bool) {
+    func forRowAt(_ movie: Movie, isSelected: Bool, query: String) {
         let url = URL(string: .imageBaseURL + "/w300" + (movie.posterPath ?? ""))
         posterImageView.kf.indicatorType = .activity
         posterImageView.kf.setImage(
@@ -55,23 +55,22 @@ final class SearchTableViewCell: UITableViewCell {
             options: [.transition(.fade(0.3))]
         )
         
-        titleLabel.text = movie.title
-        let date = movie.releaseDate.date(format: .yyyy_MM_dd)
         dateLabel.text = date?.toString(format: .yyyy_o_MM_o_dd)
         favoriteButton.isSelected = isSelected
         favoriteButton.tag = movie.id
         
-        let genres = movie.genreIds.prefix(2)
+        let genres = movie.genreIds?.prefix(2) ?? []
         
         for genre in genres {
-            let label = configureGenreLabel(genre.title)
+            let label = configureGenreLabel(genre.title, query: query)
             genreLabels.append(label)
             hstack.addArrangedSubview(label)
         }
         
-        if movie.genreIds.count > 2 {
-            let count = movie.genreIds.count - 2
-            let label = configureGenreLabel("+\(count)")
+        let genresCount = movie.genreIds?.count ?? 0
+        if genresCount > 2 {
+            let count = genresCount - 2
+            let label = configureGenreLabel("+\(count)", query: "")
             genreLabels.append(label)
             hstack.addArrangedSubview(label)
         }

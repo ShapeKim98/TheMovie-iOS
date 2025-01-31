@@ -259,12 +259,13 @@ private extension DetailViewController {
     
     func configureMovieInfoLabel() {
         let releaseDate = domain.movie.releaseDate
-        let voteAverage = String(format: "%.1f", domain.movie.voteAverage)
-        var genres = domain.movie.genreIds.map(\.title).prefix(2)
-        if domain.movie.genreIds.count > 2 {
-            genres.append("+\(domain.movie.genreIds.count - 2)")
+        let voteAverage = String(format: "%.1f", domain.movie.voteAverage ?? 0)
+        var genres = domain.movie.genreIds?.map(\.title).prefix(2) ?? []
+        let count = domain.movie.genreIds?.count ?? 0
+        if count > 2 {
+            genres.append("+\(count - 2)")
         }
-        let releaseLabel = MovieInfoLabel(image: "calendar", text: releaseDate)
+        let releaseLabel = MovieInfoLabel(image: "calendar", text: releaseDate ?? "")
         let voteLabel = MovieInfoLabel(image: "star.fill", text: voteAverage)
         let genresLabel = MovieInfoLabel(
             image: "film",
