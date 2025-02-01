@@ -55,11 +55,15 @@ final class SearchTableViewCell: UITableViewCell {
             options: [.transition(.fade(0.3))]
         )
         
-        
-        titleLabel.attributedText = highlightAttributedString(
+        titleLabel.attributedText = NSAttributedString(string: query)
+        highlightAttributedString(
             text: movie.title ?? "",
             keyword: query
-        )
+        ) { [weak self] text in
+            guard let `self` else { return }
+            titleLabel.attributedText = text
+        }
+        
         let date = movie.releaseDate?.date(format: .yyyy_MM_dd)
         dateLabel.text = date?.toString(format: .yyyy_o_MM_o_dd)
         favoriteButton.isSelected = isSelected
@@ -67,18 +71,18 @@ final class SearchTableViewCell: UITableViewCell {
         
         let genres = movie.genreIds?.prefix(2) ?? []
         
+        let group = DispatchGroup()
         for genre in genres {
-            let label = configureGenreLabel(genre.title, query: query)
-            genreLabels.append(label)
-            hstack.addArrangedSubview(label)
+            configureGenreLabel(genre.title, query: query, group: group)
         }
         
-        let genresCount = movie.genreIds?.count ?? 0
-        if genresCount > 2 {
-            let count = genresCount - 2
-            let label = configureGenreLabel("+\(count)", query: "")
-            genreLabels.append(label)
-            hstack.addArrangedSubview(label)
+        group.notify(queue: .main) { [weak self] in
+            guard let `self` else { return }
+            let genresCount = movie.genreIds?.count ?? 0
+            if genresCount > 2 {
+                let count = genresCount - 2
+                configureGenreLabel("+\(count)", query: "")
+            }
         }
     }
     
@@ -173,19 +177,25 @@ private extension SearchTableViewCell {
         contentView.addSubview(favoriteButton)
     }
     
-    func configureGenreLabel(_ genre: String, query: String) -> UIView {
+    func configureGenreLabel(_ genre: String, query: String, group: DispatchGroup? = nil) {
         let container = UIView()
         container.backgroundColor = .tm(.semantic(.background(.secondary)), alpha: 0.6)
         container.layer.cornerRadius = 4
         let label = UILabel()
+        
         label.font = .tm(.caption)
         label.textColor = .tm(.semantic(.text(.primary)))
-        label.attributedText = highlightAttributedString(text: genre, keyword: query)
         container.addSubview(label)
         
-        label.snp.makeConstraints { $0.edges.equalToSuperview().inset(4) }
-        
-        return container
+        group?.enter()
+        highlightAttributedString(text: genre, keyword: query) { [weak self] text in
+            guard let `self` else { return }
+            label.attributedText = text
+            label.snp.makeConstraints { $0.edges.equalToSuperview().inset(4) }
+            genreLabels.append(container)
+            hstack.addArrangedSubview(container)
+            group?.leave()
+        }
     }
 }
 
@@ -197,81 +207,101 @@ private extension SearchTableViewCell {
         delegate?.favoritButtonTouchUpInside(button.tag)
     }
     
-    private func highlightAttributedString(text: String, keyword: String) -> NSAttributedString {
-        let lowercasedText = NSMutableAttributedString(
-            string: text.lowercased()
-        )
-        let attributedString = highlightWords(
-            text: text,
-            keyword: keyword,
-            lowercasedText: lowercasedText
-        )
-        guard let attributedString else {
-            return highlightCharacters(
-                text: text,
-                keyword: keyword,
-                lowercasedText: lowercasedText
-            )
+    private func highlightAttributedString(
+        text: String,
+        keyword: String,
+        completion: @escaping (NSAttributedString) -> Void
+    ) {
+        highlightWords(text: text, keyword: keyword) { [weak self] attributedString in
+            guard let `self` else { return }
+            guard let attributedString else {
+                highlightCharacters(text: text, keyword: keyword) { attributedString in
+                    completion(attributedString)
+                }
+                return
+            }
+            DispatchQueue.main.async {
+                completion(attributedString)
+            }
         }
-        return attributedString
     }
     
     func highlightWords(
         text: String,
         keyword: String,
-        lowercasedText: NSMutableAttributedString
-    ) -> NSAttributedString? {
-        var matchCount = 0
-        let mutableAttributedString = NSMutableAttributedString(
-            string: text
-        )
-        
-        let keywords = keyword.lowercased().split(separator: " ").map { String($0) }
-        for keyword in keywords {
-            let range = lowercasedText.mutableString.range(
-                of: keyword
+        completion: @escaping (NSAttributedString?) -> Void
+    ) {
+        DispatchQueue.global().async {
+            let lowercasedText = NSMutableAttributedString(
+                string: text.lowercased()
             )
-            mutableAttributedString.addAttributes(
-                [.foregroundColor: UIColor.tm(.semantic(.text(.brand)))],
-                range: range
+            
+            var matchCount = 0
+            let mutableAttributedString = NSMutableAttributedString(
+                string: text
             )
-            if range.length > 0 {
-                matchCount += 1
+            
+            let keywords = keyword.lowercased().split(separator: " ").map { String($0) }
+            for keyword in keywords {
+                let range = lowercasedText.mutableString.range(
+                    of: keyword
+                )
+                mutableAttributedString.addAttributes(
+                    [.foregroundColor: UIColor.tm(.semantic(.text(.brand)))],
+                    range: range
+                )
+                if range.length > 0 {
+                    matchCount += 1
+                }
             }
+            guard matchCount != keywords.count else {
+                completion(mutableAttributedString)
+                return
+            }
+            completion(nil)
         }
-        guard matchCount != keywords.count else { return mutableAttributedString }
-        return nil
     }
     
     func highlightCharacters(
         text: String,
         keyword: String,
-        lowercasedText: NSMutableAttributedString
-    ) -> NSAttributedString {
-        var matchCount = 0
-        
-        let mutableAttributedString = NSMutableAttributedString(
-            string: text
-        )
-        
-        let characters = keyword.map { String($0).lowercased() }
-        for character in characters {
-            let range = lowercasedText.mutableString.range(
-                of: character
+        completion: @escaping(NSAttributedString) -> Void
+    ) {
+        DispatchQueue.global().async {
+            let lowercasedText = NSMutableAttributedString(
+                string: text.lowercased()
             )
-            mutableAttributedString.addAttributes(
-                [.foregroundColor:UIColor.tm(.semantic(.text(.brand)))],
-                range: range
+            
+            var matchCount = 0
+            
+            let mutableAttributedString = NSMutableAttributedString(
+                string: text
             )
-            if range.length > 0 {
-                matchCount += 1
+            
+            let characters = keyword.map { String($0).lowercased() }
+            for character in characters {
+                let range = lowercasedText.mutableString.range(
+                    of: character
+                )
+                mutableAttributedString.addAttributes(
+                    [.foregroundColor:UIColor.tm(.semantic(.text(.brand)))],
+                    range: range
+                )
+                if range.length > 0 {
+                    matchCount += 1
+                }
+            }
+            guard matchCount != characters.count else {
+                DispatchQueue.main.async {
+                    completion(mutableAttributedString)
+                }
+                return
+            }
+            
+            DispatchQueue.main.async {
+                completion(NSMutableAttributedString(string: text))
             }
         }
-        guard matchCount != characters.count else {
-            return mutableAttributedString
-        }
-        
-        return NSMutableAttributedString(string: text)
     }
 }
 
