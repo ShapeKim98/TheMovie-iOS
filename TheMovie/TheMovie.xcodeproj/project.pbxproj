@@ -167,7 +167,7 @@
 				DEVELOPMENT_TEAM = FNC65X95VM;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TheMovie/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "더무비(김도형)";
+				INFOPLIST_KEY_CFBundleDisplayName = "김도형";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -204,7 +204,7 @@
 				DEVELOPMENT_TEAM = FNC65X95VM;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TheMovie/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "더무비(김도형)";
+				INFOPLIST_KEY_CFBundleDisplayName = "김도형";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
