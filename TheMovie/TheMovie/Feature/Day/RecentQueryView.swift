@@ -93,7 +93,8 @@ private extension RecentQueryView {
         }
         
         emptyLabel.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.bottom).offset(20)
+            make.top.equalTo(titleLabel.snp.bottom).offset(16)
+            make.bottom.equalToSuperview().inset(16)
             make.horizontalEdges.equalToSuperview()
         }
         

@@ -33,16 +33,6 @@ final class DayCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func layoutIfNeeded() {
-        super.layoutIfNeeded()
-        
-        let height = posterImageView.frame.height + titleLabel.frame.height + overviewLabel.frame.height + 16
-        snp.updateConstraints { make in
-            make.height.equalTo(height)
-            make.edges.equalToSuperview()
-        }
-    }
-    
     override func prepareForReuse() {
         super.prepareForReuse()
         favoriteButton.isSelected = false

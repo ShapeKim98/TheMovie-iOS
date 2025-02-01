@@ -73,7 +73,7 @@ private extension DayViewController {
         recentQueryView.layoutIfNeeded()
         
         dayCollectionView.snp.makeConstraints { make in
-            make.top.equalTo(recentQueryView.snp.bottom).offset(16)
+            make.top.equalTo(recentQueryView.snp.bottom)
             make.horizontalEdges.equalToSuperview()
             make.height.equalTo(364)
         }
@@ -105,7 +105,7 @@ private extension DayViewController {
         layout.scrollDirection = .horizontal
         layout.minimumLineSpacing = spacing
         layout.minimumInteritemSpacing = spacing
-        layout.sectionInset = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 16, bottom: 12, right: 16)
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.register(
