@@ -34,6 +34,8 @@ extension UIViewController {
     }
     
     func handleFailure(_ failure: Error) {
+        UINotificationFeedbackGenerator()
+            .notificationOccurred(.error)
         if let baseError = failure as? BaseError {
             let message =  baseError.statusMessage
             presentAlert(title: "오류", message: message)
