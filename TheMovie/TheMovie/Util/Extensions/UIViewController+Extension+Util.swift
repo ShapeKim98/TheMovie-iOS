@@ -42,6 +42,7 @@ extension UIViewController {
         )
         let confirm = UIAlertAction(title: "확인", style: .default)
         alert.addAction(confirm)
+        alert.overrideUserInterfaceStyle = .dark
         present(alert, animated: true)
     }
     

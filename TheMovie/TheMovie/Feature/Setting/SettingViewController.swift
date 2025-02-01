@@ -116,6 +116,7 @@ private extension SettingViewController {
         let cancel = UIAlertAction(title: "취소", style: .cancel)
         alert.addAction(confirm)
         alert.addAction(cancel)
+        alert.overrideUserInterfaceStyle = .dark
         UINotificationFeedbackGenerator()
             .notificationOccurred(.warning)
         present(alert, animated: true)
