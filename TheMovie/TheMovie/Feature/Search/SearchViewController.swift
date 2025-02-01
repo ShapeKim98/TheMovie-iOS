@@ -136,6 +136,7 @@ private extension SearchViewController {
         searchTableView.keyboardDismissMode = .onDrag
         searchTableView.separatorColor = .tm(.semantic(.border(.tertiary)))
         searchTableView.separatorInset = .zero
+        searchTableView.overrideUserInterfaceStyle = .dark
         view.addSubview(searchTableView)
     }
     

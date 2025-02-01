@@ -81,6 +81,8 @@ private extension SettingViewController {
             forCellReuseIdentifier: .settingTableCell
         )
         tableView.backgroundColor = .clear
+        tableView.overrideUserInterfaceStyle = .dark
+        tableView.isScrollEnabled = false
         view.addSubview(tableView)
     }
 }
