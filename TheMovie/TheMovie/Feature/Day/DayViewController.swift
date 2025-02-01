@@ -115,6 +115,7 @@ private extension DayViewController {
         collectionView.backgroundColor = .clear
         collectionView.delegate = self
         collectionView.dataSource = self
+        collectionView.overrideUserInterfaceStyle = .dark
         view.addSubview(collectionView)
         
         return collectionView
@@ -270,5 +271,5 @@ extension DayViewController: DayCollectionViewCellDelegate {
 
 @available(iOS 17.0, *)
 #Preview {
-    DayViewController()
+    ViewController()
 }
