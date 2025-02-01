@@ -28,6 +28,8 @@ final class DayCollectionViewCell: UICollectionViewCell {
         configureUI()
         
         configureLayout()
+        
+        configureUpdateHandler()
     }
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -95,6 +97,16 @@ private extension DayCollectionViewCell {
         overviewLabel.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(12)
             make.horizontalEdges.equalToSuperview()
+        }
+    }
+    
+    func configureUpdateHandler() {
+        configurationUpdateHandler = { cell, _ in
+            UIView.fadeAnimate {
+                cell.transform = cell.isHighlighted
+                ? CGAffineTransform(scaleX: 0.95, y: 0.95)
+                : CGAffineTransform(scaleX: 1, y: 1)
+            }
         }
     }
     

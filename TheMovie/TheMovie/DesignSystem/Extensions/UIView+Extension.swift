@@ -12,7 +12,7 @@ extension UIView {
         duration: TimeInterval = 0.7,
         damping: CGFloat = 0.7,
         velocity: CGFloat = 1,
-        options: UIView.AnimationOptions = [],
+        options: UIView.AnimationOptions = [.curveEaseOut],
         animations: @escaping () -> Void,
         completion: ((Bool) -> Void)? = nil
     ) {

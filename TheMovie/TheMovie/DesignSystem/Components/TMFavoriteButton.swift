@@ -46,14 +46,20 @@ final class TMFavoriteButton: UIButton {
     private func configureUpdateHandler() {
         configurationUpdateHandler = { button in
             switch button.state {
+            case .highlighted:
+                UIView.fadeAnimate {
+                    button.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
+                }
             case .selected:
                 button.configuration?.image = UIImage(systemName: "heart.fill")
                 UIView.fadeAnimate {
+                    button.transform = CGAffineTransform(scaleX: 1, y: 1)
                     button.layoutIfNeeded()
                 }
             case .normal:
                 button.configuration?.image = UIImage(systemName: "heart")
                 UIView.fadeAnimate {
+                    button.transform = CGAffineTransform(scaleX: 1, y: 1)
                     button.layoutIfNeeded()
                 }
             default: break

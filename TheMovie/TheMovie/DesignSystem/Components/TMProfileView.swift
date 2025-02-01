@@ -116,6 +116,14 @@ final class TMProfileView: UIView {
             make.trailing.equalTo(self).inset(12)
         }
         image.tintColor = .tm(.semantic(.icon(.tertiary)))
+        button.configurationUpdateHandler = { [weak self] button in
+            guard let `self` else { return }
+            UIView.fadeAnimate {
+                self.transform = button.isHighlighted
+                ? CGAffineTransform(scaleX: 0.95, y: 0.95)
+                : CGAffineTransform(scaleX: 1, y: 1)
+            }
+        }
     }
     
     private func configureMovieBoxLabel() {

@@ -42,16 +42,26 @@ final class TMBoarderButton: UIButton {
         configurationUpdateHandler = { [weak self] button in
             guard let `self` else { return }
             switch button.state {
+            case .highlighted:
+                UIView.fadeAnimate {
+                    button.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
+                }
             case .disabled:
                 updateState(
                     strokeColor: .tm(.semantic(.border(.tertiary))),
                     textColor: .tm(.semantic(.text(.tertiary)))
                 )
+                UIView.fadeAnimate {
+                    button.transform = CGAffineTransform(scaleX: 1, y: 1)
+                }
             default:
                 updateState(
                     strokeColor: .tm(.semantic(.border(.brand))),
                     textColor: .tm(.semantic(.text(.brand)))
                 )
+                UIView.fadeAnimate {
+                    button.transform = CGAffineTransform(scaleX: 1, y: 1)
+                }
             }
         }
     }
