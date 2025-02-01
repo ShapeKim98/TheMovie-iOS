@@ -191,6 +191,7 @@ private extension RecentQueryView {
 // MARK: Functions
 private extension RecentQueryView {
     func removeAllButtonTouchUpInside(_ action: UIAction) {
+        UINotificationFeedbackGenerator()
         recentQueries?.removeAll()
     }
 }
@@ -208,6 +209,7 @@ extension RecentQueryView: QueryButtonDelegate {
         let removedButton = queryButtons.remove(at: index)
         contentView.removeArrangedSubview(removedButton)
         UIView.fadeAnimate {
+            removedButton.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
             removedButton.alpha = 0
         } completion: { _ in
             removedButton.removeFromSuperview()
