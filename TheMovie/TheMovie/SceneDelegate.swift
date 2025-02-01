@@ -95,12 +95,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             UINavigationController(rootViewController: settingViewController)
         ]
         
-        for vc in viewControllers {
-            vc.navigationBar.titleTextAttributes = [
+        for child in viewControllers {
+            child.navigationBar.titleTextAttributes = [
                 .foregroundColor: UIColor.tm(.semantic(.text(.primary)))
             ]
-            vc.navigationBar.tintColor = .tm(.primitive(.blue))
-            vc.navigationBar.barTintColor = .tm(.primitive(.black))
+            child.navigationBar.tintColor = .tm(.primitive(.blue))
+            child.navigationBar.barTintColor = .tm(.primitive(.black))
         }
         
         viewController.setViewControllers(viewControllers, animated: true)
@@ -124,7 +124,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 extension SceneDelegate: SettingViewControllerDelegate {
     func withdrawButtonTouchUpInside() {
-        window?.rootViewController?.removeFromParent()
         window?.rootViewController = configureOnboardViewController()
         window?.makeKeyAndVisible()
     }
@@ -132,7 +131,6 @@ extension SceneDelegate: SettingViewControllerDelegate {
 
 extension SceneDelegate: OnboardViewControllerDelegate {
     func completeButtonTouchUpInside() {
-        window?.rootViewController?.removeFromParent()
         window?.rootViewController = configureViewController()
         window?.makeKeyAndVisible()
     }
