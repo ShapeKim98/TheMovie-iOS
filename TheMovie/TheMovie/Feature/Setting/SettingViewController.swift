@@ -36,6 +36,8 @@ private extension SettingViewController {
     func configureUI() {
         view.backgroundColor = .tm(.semantic(.background(.primary)))
         
+        configureNavigation()
+        
         configureProfileView()
         
         configureTableView()
@@ -52,6 +54,10 @@ private extension SettingViewController {
             make.horizontalEdges.equalToSuperview().inset(16)
             make.bottom.equalTo(view.safeAreaLayoutGuide)
         }
+    }
+    
+    func configureNavigation() {
+        navigationItem.title = "설정"
     }
     
     func configureProfileView() {
