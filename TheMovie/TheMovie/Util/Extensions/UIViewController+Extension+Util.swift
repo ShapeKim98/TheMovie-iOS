@@ -30,6 +30,7 @@ extension UIViewController {
             let message =  baseError.statusMessage
             presentAlert(title: "오류", message: message)
         } else {
+            presentAlert(title: "오류", message: "알 수 없는 오류입니다.")
             print(failure)
         }
     }
