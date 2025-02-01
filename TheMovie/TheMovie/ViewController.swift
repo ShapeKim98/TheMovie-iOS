@@ -43,6 +43,8 @@ final class ViewController: UITabBarController {
 // MARK: Configure Views
 private extension ViewController {
     func configureUI() {
+        view.backgroundColor = .tm(.semantic(.background(.primary)))
+        
         configureTabBarAppearance()
         
         configureToastMessageView()
