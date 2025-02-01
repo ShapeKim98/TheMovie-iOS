@@ -385,13 +385,16 @@ private extension DetailViewController {
     func didSetDomain() {
         let isLoading = domain.images == nil || domain.credits == nil
         guard !isLoading else { return }
+        
         backdropCollectionView.reloadData()
         castCollectionView.reloadData()
         posterCollectionView.reloadData()
         backdropPageControl.numberOfPages = backdropImages.count
+        
         let backdropIsEmpty = backdropImages.isEmpty
         let castIsEmpty = domain.credits?.cast.isEmpty ?? true
         let posterIsEmpty = domain.images?.posters.isEmpty ?? true
+        
         UIView.fadeAnimate { [weak self] in
             guard let `self` else { return }
             activityIndicatorView.alpha = 0

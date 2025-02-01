@@ -79,10 +79,10 @@ final class SearchTableViewCell: UITableViewCell {
         group.notify(queue: .main) { [weak self] in
             guard let `self` else { return }
             let genresCount = movie.genreIds?.count ?? 0
-            if genresCount > 2 {
-                let count = genresCount - 2
-                configureGenreLabel("+\(count)", query: "")
-            }
+            guard genresCount > 2 else { return }
+            
+            let count = genresCount - 2
+            configureGenreLabel("+\(count)", query: "")
         }
     }
     
