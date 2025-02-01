@@ -23,16 +23,6 @@ extension UIViewController {
         navigationController?.popViewController(animated: true)
     }
     
-    func switchRoot(_ viewController: UIViewController) {
-        let scene = UIApplication.shared.connectedScenes.first
-        guard
-            let windowScene = scene as? UIWindowScene,
-            let window = windowScene.windows.first
-        else { return }
-        window.rootViewController = viewController
-        window.makeKeyAndVisible()
-    }
-    
     func handleFailure(_ failure: Error) {
         UINotificationFeedbackGenerator()
             .notificationOccurred(.error)

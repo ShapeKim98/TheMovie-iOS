@@ -27,18 +27,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         var viewController: UIViewController
         
         if let isProfileCompleted, isProfileCompleted {
-            viewController = ViewController()
+            viewController = configureViewController()
         } else {
-            let onboardViewController = UINavigationController(
-                rootViewController: OnboardViewController()
-            )
-            onboardViewController.navigationBar.titleTextAttributes = [
-                .foregroundColor: UIColor.tm(.semantic(.text(.primary)))
-            ]
-            onboardViewController.navigationBar.tintColor = .tm(.primitive(.blue))
-            onboardViewController.navigationBar.barTintColor = .tm(.primitive(.black))
-            
-            viewController = onboardViewController
+            viewController = configureOnboardViewController()
         }
         
         window?.rootViewController = viewController
@@ -73,6 +64,76 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // to restore the scene back to its current state.
     }
 
-
+    func configureViewController() -> UIViewController {
+        let viewController = ViewController()
+        
+        let dayViewController = DayViewController()
+        dayViewController.tabBarItem = UITabBarItem(
+            title: "CINEMA",
+            image: UIImage(systemName: "popcorn"),
+            tag: 0
+        )
+        
+        let upcomingViewController = UIViewController()
+        upcomingViewController.tabBarItem = UITabBarItem(
+            title: "UPCOMING",
+            image: UIImage(systemName: "film.stack"),
+            tag: 1
+        )
+        
+        let settingViewController = SettingViewController()
+        settingViewController.tabBarItem = UITabBarItem(
+            title: "PROFILE",
+            image: UIImage(systemName: "person.crop.circle"),
+            tag: 2
+        )
+        settingViewController.delegate = self
+        
+        let viewControllers = [
+            UINavigationController(rootViewController: dayViewController),
+            UINavigationController(rootViewController: upcomingViewController),
+            UINavigationController(rootViewController: settingViewController)
+        ]
+        
+        for vc in viewControllers {
+            vc.navigationBar.titleTextAttributes = [
+                .foregroundColor: UIColor.tm(.semantic(.text(.primary)))
+            ]
+            vc.navigationBar.tintColor = .tm(.primitive(.blue))
+            vc.navigationBar.barTintColor = .tm(.primitive(.black))
+        }
+        
+        viewController.setViewControllers(viewControllers, animated: true)
+        return viewController
+    }
+    
+    func configureOnboardViewController() -> UIViewController {
+        let onboardViewController = OnboardViewController()
+        onboardViewController.delegate = self
+        onboardViewController.navigationController?.navigationBar.titleTextAttributes = [
+            .foregroundColor: UIColor.tm(.semantic(.text(.primary)))
+        ]
+        onboardViewController.navigationController?.navigationBar.tintColor = .tm(.primitive(.blue))
+        onboardViewController.navigationController?.navigationBar.barTintColor = .tm(.primitive(.black))
+        
+        return UINavigationController(
+            rootViewController: onboardViewController
+        )
+    }
 }
 
+extension SceneDelegate: SettingViewControllerDelegate {
+    func withdrawButtonTouchUpInside() {
+        window?.rootViewController?.removeFromParent()
+        window?.rootViewController = configureOnboardViewController()
+        window?.makeKeyAndVisible()
+    }
+}
+
+extension SceneDelegate: OnboardViewControllerDelegate {
+    func completeButtonTouchUpInside() {
+        window?.rootViewController?.removeFromParent()
+        window?.rootViewController = configureViewController()
+        window?.makeKeyAndVisible()
+    }
+}

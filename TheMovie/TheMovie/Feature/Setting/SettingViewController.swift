@@ -9,11 +9,17 @@ import UIKit
 
 import SnapKit
 
+protocol SettingViewControllerDelegate: AnyObject {
+    func withdrawButtonTouchUpInside()
+}
+
 final class SettingViewController: UIViewController {
     private let profileView = TMProfileView()
     private let tableView = UITableView()
     
     private let items = SettingItem.allCases
+    
+    weak var delegate: (any SettingViewControllerDelegate)?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -93,7 +99,7 @@ private extension SettingViewController {
             UserDefaults.standard.removeObject(forKey: key.rawValue)
         }
         
-        switchRoot(navigation(OnboardViewController()))
+        delegate?.withdrawButtonTouchUpInside()
     }
     
     func presentWithdrawAlert() {

@@ -43,8 +43,6 @@ final class ViewController: UITabBarController {
 // MARK: Configure Views
 private extension ViewController {
     func configureUI() {
-        configureTabBarController()
-        
         configureTabBarAppearance()
         
         configureToastMessageView()
@@ -55,45 +53,6 @@ private extension ViewController {
             make.centerX.equalToSuperview()
             make.top.equalToSuperview()
         }
-    }
-    
-    func configureTabBarController() {
-        let dayViewController = DayViewController()
-        dayViewController.tabBarItem = UITabBarItem(
-            title: "CINEMA",
-            image: UIImage(systemName: "popcorn"),
-            tag: 0
-        )
-        
-        let upcomingViewController = UIViewController()
-        upcomingViewController.tabBarItem = UITabBarItem(
-            title: "UPCOMING",
-            image: UIImage(systemName: "film.stack"),
-            tag: 1
-        )
-        
-        let settingViewController = SettingViewController()
-        settingViewController.tabBarItem = UITabBarItem(
-            title: "PROFILE",
-            image: UIImage(systemName: "person.crop.circle"),
-            tag: 2
-        )
-        
-        let viewControllers = [
-            UINavigationController(rootViewController: dayViewController),
-            UINavigationController(rootViewController: upcomingViewController),
-            UINavigationController(rootViewController: settingViewController)
-        ]
-        
-        for viewController in viewControllers {
-            viewController.navigationBar.titleTextAttributes = [
-                .foregroundColor: UIColor.tm(.semantic(.text(.primary)))
-            ]
-            viewController.navigationBar.tintColor = .tm(.primitive(.blue))
-            viewController.navigationBar.barTintColor = .tm(.primitive(.black))
-        }
-        
-        setViewControllers(viewControllers, animated: true)
     }
     
     func configureTabBarAppearance() {

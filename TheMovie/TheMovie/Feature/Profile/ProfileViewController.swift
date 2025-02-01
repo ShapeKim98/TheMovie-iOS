@@ -9,8 +9,10 @@ import UIKit
 
 import SnapKit
 
-protocol ProfileViewControllerDelegate: AnyObject {
-    func dismiss()
+@objc protocol ProfileViewControllerDelegate: AnyObject {
+    @objc optional func dismiss()
+    
+    @objc optional func completeButtonTouchUpInside()
 }
 
 final class ProfileViewController: UIViewController {
@@ -190,8 +192,10 @@ private extension ProfileViewController {
         profileDate = Date.now.toString(format: .yy_o_MM_o_dd)
         UINotificationFeedbackGenerator()
             .notificationOccurred(.success)
-        
-        switchRoot(ViewController())
+        guard
+            let completeButtonTouchUpInside = delegate?.completeButtonTouchUpInside
+        else { return }
+        completeButtonTouchUpInside()
     }
     
     func updateTextFieldState(_ text: String) {
@@ -227,7 +231,8 @@ private extension ProfileViewController {
             .notificationOccurred(.success)
         dismiss(animated: true) { [weak self] in
             guard let `self` else { return }
-            delegate?.dismiss()
+            guard let dismiss = delegate?.dismiss else { return }
+            dismiss()
         }
     }
     

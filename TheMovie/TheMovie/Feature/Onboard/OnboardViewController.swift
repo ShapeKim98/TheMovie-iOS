@@ -9,11 +9,17 @@ import UIKit
 
 import SnapKit
 
+protocol OnboardViewControllerDelegate: AnyObject {
+    func completeButtonTouchUpInside()
+}
+
 final class OnboardViewController: UIViewController {
     private let onboardImageView = UIImageView()
     private let onboardLabel = UILabel()
     private let descriptionLabel = UILabel()
     private let startButton = TMBoarderButton(title: "시작하기")
+    
+    weak var delegate: (any OnboardViewControllerDelegate)?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -100,7 +106,15 @@ private extension OnboardViewController {
 // MARK: Functions
 private extension OnboardViewController {
     func startButtonTouchUpInside(_ action: UIAction) {
-        push(ProfileViewController(mode: .setting))
+        let viewController = ProfileViewController(mode: .setting)
+        viewController.delegate = self
+        push(viewController)
+    }
+}
+
+extension OnboardViewController: ProfileViewControllerDelegate {
+    func completeButtonTouchUpInside() {
+        delegate?.completeButtonTouchUpInside()
     }
 }
 
