@@ -103,6 +103,8 @@ final class QueryButton: UIView {
     }
     
     private func removeButtonAddAction(_ action: UIAction) {
+        UINotificationFeedbackGenerator()
+            .notificationOccurred(.error)
         delegate?.removeButtonTouchUpInside(text: text)
     }
 }

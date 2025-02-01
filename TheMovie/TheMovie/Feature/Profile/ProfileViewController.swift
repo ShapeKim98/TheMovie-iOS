@@ -188,6 +188,8 @@ private extension ProfileViewController {
         profileImageId = profileButton.id
         isProfileCompleted = true
         profileDate = Date.now.toString(format: .yy_o_MM_o_dd)
+        UINotificationFeedbackGenerator()
+            .notificationOccurred(.success)
         
         switchRoot(ViewController())
     }
@@ -221,6 +223,8 @@ private extension ProfileViewController {
         nickname = text
         profileImageId = profileButton.id
         isProfileCompleted = true
+        UINotificationFeedbackGenerator()
+            .notificationOccurred(.success)
         dismiss(animated: true) { [weak self] in
             guard let `self` else { return }
             delegate?.dismiss()

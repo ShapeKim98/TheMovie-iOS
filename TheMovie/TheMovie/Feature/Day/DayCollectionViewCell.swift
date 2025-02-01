@@ -132,6 +132,13 @@ private extension DayCollectionViewCell {
     func favoritButtonTouchUpInside(_ action: UIAction) {
         guard let button = action.sender as? UIButton else { return }
         favoriteButton.isSelected.toggle()
+        if favoriteButton.isSelected {
+            UINotificationFeedbackGenerator()
+                .notificationOccurred(.success)
+        } else {
+            UINotificationFeedbackGenerator()
+                .notificationOccurred(.warning)
+        }
         delegate?.favoriteButtonTouchUpInside(button.tag)
     }
 }

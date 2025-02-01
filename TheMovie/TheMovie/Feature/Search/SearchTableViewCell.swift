@@ -204,6 +204,13 @@ private extension SearchTableViewCell {
     func favoritButtonTouchUpInside(_ action: UIAction) {
         guard let button = action.sender as? UIButton else { return }
         button.isSelected.toggle()
+        if favoriteButton.isSelected {
+            UINotificationFeedbackGenerator()
+                .notificationOccurred(.success)
+        } else {
+            UINotificationFeedbackGenerator()
+                .notificationOccurred(.warning)
+        }
         delegate?.favoritButtonTouchUpInside(button.tag)
     }
     
