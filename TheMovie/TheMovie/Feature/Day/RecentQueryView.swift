@@ -192,6 +192,7 @@ private extension RecentQueryView {
 private extension RecentQueryView {
     func removeAllButtonTouchUpInside(_ action: UIAction) {
         UINotificationFeedbackGenerator()
+            .notificationOccurred(.error)
         recentQueries?.removeAll()
     }
 }

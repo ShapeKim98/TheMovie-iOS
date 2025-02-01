@@ -442,6 +442,13 @@ private extension DetailViewController {
         } else {
             movieBox?.updateValue(domain.movie.id, forKey: movieIdString)
         }
+        if favoriteButton.isSelected {
+            UINotificationFeedbackGenerator()
+                .notificationOccurred(.success)
+        } else {
+            UINotificationFeedbackGenerator()
+                .notificationOccurred(.warning)
+        }
         delegate?.favoriteButtonTouchUpInside(movieId: domain.movie.id)
     }
 }
