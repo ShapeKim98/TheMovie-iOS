@@ -24,7 +24,10 @@ final class TMProfileView: UIView {
     private var profileDate: String?
     @UserDefault(forKey: .userDefaults(.profileImageId))
     private var profileImageId: Int?
-    @UserDefault(forKey: .userDefaults(.movieBox))
+    @UserDefault(
+        forKey: .userDefaults(.movieBox),
+        defaultValue: [:]
+    )
     private var movieBox: [String: Int]?
     
     init() {

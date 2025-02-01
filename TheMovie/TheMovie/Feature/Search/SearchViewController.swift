@@ -20,7 +20,10 @@ final class SearchViewController: UIViewController {
     private let activityIndicatorView = UIActivityIndicatorView(style: .large)
     private let emptyLabel = UILabel()
     
-    @UserDefault(forKey: .userDefaults(.movieBox))
+    @UserDefault(
+        forKey: .userDefaults(.movieBox),
+        defaultValue: [:]
+    )
     private var movieBox: [String: Int]?
     @UserDefault(forKey: .userDefaults(.recentQueries))
     private var recentQueries: [String]?

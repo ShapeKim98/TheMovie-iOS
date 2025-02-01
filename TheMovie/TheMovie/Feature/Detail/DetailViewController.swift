@@ -40,7 +40,10 @@ final class DetailViewController: UIViewController {
     private let imagesClient = ImagesClient.shared
     private let creditsClient = CreditsClient.shared
     
-    @UserDefault(forKey: .userDefaults(.movieBox))
+    @UserDefault(
+        forKey: .userDefaults(.movieBox),
+        defaultValue: [:]
+    )
     private var movieBox: [String: Int]?
     
     private var domain: Detail {
