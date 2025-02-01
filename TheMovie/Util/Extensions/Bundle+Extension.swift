@@ -11,4 +11,12 @@ extension Bundle {
     var accessToken: String {
         return infoDictionary?["ACCESS_TOKEN"] as? String ?? ""
     }
+    
+    var baseURL: String {
+        return infoDictionary?["BASE_URL"] as? String ?? ""
+    }
+    
+    var imageBaseURL: String {
+        return infoDictionary?["IMAGE_BASE_URL"] as? String ?? ""
+    }
 }

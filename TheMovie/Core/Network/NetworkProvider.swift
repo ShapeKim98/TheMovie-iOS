@@ -50,9 +50,9 @@ struct NetworkProvider<E: EndPoint>: Sendable {
 }
 
 extension String {
-    static let baseURL = "https://api.themoviedb.org/3"
+    static let baseURL = Bundle.main.baseURL
     
-    static let imageBaseURL = "https://image.tmdb.org/t/p"
+    static let imageBaseURL = Bundle.main.imageBaseURL
 }
 
 extension HTTPHeaders {
