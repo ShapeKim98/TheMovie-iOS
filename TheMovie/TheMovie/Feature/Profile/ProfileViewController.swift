@@ -257,6 +257,10 @@ extension ProfileViewController: UITextFieldDelegate {
         updateTextFieldState(String(newText))
         return true
     }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+    }
 }
 
 extension ProfileViewController {
