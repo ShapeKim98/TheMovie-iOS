@@ -33,6 +33,11 @@ final class ViewController: UITabBarController {
             networkIsConnected = path.status == .satisfied
         }
     }
+    
+    override func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
+        UIImpactFeedbackGenerator(style: .light)
+            .impactOccurred()
+    }
 }
 
 // MARK: Configure Views
@@ -53,34 +58,42 @@ private extension ViewController {
     }
     
     func configureTabBarController() {
-        let dayViewController = UINavigationController(rootViewController: DayViewController())
-        dayViewController.tabBarItem.title = "CINEMA"
-        dayViewController.tabBarItem.image = UIImage(systemName: "popcorn")
-        
-        let upcomingViewController = UINavigationController(rootViewController: UIViewController())
-        upcomingViewController.tabBarItem.title = "UPCOMING"
-        upcomingViewController.tabBarItem.image = UIImage(systemName: "film.stack")
-        
-        let settingViewController = UINavigationController(rootViewController: SettingViewController())
-        settingViewController.tabBarItem.title = "PROFILE"
-        settingViewController.tabBarItem.image = UIImage(systemName: "person.crop.circle")
-        
-        setViewControllers(
-            [dayViewController, upcomingViewController, settingViewController],
-            animated: true
+        let dayViewController = DayViewController()
+        dayViewController.tabBarItem = UITabBarItem(
+            title: "CINEMA",
+            image: UIImage(systemName: "popcorn"),
+            tag: 0
         )
         
-        for viewController in viewControllers ?? [] {
-            guard let viewController = viewController as? UINavigationController else {
-                continue
-            }
-            
+        let upcomingViewController = UIViewController()
+        upcomingViewController.tabBarItem = UITabBarItem(
+            title: "UPCOMING",
+            image: UIImage(systemName: "film.stack"),
+            tag: 1
+        )
+        
+        let settingViewController = SettingViewController()
+        settingViewController.tabBarItem = UITabBarItem(
+            title: "PROFILE",
+            image: UIImage(systemName: "person.crop.circle"),
+            tag: 2
+        )
+        
+        let viewControllers = [
+            UINavigationController(rootViewController: dayViewController),
+            UINavigationController(rootViewController: upcomingViewController),
+            UINavigationController(rootViewController: settingViewController)
+        ]
+        
+        for viewController in viewControllers {
             viewController.navigationBar.titleTextAttributes = [
                 .foregroundColor: UIColor.tm(.semantic(.text(.primary)))
             ]
             viewController.navigationBar.tintColor = .tm(.primitive(.blue))
             viewController.navigationBar.barTintColor = .tm(.primitive(.black))
         }
+        
+        setViewControllers(viewControllers, animated: true)
     }
     
     func configureTabBarAppearance() {
@@ -124,4 +137,9 @@ private extension ViewController {
             }
         }
     }
+}
+
+@available(iOS 17.0, *)
+#Preview {
+    ViewController()
 }
