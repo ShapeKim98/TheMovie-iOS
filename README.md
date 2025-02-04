@@ -6,13 +6,9 @@
 
 ## 기능
 
-나만의 프로필 설정
-
-오늘 유행하는 영화 탐색
-
-영화의 자세한 정보 탐색
-
-영화 검색하기
+나만의 프로필 설정 | 오늘 유행하는 영화 탐색 | 영화의 자세한 정보 탐색 | 영화 검색하기
+|:----------:|:----------:|:----------:|:----------:|
+![Simulator Screenshot - iPhone 16 Pro - 2025-02-04 at 21 35 15](https://github.com/user-attachments/assets/cda805d5-a470-48ea-a627-6901692cf8d3) | ![Simulator Screenshot - iPhone 16 Pro - 2025-02-04 at 21 41 56](https://github.com/user-attachments/assets/80280447-2b7d-4ced-bd92-bdb41c3ab7dd) | ![Simulator Screenshot - iPhone 16 Pro - 2025-02-04 at 21 39 11](https://github.com/user-attachments/assets/4cba7f71-deec-442a-aecf-435b411fbd5c) | ![Simulator Screenshot - iPhone 16 Pro - 2025-02-04 at 21 39 43](https://github.com/user-attachments/assets/db53cc3a-ab16-4b6a-9aa9-fb0050bb8f50)
 
 ## 기술
 > `UIKit`, `SnapKit`, `Kingfisher`, `Alamofire`, `GCD`
@@ -30,16 +26,16 @@ DispatchQueue.global().async {
 	let lowercasedText = NSMutableAttributedString(
 		string: text.lowercased()
 	)
-
+	
 	//검색어 일치 여부 판단..
-
+	
 	guard matchCount != characters.count else {
 		DispatchQueue.main.async {
 			completion(mutableAttributedString)
 		}
 		return
 	}
-
+	
 	DispatchQueue.main.async {
 		completion(NSMutableAttributedString(string: text))
 	}
