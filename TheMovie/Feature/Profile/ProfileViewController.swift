@@ -17,28 +17,15 @@ import SnapKit
 
 final class ProfileViewController: UIViewController {
     private lazy var profileButton = TMProfileButton(
-        profileImageId ?? 0,
+        viewModel.model.profileImageId ?? 0,
         size: 100
     )
     private let nicknameTextField = NicknameTextField()
     private let completeButton = TMBoarderButton(title: "완료")
-    
-    @UserDefault(
-        forKey: .userDefaults(.profileImageId),
-        defaultValue: (0...11).randomElement() ?? 0
-    )
-    private var profileImageId: Int?
-    @UserDefault(forKey: .userDefaults(.nickname))
-    private var nickname: String?
-    @UserDefault(forKey: .userDefaults(.profileCompleted))
-    private var isProfileCompleted: Bool?
-    @UserDefault(forKey: .userDefaults(.profileDate))
-    private var profileDate: String?
-    
-    private var isValidNickname = false {
-        didSet { didSetIsValidNickname() }
-    }
+
     private let mode: Mode
+    
+    private let viewModel = ProfileViewModel()
     
     weak var delegate: (any ProfileViewControllerDelegate)?
     
@@ -58,6 +45,10 @@ final class ProfileViewController: UIViewController {
         configureUI()
         
         configureLayout()
+        
+        dataBinding()
+        
+        viewModel.input(.viewDidLoad)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -134,17 +125,15 @@ private extension ProfileViewController {
     }
     
     func configureNicknameTextField() {
-        nicknameTextField.textField.text = nickname
+        nicknameTextField.textField.text = viewModel.nickname
         nicknameTextField.textField.delegate = self
-        if let nickname {
-            updateTextFieldState(nickname)
-        }
+        nicknameTextField.updateState(viewModel.model.nicknameState)
         view.addSubview(nicknameTextField)
     }
     
     func configureCompleteButton() {
         completeButton.isHidden = mode == .edit
-        completeButton.isEnabled = nickname != nil
+        completeButton.isEnabled = viewModel.nickname != nil
         completeButton.addAction(
             UIAction(handler: completeButtonTouchUpInside),
             for: .touchUpInside
@@ -164,18 +153,46 @@ private extension ProfileViewController {
 
 // MARK: Data Bindings
 private extension ProfileViewController {
-    func didSetIsValidNickname() {
+    func dataBinding() {
+        Task { [weak self] in
+            guard let self else { return }
+            for await output in viewModel.output {
+                switch output {
+                case let .profileImageId(profileImageId):
+                    bindedProfileImageId(profileImageId)
+                case let .isValidNickname(isValidNickname):
+                    bindedIsValidNickname(isValidNickname)
+                case let .nicknameState(nicknameState):
+                    bindedNicknameState(nicknameState)
+                }
+            }
+        }
+    }
+    
+    func bindedProfileImageId(_ profileImageId: Int?) {
+        guard let profileImageId else { return }
+        profileButton.setProfile(id: profileImageId)
+        profileButton.id = profileImageId
+    }
+    
+    func bindedIsValidNickname(_ isValidNickname: Bool) {
         completeButton.isEnabled = isValidNickname
         navigationItem.rightBarButtonItem?.isEnabled = isValidNickname
+    }
+    
+    func bindedNicknameState(_ nicknameState: NicknameTextField.State) {
+        nicknameTextField.updateState(nicknameState)
     }
 }
 
 // MARK: Functions
 private extension ProfileViewController {
     func profileButtonTouchUpInside(_ action: UIAction) {
-        guard let profileImageId else { return }
+        guard
+            let profileImageId = viewModel.model.profileImageId
+        else { return }
         let viewModel = ProfileImageViewModel(selectedId: profileImageId)
-        viewModel.delegate = self
+        viewModel.delegate = self.viewModel
         let viewController = ProfileImageViewController(
             title: mode.profileImage,
             viewModel: viewModel
@@ -184,13 +201,7 @@ private extension ProfileViewController {
     }
     
     func completeButtonTouchUpInside(_ action: UIAction) {
-        guard let text = nicknameTextField.textField.text else {
-            return
-        }
-        nickname = text
-        profileImageId = profileButton.id
-        isProfileCompleted = true
-        profileDate = Date.now.toString(format: .yy_o_MM_o_dd)
+        viewModel.input(.completeButtonTouchUpInside(text: nicknameTextField.textField.text))
         UINotificationFeedbackGenerator()
             .notificationOccurred(.success)
         guard
@@ -199,35 +210,13 @@ private extension ProfileViewController {
         completeButtonTouchUpInside()
     }
     
-    func updateTextFieldState(_ text: String) {
-        isValidNickname = false
-        guard (2 <= text.count && text.count < 10) else {
-            nicknameTextField.updateState(.글자수_조건에_맞지_않는_경우)
-            return
-        }
-        guard !text.contains(/[@#$%]/) else {
-            nicknameTextField.updateState(.특수문자_조건에_맞지_않는_경우)
-            return
-        }
-        guard !text.contains(/\d/) else {
-            nicknameTextField.updateState(.숫자_조건에_맞지_않는_경우)
-            return
-        }
-        isValidNickname = true
-        nicknameTextField.updateState(.조건에_맞는_경우)
-    }
-    
     func backButtonTouchUpInside(_ action: UIAction) {
         dismiss(animated: true)
     }
     
     func saveButtonTouchUpInside(_ action: UIAction) {
-        guard let text = nicknameTextField.textField.text else {
-            return
-        }
-        nickname = text
-        profileImageId = profileButton.id
-        isProfileCompleted = true
+        viewModel.input(.saveButtonTouchUpInside(text: nicknameTextField.textField.text))
+        
         UINotificationFeedbackGenerator()
             .notificationOccurred(.success)
         dismiss(animated: true) { [weak self] in
@@ -243,19 +232,13 @@ private extension ProfileViewController {
     }
 }
 
-extension ProfileViewController: ProfileImageViewModelDelegate {
-    func collectionViewDidSelectItemAt(selectedId: Int) {
-        profileButton.setProfile(id: selectedId)
-        profileButton.id = selectedId
-    }
-}
-
 extension ProfileViewController: UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        guard let text = textField.text else { return true }
-        let newText = text.prefix(range.location) + string
-        
-        updateTextFieldState(String(newText))
+        viewModel.input(.textFieldShouldChangeCharactersIn(
+            text: textField.text,
+            range: range,
+            string: string
+        ))
         return true
     }
     
