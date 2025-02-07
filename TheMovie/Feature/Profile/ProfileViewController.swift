@@ -174,11 +174,12 @@ private extension ProfileViewController {
 private extension ProfileViewController {
     func profileButtonTouchUpInside(_ action: UIAction) {
         guard let profileImageId else { return }
+        let viewModel = ProfileImageViewModel(selectedId: profileImageId)
+        viewModel.delegate = self
         let viewController = ProfileImageViewController(
-            selectedId: profileImageId,
-            title: mode.profileImage
+            title: mode.profileImage,
+            viewModel: viewModel
         )
-        viewController.delegate = self
         push(viewController)
     }
     
@@ -242,8 +243,8 @@ private extension ProfileViewController {
     }
 }
 
-extension ProfileViewController: ProfileImageViewControllerDelegate {
-    func didSetSelectedId(selectedId: Int) {
+extension ProfileViewController: ProfileImageViewModelDelegate {
+    func collectionViewDidSelectItemAt(selectedId: Int) {
         profileButton.setProfile(id: selectedId)
         profileButton.id = selectedId
     }
@@ -288,5 +289,5 @@ extension ProfileViewController {
 
 @available(iOS 17.0, *)
 #Preview {
-    ProfileViewController(mode: .setting)
+    UINavigationController(rootViewController: ProfileViewController(mode: .setting))
 }
