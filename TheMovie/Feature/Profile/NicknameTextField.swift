@@ -86,5 +86,8 @@ final class NicknameTextField: UIView {
     func updateState(_ state: State) {
         stateLabel.isHidden = false
         stateLabel.text = state.text
+        stateLabel.textColor = state == .조건에_맞는_경우
+        ? .tm(.semantic(.text(.brand)))
+        : .tm(.semantic(.text(.error)))
     }
 }
