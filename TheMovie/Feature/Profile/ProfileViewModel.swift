@@ -9,7 +9,6 @@ import Foundation
 
 final class ProfileViewModel: ViewModel {
     enum Input {
-        case viewDidLoad
         case completeButtonTouchUpInside(text: String?)
         case textFieldShouldChangeCharactersIn(text: String?, range: NSRange, string: String)
         case saveButtonTouchUpInside(text: String?)
@@ -77,9 +76,6 @@ final class ProfileViewModel: ViewModel {
     
     func input(_ action: Input) {
         switch action {
-        case .viewDidLoad:
-            guard let nickname else { return }
-            updateTextFieldState(nickname)
         case let .completeButtonTouchUpInside(text):
             guard let text else { return }
             nickname = text

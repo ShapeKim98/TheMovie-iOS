@@ -47,8 +47,6 @@ final class ProfileViewController: UIViewController {
         configureLayout()
         
         dataBinding()
-        
-        viewModel.input(.viewDidLoad)
     }
     
     override func viewDidAppear(_ animated: Bool) {
