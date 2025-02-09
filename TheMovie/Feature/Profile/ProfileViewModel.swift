@@ -25,7 +25,7 @@ final class ProfileViewModel: ViewModel {
     
     enum Output {
         case profileImageId(_ value: Int?)
-        case isValidNickname(_ value: Bool)
+        case isValidProfile(_ value: Bool)
         case nicknameState(_ value: NicknameTextField.State)
         case selectedMBTI(_ value: [MBTIType: String])
     }
@@ -40,7 +40,7 @@ final class ProfileViewModel: ViewModel {
         var isValidProfile = false {
             didSet {
                 guard oldValue != isValidProfile else { return }
-                continuation?.yield(.isValidNickname(isValidProfile))
+                continuation?.yield(.isValidProfile(isValidProfile))
             }
         }
         var nicknameState: NicknameTextField.State = .글자수_조건에_맞지_않는_경우 {

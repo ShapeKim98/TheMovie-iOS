@@ -200,8 +200,8 @@ private extension ProfileViewController {
                 switch output {
                 case let .profileImageId(profileImageId):
                     bindedProfileImageId(profileImageId)
-                case let .isValidNickname(isValidNickname):
-                    bindedIsValidNickname(isValidNickname)
+                case let .isValidProfile(isValidProfile):
+                    bindedIsValidProfile(isValidProfile)
                 case let .nicknameState(nicknameState):
                     bindedNicknameState(nicknameState)
                 case let .selectedMBTI(selectedMBTI):
@@ -218,10 +218,10 @@ private extension ProfileViewController {
         profileButton.id = profileImageId
     }
     
-    func bindedIsValidNickname(_ isValidNickname: Bool) {
+    func bindedIsValidProfile(_ isValidProfile: Bool) {
         print(#function)
-        completeButton.isEnabled = isValidNickname
-        navigationItem.rightBarButtonItem?.isEnabled = isValidNickname
+        completeButton.isEnabled = isValidProfile
+        navigationItem.rightBarButtonItem?.isEnabled = isValidProfile
     }
     
     func bindedNicknameState(_ nicknameState: NicknameTextField.State) {
