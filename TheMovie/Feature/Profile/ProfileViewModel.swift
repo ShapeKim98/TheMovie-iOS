@@ -72,6 +72,7 @@ final class ProfileViewModel: ViewModel {
                 model.selectedMBTI[type] = value
             }
         }
+        model.isValidProfile = model.selectedMBTI.count == 4
     }
     
     deinit {

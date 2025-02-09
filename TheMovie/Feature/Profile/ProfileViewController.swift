@@ -121,6 +121,7 @@ private extension ProfileViewController {
                 title: "저장",
                 primaryAction: UIAction(handler: saveButtonTouchUpInside)
             )
+            navigationItem.rightBarButtonItem?.isEnabled = viewModel.model.isValidProfile
         }
         setTMBackButton()
     }
@@ -149,7 +150,7 @@ private extension ProfileViewController {
     
     func configureCompleteButton() {
         completeButton.isHidden = mode == .edit
-        completeButton.isEnabled = viewModel.nickname != nil
+        completeButton.isEnabled = viewModel.model.isValidProfile != nil
         completeButton.addAction(
             UIAction(handler: completeButtonTouchUpInside),
             for: .touchUpInside
