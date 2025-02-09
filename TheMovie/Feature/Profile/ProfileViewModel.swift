@@ -138,7 +138,8 @@ extension ProfileViewModel: ProfileImageViewModelDelegate {
 
 private extension ProfileViewModel {
     func updateTextFieldState(_ text: String) {
-        guard (2 <= text.count && text.count < 10) else {
+        let count = text.filter { !$0.isWhitespace }.count
+        guard (2 <= count && count < 10) else {
             model.nicknameState = .글자수_조건에_맞지_않는_경우
             model.isValidProfile = false
             return
