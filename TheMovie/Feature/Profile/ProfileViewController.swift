@@ -150,7 +150,7 @@ private extension ProfileViewController {
     
     func configureCompleteButton() {
         completeButton.isHidden = mode == .edit
-        completeButton.isEnabled = viewModel.model.isValidProfile != nil
+        completeButton.isEnabled = viewModel.model.isValidProfile
         completeButton.addAction(
             UIAction(handler: completeButtonTouchUpInside),
             for: .touchUpInside
