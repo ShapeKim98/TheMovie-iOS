@@ -364,6 +364,10 @@ extension ProfileViewController {
     }
 }
 
+fileprivate extension String {
+    static let mbtiCollectionCell = "MBTICollectionViewCell"
+}
+
 @available(iOS 17.0, *)
 #Preview {
     UINavigationController(rootViewController: ProfileViewController(mode: .setting))

@@ -43,6 +43,3 @@ final class ProfileImageCollectionViewCell: UICollectionViewCell {
     }
 }
 
-extension String {
-    static let profileImageCollectionCell = "ProfileImageCollectionViewCell"
-}

@@ -80,6 +80,3 @@ private extension MBTICollectionViewCell {
     }
 }
 
-extension String {
-    static let mbtiCollectionCell = "MBTICollectionViewCell"
-}

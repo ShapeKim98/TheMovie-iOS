@@ -152,6 +152,10 @@ extension ProfileImageViewController: UICollectionViewDataSource,
     }
 }
 
+fileprivate extension String {
+    static let profileImageCollectionCell = "ProfileImageCollectionViewCell"
+}
+
 @available(iOS 17.0, *)
 #Preview {
     ProfileImageViewController(title: "프로필 이미지 설정", viewModel: .init(selectedId: 0))
