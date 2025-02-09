@@ -20,6 +20,7 @@ final class ProfileViewModel: ViewModel {
         case textFieldShouldChangeCharactersIn(text: String?, range: NSRange, string: String)
         case saveButtonTouchUpInside(text: String?)
         case collectionViewDidSelectItemAt(element: String)
+        case collectionViewDidDeselectItemAt(element: String)
     }
     
     enum Output {
@@ -36,10 +37,10 @@ final class ProfileViewModel: ViewModel {
                 continuation?.yield(.profileImageId(profileImageId))
             }
         }
-        var isValidNickname = false {
+        var isValidProfile = false {
             didSet {
-                guard oldValue != isValidNickname else { return }
-                continuation?.yield(.isValidNickname(isValidNickname))
+                guard oldValue != isValidProfile else { return }
+                continuation?.yield(.isValidNickname(isValidProfile))
             }
         }
         var nicknameState: NicknameTextField.State = .글자수_조건에_맞지_않는_경우 {
@@ -121,6 +122,10 @@ final class ProfileViewModel: ViewModel {
             saveSelectedMBTI()
         case let .collectionViewDidSelectItemAt(element):
             updateSelectedMBTI(element)
+            model.isValidProfile = model.selectedMBTI.count == 4
+        case let .collectionViewDidDeselectItemAt(element):
+            updateSelectedMBTI(element)
+            model.isValidProfile = model.selectedMBTI.count == 4
         }
     }
 }
@@ -135,33 +140,49 @@ private extension ProfileViewModel {
     func updateTextFieldState(_ text: String) {
         guard (2 <= text.count && text.count < 10) else {
             model.nicknameState = .글자수_조건에_맞지_않는_경우
-            model.isValidNickname = false
+            model.isValidProfile = false
             return
         }
         guard !text.contains(/[@#$%]/) else {
             model.nicknameState = .특수문자_조건에_맞지_않는_경우
-            model.isValidNickname = false
+            model.isValidProfile = false
             return
         }
         guard !text.contains(/\d/) else {
             model.nicknameState = .숫자_조건에_맞지_않는_경우
-            model.isValidNickname = false
+            model.isValidProfile = false
             return
         }
-        model.isValidNickname = true
+        model.isValidProfile = true
         model.nicknameState = .조건에_맞는_경우
     }
     
     func updateSelectedMBTI(_ element: String) {
         switch element {
         case "E", "I":
-            model.selectedMBTI[.주의초점] = element
+            if model.selectedMBTI[.주의초점] == element {
+                model.selectedMBTI[.주의초점] = nil
+            } else {
+                model.selectedMBTI[.주의초점] = element
+            }
         case "N", "S":
-            model.selectedMBTI[.인식기능] = element
+            if model.selectedMBTI[.인식기능] == element {
+                model.selectedMBTI[.인식기능] = nil
+            } else {
+                model.selectedMBTI[.인식기능] = element
+            }
         case "T", "F":
-            model.selectedMBTI[.판단기능] = element
+            if model.selectedMBTI[.판단기능] == element {
+                model.selectedMBTI[.판단기능] = nil
+            } else {
+                model.selectedMBTI[.판단기능] = element
+            }
         case "J", "P":
-            model.selectedMBTI[.생활양식] = element
+            if model.selectedMBTI[.생활양식] == element {
+                model.selectedMBTI[.생활양식] = nil
+            } else {
+                model.selectedMBTI[.생활양식] = element
+            }
         default:
             break
         }

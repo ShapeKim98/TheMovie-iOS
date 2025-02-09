@@ -212,20 +212,24 @@ private extension ProfileViewController {
     
     func bindedProfileImageId(_ profileImageId: Int?) {
         guard let profileImageId else { return }
+        print(#function)
         profileButton.setProfile(id: profileImageId)
         profileButton.id = profileImageId
     }
     
     func bindedIsValidNickname(_ isValidNickname: Bool) {
+        print(#function)
         completeButton.isEnabled = isValidNickname
         navigationItem.rightBarButtonItem?.isEnabled = isValidNickname
     }
     
     func bindedNicknameState(_ nicknameState: NicknameTextField.State) {
+        print(#function)
         nicknameTextField.updateState(nicknameState)
     }
     
     func bindedSelectedMBTI(_ selectedMBTI: [MBTIType: String]) {
+        print(#function)
         let seletectValues = Set(selectedMBTI.values)
         for (index, element) in mbtiElements.enumerated() {
             let indexPath = IndexPath(item: index, section: 0)
@@ -315,6 +319,10 @@ extension ProfileViewController: UICollectionViewDelegate,
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         viewModel.input(.collectionViewDidSelectItemAt(element: mbtiElements[indexPath.item]))
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        viewModel.input(.collectionViewDidDeselectItemAt(element: mbtiElements[indexPath.item]))
     }
 }
 
