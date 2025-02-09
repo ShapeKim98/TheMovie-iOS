@@ -22,8 +22,14 @@ final class ProfileViewController: UIViewController {
     )
     private let nicknameTextField = NicknameTextField()
     private let completeButton = TMBoarderButton(title: "완료")
-
+    private lazy var mbtiCollectionView = {
+        configureMBTICollectionView()
+    }()
+    private let mbtiLabel = UILabel()
+    
     private let mode: Mode
+    
+    private let mbtiElements = ["E", "I", "S", "N", "T", "F", "J", "P"]
     
     private let viewModel = ProfileViewModel()
     
@@ -71,7 +77,7 @@ private extension ProfileViewController {
         
         configureCompleteButton()
         
-        configureGestureRecognizer()
+        configureMBTILabel()
     }
     
     func configureLayout() {
@@ -86,8 +92,20 @@ private extension ProfileViewController {
         }
         
         completeButton.snp.makeConstraints { make in
-            make.top.equalTo(nicknameTextField.stateLabel.snp.bottom).offset(32)
+            make.bottom.equalTo(view.safeAreaLayoutGuide)
             make.horizontalEdges.equalToSuperview().inset(16)
+        }
+        
+        mbtiCollectionView.snp.makeConstraints { make in
+            make.top.equalTo(nicknameTextField.snp.bottom).offset(52)
+            make.trailing.equalToSuperview().inset(16)
+            make.width.equalTo(200 + 24)
+            make.height.equalTo(100 + 8)
+        }
+        
+        mbtiLabel.snp.makeConstraints { make in
+            make.top.equalTo(mbtiCollectionView).inset(8)
+            make.leading.equalToSuperview().inset(16)
         }
     }
     
@@ -139,13 +157,36 @@ private extension ProfileViewController {
         view.addSubview(completeButton)
     }
     
-    func configureGestureRecognizer() {
-        view.gestureRecognizers = [
-            UITapGestureRecognizer(
-                target: self,
-                action: #selector(tapGestureRecognizer)
-            )
-        ]
+    func configureMBTICollectionView() -> UICollectionView {
+        let layout = UICollectionViewFlowLayout()
+        let spacing: CGFloat = 8
+        
+        layout.scrollDirection = .horizontal
+        layout.minimumLineSpacing = spacing
+        layout.minimumInteritemSpacing = spacing
+        layout.itemSize = CGSize(width: 50, height: 50)
+        let collectionView = UICollectionView(
+            frame: .zero,
+            collectionViewLayout: layout
+        )
+        collectionView.register(
+            MBTICollectionViewCell.self,
+            forCellWithReuseIdentifier: .mbtiCollectionCell
+        )
+        collectionView.backgroundColor = .clear
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.allowsMultipleSelection = true
+        view.addSubview(collectionView)
+        
+        return collectionView
+    }
+    
+    func configureMBTILabel() {
+        mbtiLabel.text = "MBTI"
+        mbtiLabel.textColor = .tm(.semantic(.text(.primary)))
+        mbtiLabel.font = .systemFont(ofSize: 16, weight: .heavy)
+        view.addSubview(mbtiLabel)
     }
 }
 
@@ -162,6 +203,8 @@ private extension ProfileViewController {
                     bindedIsValidNickname(isValidNickname)
                 case let .nicknameState(nicknameState):
                     bindedNicknameState(nicknameState)
+                case let .selectedMBTI(selectedMBTI):
+                    bindedSelectedMBTI(selectedMBTI)
                 }
             }
         }
@@ -180,6 +223,25 @@ private extension ProfileViewController {
     
     func bindedNicknameState(_ nicknameState: NicknameTextField.State) {
         nicknameTextField.updateState(nicknameState)
+    }
+    
+    func bindedSelectedMBTI(_ selectedMBTI: [MBTIType: String]) {
+        let seletectValues = Set(selectedMBTI.values)
+        for (index, element) in mbtiElements.enumerated() {
+            let indexPath = IndexPath(item: index, section: 0)
+            if seletectValues.contains(element) {
+                mbtiCollectionView.selectItem(
+                    at: indexPath,
+                    animated: true,
+                    scrollPosition: []
+                )
+            } else {
+                mbtiCollectionView.deselectItem(
+                    at: indexPath,
+                    animated: true
+                )
+            }
+        }
     }
 }
 
@@ -223,10 +285,36 @@ private extension ProfileViewController {
             dismiss()
         }
     }
+}
+
+extension ProfileViewController: UICollectionViewDelegate,
+                                 UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 8
+    }
     
-    @objc
-    func tapGestureRecognizer(_ action: UITapGestureRecognizer) {
-        nicknameTextField.textField.resignFirstResponder()
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: .mbtiCollectionCell,
+            for: indexPath
+        ) as? MBTICollectionViewCell
+        guard let cell else { return UICollectionViewCell() }
+        let element = mbtiElements[indexPath.item]
+        cell.forItemAt(element)
+        let seletectValues = Set(viewModel.model.selectedMBTI.values)
+        if seletectValues.contains(element) {
+            collectionView.selectItem(
+                at: indexPath,
+                animated: true,
+                scrollPosition: []
+            )
+        }
+        
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        viewModel.input(.collectionViewDidSelectItemAt(element: mbtiElements[indexPath.item]))
     }
 }
 
