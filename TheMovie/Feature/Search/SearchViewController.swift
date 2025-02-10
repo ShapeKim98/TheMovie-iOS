@@ -187,8 +187,6 @@ private extension SearchViewController {
 // MARK: Functions
 private extension SearchViewController {
     func fetchSearch(query: String) {
-        guard !query.isEmpty else { return }
-        
         updateRecentQueries(query: query)
         let request = SearchRequest(query: query, page: 1)
         searchClient.fetchSearch(request) { [weak self] result in
@@ -242,7 +240,11 @@ private extension SearchViewController {
 
 extension SearchViewController: UITextFieldDelegate, UISearchControllerDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        guard let text = textField.text, !text.isEmpty else { return true }
+        guard
+            let text = textField.text,
+            !text.isEmpty,
+            !text.filter({ !$0.isWhitespace }).isEmpty
+        else { return true }
         domain = nil
         fetchSearch(query: text)
         searchController.searchBar.searchTextField.resignFirstResponder()
