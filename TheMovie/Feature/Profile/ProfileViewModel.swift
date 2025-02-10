@@ -115,6 +115,7 @@ final class ProfileViewModel: ViewModel {
             guard let text else { return }
             let newText = text.prefix(range.location) + string
             updateTextFieldState(String(newText))
+            updateIsValidProfile()
         case let .saveButtonTouchUpInside(text):
             guard let text else { return }
             nickname = text
@@ -123,10 +124,10 @@ final class ProfileViewModel: ViewModel {
             saveSelectedMBTI()
         case let .collectionViewDidSelectItemAt(element):
             updateSelectedMBTI(element)
-            model.isValidProfile = model.selectedMBTI.count == 4
+            updateIsValidProfile()
         case let .collectionViewDidDeselectItemAt(element):
             updateSelectedMBTI(element)
-            model.isValidProfile = model.selectedMBTI.count == 4
+            updateIsValidProfile()
         }
     }
 }
@@ -155,7 +156,6 @@ private extension ProfileViewModel {
             model.isValidProfile = false
             return
         }
-        model.isValidProfile = true
         model.nicknameState = .조건에_맞는_경우
     }
     
@@ -188,6 +188,12 @@ private extension ProfileViewModel {
         default:
             break
         }
+    }
+    
+    func updateIsValidProfile() {
+        let isValidNickname = model.nicknameState == .조건에_맞는_경우
+        let isValidMBTI = model.selectedMBTI.count == 4
+        model.isValidProfile = isValidNickname && isValidMBTI
     }
     
     func saveSelectedMBTI() {
