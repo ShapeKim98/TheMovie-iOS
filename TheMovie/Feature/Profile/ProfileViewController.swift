@@ -17,28 +17,21 @@ import SnapKit
 
 final class ProfileViewController: UIViewController {
     private lazy var profileButton = TMProfileButton(
-        profileImageId ?? 0,
+        viewModel.model.profileImageId ?? 0,
         size: 100
     )
     private let nicknameTextField = NicknameTextField()
     private let completeButton = TMBoarderButton(title: "완료")
+    private lazy var mbtiCollectionView = {
+        configureMBTICollectionView()
+    }()
+    private let mbtiLabel = UILabel()
     
-    @UserDefault(
-        forKey: .userDefaults(.profileImageId),
-        defaultValue: (0...11).randomElement() ?? 0
-    )
-    private var profileImageId: Int?
-    @UserDefault(forKey: .userDefaults(.nickname))
-    private var nickname: String?
-    @UserDefault(forKey: .userDefaults(.profileCompleted))
-    private var isProfileCompleted: Bool?
-    @UserDefault(forKey: .userDefaults(.profileDate))
-    private var profileDate: String?
-    
-    private var isValidNickname = false {
-        didSet { didSetIsValidNickname() }
-    }
     private let mode: Mode
+    
+    private let mbtiElements = ["E", "I", "S", "N", "T", "F", "J", "P"]
+    
+    private let viewModel = ProfileViewModel()
     
     weak var delegate: (any ProfileViewControllerDelegate)?
     
@@ -58,6 +51,8 @@ final class ProfileViewController: UIViewController {
         configureUI()
         
         configureLayout()
+        
+        dataBinding()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -82,7 +77,7 @@ private extension ProfileViewController {
         
         configureCompleteButton()
         
-        configureGestureRecognizer()
+        configureMBTILabel()
     }
     
     func configureLayout() {
@@ -97,8 +92,20 @@ private extension ProfileViewController {
         }
         
         completeButton.snp.makeConstraints { make in
-            make.top.equalTo(nicknameTextField.stateLabel.snp.bottom).offset(32)
+            make.bottom.equalTo(view.safeAreaLayoutGuide)
             make.horizontalEdges.equalToSuperview().inset(16)
+        }
+        
+        mbtiCollectionView.snp.makeConstraints { make in
+            make.top.equalTo(nicknameTextField.snp.bottom).offset(52)
+            make.trailing.equalToSuperview().inset(16)
+            make.width.equalTo(200 + 24)
+            make.height.equalTo(100 + 8)
+        }
+        
+        mbtiLabel.snp.makeConstraints { make in
+            make.top.equalTo(mbtiCollectionView).inset(8)
+            make.leading.equalToSuperview().inset(16)
         }
     }
     
@@ -114,6 +121,7 @@ private extension ProfileViewController {
                 title: "저장",
                 primaryAction: UIAction(handler: saveButtonTouchUpInside)
             )
+            navigationItem.rightBarButtonItem?.isEnabled = viewModel.model.isValidProfile
         }
         setTMBackButton()
     }
@@ -134,17 +142,15 @@ private extension ProfileViewController {
     }
     
     func configureNicknameTextField() {
-        nicknameTextField.textField.text = nickname
+        nicknameTextField.textField.text = viewModel.nickname
         nicknameTextField.textField.delegate = self
-        if let nickname {
-            updateTextFieldState(nickname)
-        }
+        nicknameTextField.updateState(viewModel.model.nicknameState)
         view.addSubview(nicknameTextField)
     }
     
     func configureCompleteButton() {
         completeButton.isHidden = mode == .edit
-        completeButton.isEnabled = nickname != nil
+        completeButton.isEnabled = viewModel.model.isValidProfile
         completeButton.addAction(
             UIAction(handler: completeButtonTouchUpInside),
             for: .touchUpInside
@@ -152,44 +158,115 @@ private extension ProfileViewController {
         view.addSubview(completeButton)
     }
     
-    func configureGestureRecognizer() {
-        view.gestureRecognizers = [
-            UITapGestureRecognizer(
-                target: self,
-                action: #selector(tapGestureRecognizer)
-            )
-        ]
+    func configureMBTICollectionView() -> UICollectionView {
+        let layout = UICollectionViewFlowLayout()
+        let spacing: CGFloat = 8
+        
+        layout.scrollDirection = .horizontal
+        layout.minimumLineSpacing = spacing
+        layout.minimumInteritemSpacing = spacing
+        layout.itemSize = CGSize(width: 50, height: 50)
+        let collectionView = UICollectionView(
+            frame: .zero,
+            collectionViewLayout: layout
+        )
+        collectionView.register(
+            MBTICollectionViewCell.self,
+            forCellWithReuseIdentifier: .mbtiCollectionCell
+        )
+        collectionView.backgroundColor = .clear
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.allowsMultipleSelection = true
+        view.addSubview(collectionView)
+        
+        return collectionView
+    }
+    
+    func configureMBTILabel() {
+        mbtiLabel.text = "MBTI"
+        mbtiLabel.textColor = .tm(.semantic(.text(.primary)))
+        mbtiLabel.font = .systemFont(ofSize: 16, weight: .heavy)
+        view.addSubview(mbtiLabel)
     }
 }
 
 // MARK: Data Bindings
 private extension ProfileViewController {
-    func didSetIsValidNickname() {
-        completeButton.isEnabled = isValidNickname
-        navigationItem.rightBarButtonItem?.isEnabled = isValidNickname
+    func dataBinding() {
+        Task { [weak self] in
+            guard let self else { return }
+            for await output in viewModel.output {
+                switch output {
+                case let .profileImageId(profileImageId):
+                    bindedProfileImageId(profileImageId)
+                case let .isValidProfile(isValidProfile):
+                    bindedIsValidProfile(isValidProfile)
+                case let .nicknameState(nicknameState):
+                    bindedNicknameState(nicknameState)
+                case let .selectedMBTI(selectedMBTI):
+                    bindedSelectedMBTI(selectedMBTI)
+                }
+            }
+        }
+    }
+    
+    func bindedProfileImageId(_ profileImageId: Int?) {
+        guard let profileImageId else { return }
+        print(#function)
+        profileButton.setProfile(id: profileImageId)
+        profileButton.id = profileImageId
+    }
+    
+    func bindedIsValidProfile(_ isValidProfile: Bool) {
+        print(#function)
+        completeButton.isEnabled = isValidProfile
+        navigationItem.rightBarButtonItem?.isEnabled = isValidProfile
+    }
+    
+    func bindedNicknameState(_ nicknameState: NicknameTextField.State) {
+        print(#function)
+        nicknameTextField.updateState(nicknameState)
+    }
+    
+    func bindedSelectedMBTI(_ selectedMBTI: [MBTIType: String]) {
+        print(#function)
+        let seletectValues = Set(selectedMBTI.values)
+        for (index, element) in mbtiElements.enumerated() {
+            let indexPath = IndexPath(item: index, section: 0)
+            if seletectValues.contains(element) {
+                mbtiCollectionView.selectItem(
+                    at: indexPath,
+                    animated: true,
+                    scrollPosition: []
+                )
+            } else {
+                mbtiCollectionView.deselectItem(
+                    at: indexPath,
+                    animated: true
+                )
+            }
+        }
     }
 }
 
 // MARK: Functions
 private extension ProfileViewController {
     func profileButtonTouchUpInside(_ action: UIAction) {
-        guard let profileImageId else { return }
+        guard
+            let profileImageId = viewModel.model.profileImageId
+        else { return }
+        let viewModel = ProfileImageViewModel(selectedId: profileImageId)
+        viewModel.delegate = self.viewModel
         let viewController = ProfileImageViewController(
-            selectedId: profileImageId,
-            title: mode.profileImage
+            title: mode.profileImage,
+            viewModel: viewModel
         )
-        viewController.delegate = self
         push(viewController)
     }
     
     func completeButtonTouchUpInside(_ action: UIAction) {
-        guard let text = nicknameTextField.textField.text else {
-            return
-        }
-        nickname = text
-        profileImageId = profileButton.id
-        isProfileCompleted = true
-        profileDate = Date.now.toString(format: .yy_o_MM_o_dd)
+        viewModel.input(.completeButtonTouchUpInside(text: nicknameTextField.textField.text))
         UINotificationFeedbackGenerator()
             .notificationOccurred(.success)
         guard
@@ -198,35 +275,13 @@ private extension ProfileViewController {
         completeButtonTouchUpInside()
     }
     
-    func updateTextFieldState(_ text: String) {
-        isValidNickname = false
-        guard (2 <= text.count && text.count < 10) else {
-            nicknameTextField.updateState(.글자수_조건에_맞지_않는_경우)
-            return
-        }
-        guard !text.contains(/[@#$%]/) else {
-            nicknameTextField.updateState(.특수문자_조건에_맞지_않는_경우)
-            return
-        }
-        guard !text.contains(/\d/) else {
-            nicknameTextField.updateState(.숫자_조건에_맞지_않는_경우)
-            return
-        }
-        isValidNickname = true
-        nicknameTextField.updateState(.조건에_맞는_경우)
-    }
-    
     func backButtonTouchUpInside(_ action: UIAction) {
         dismiss(animated: true)
     }
     
     func saveButtonTouchUpInside(_ action: UIAction) {
-        guard let text = nicknameTextField.textField.text else {
-            return
-        }
-        nickname = text
-        profileImageId = profileButton.id
-        isProfileCompleted = true
+        viewModel.input(.saveButtonTouchUpInside(text: nicknameTextField.textField.text))
+        
         UINotificationFeedbackGenerator()
             .notificationOccurred(.success)
         dismiss(animated: true) { [weak self] in
@@ -235,26 +290,50 @@ private extension ProfileViewController {
             dismiss()
         }
     }
-    
-    @objc
-    func tapGestureRecognizer(_ action: UITapGestureRecognizer) {
-        nicknameTextField.textField.resignFirstResponder()
-    }
 }
 
-extension ProfileViewController: ProfileImageViewControllerDelegate {
-    func didSetSelectedId(selectedId: Int) {
-        profileButton.setProfile(id: selectedId)
-        profileButton.id = selectedId
+extension ProfileViewController: UICollectionViewDelegate,
+                                 UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 8
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: .mbtiCollectionCell,
+            for: indexPath
+        ) as? MBTICollectionViewCell
+        guard let cell else { return UICollectionViewCell() }
+        let element = mbtiElements[indexPath.item]
+        cell.forItemAt(element)
+        let seletectValues = Set(viewModel.model.selectedMBTI.values)
+        if seletectValues.contains(element) {
+            collectionView.selectItem(
+                at: indexPath,
+                animated: true,
+                scrollPosition: []
+            )
+        }
+        
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        viewModel.input(.collectionViewDidSelectItemAt(element: mbtiElements[indexPath.item]))
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        viewModel.input(.collectionViewDidDeselectItemAt(element: mbtiElements[indexPath.item]))
     }
 }
 
 extension ProfileViewController: UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        guard let text = textField.text else { return true }
-        let newText = text.prefix(range.location) + string
-        
-        updateTextFieldState(String(newText))
+        viewModel.input(.textFieldShouldChangeCharactersIn(
+            text: textField.text,
+            range: range,
+            string: string
+        ))
         return true
     }
     
@@ -286,7 +365,11 @@ extension ProfileViewController {
     }
 }
 
+fileprivate extension String {
+    static let mbtiCollectionCell = "MBTICollectionViewCell"
+}
+
 @available(iOS 17.0, *)
 #Preview {
-    ProfileViewController(mode: .setting)
+    UINavigationController(rootViewController: ProfileViewController(mode: .setting))
 }

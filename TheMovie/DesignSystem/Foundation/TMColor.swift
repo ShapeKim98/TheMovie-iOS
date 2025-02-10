@@ -32,6 +32,7 @@ extension TMColor {
         case graySecondary
         case black
         case white
+        case red
         
         var uiColor: UIColor {
             switch self {
@@ -40,6 +41,7 @@ extension TMColor {
             case .graySecondary: return UIColor(resource: .tmGraySecondary)
             case .black: return UIColor(resource: .tmBlack)
             case .white: return UIColor(resource: .tmWhite)
+            case .red: return UIColor(resource: .tmRed)
             }
         }
         
@@ -60,6 +62,7 @@ extension TMColor {
             case secondary
             case tertiary
             case quaternary
+            case error
         }
         
         var uiColor: UIColor {
@@ -71,6 +74,7 @@ extension TMColor {
                 case .secondary: return UIColor(resource: .tmGray)
                 case .tertiary: return UIColor(resource: .tmGraySecondary)
                 case .quaternary: return UIColor(resource: .tmWhite)
+                case .error: return UIColor(resource: .tmRed)
                 }
             case let .text(type):
                 switch type {
@@ -79,6 +83,7 @@ extension TMColor {
                 case .secondary: return UIColor(resource: .tmGraySecondary)
                 case .tertiary: return UIColor(resource: .tmGray)
                 case .quaternary: return UIColor(resource: .tmBlack)
+                case .error: return UIColor(resource: .tmRed)
                 }
             case let .border(type):
                 switch type {
@@ -87,6 +92,7 @@ extension TMColor {
                 case .secondary: return UIColor(resource: .tmGraySecondary)
                 case .tertiary: return UIColor(resource: .tmGray)
                 case .quaternary: return UIColor(resource: .tmBlack)
+                case .error: return UIColor(resource: .tmRed)
                 }
             case let .icon(type):
                 switch type {
@@ -95,6 +101,7 @@ extension TMColor {
                 case .secondary: return UIColor(resource: .tmGraySecondary)
                 case .tertiary: return UIColor(resource: .tmGray)
                 case .quaternary: return UIColor(resource: .tmBlack)
+                case .error: return UIColor(resource: .tmRed)
                 }
             }
         }

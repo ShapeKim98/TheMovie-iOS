@@ -36,6 +36,7 @@ enum UserDefaultsKey: String, CaseIterable {
     case profileDate = "ProfileDate"
     case movieBox = "MovieBox"
     case recentQueries = "RecentQueries"
+    case mbti = "MBTI"
 }
 
 extension String {

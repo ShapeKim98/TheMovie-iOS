@@ -9,26 +9,18 @@ import UIKit
 
 import SnapKit
 
-protocol ProfileImageViewControllerDelegate: AnyObject {
-    func didSetSelectedId(selectedId: Int)
-}
-
 final class ProfileImageViewController: UIViewController {
     private let selectedProfileView: TMProfileButton
     private lazy var profileCollectionView = {
         configureCollectionView()
     }()
     
-    weak var delegate: (any ProfileImageViewControllerDelegate)?
+    private let viewModel: ProfileImageViewModel
     
-    private var selectedId: Int {
-        didSet { didSetSelectedId() }
-    }
-    
-    init(selectedId: Int, title: String) {
-        self.selectedId = selectedId
+    init(title: String, viewModel: ProfileImageViewModel) {
+        self.viewModel = viewModel
         self.selectedProfileView = TMProfileButton(
-            selectedId,
+            self.viewModel.model.selectedId,
             size: 100
         )
         super.init(nibName: nil, bundle: nil)
@@ -46,6 +38,8 @@ final class ProfileImageViewController: UIViewController {
         configureUI()
         
         configureLayout()
+        
+        dataBinding()
     }
 }
 
@@ -103,9 +97,33 @@ private extension ProfileImageViewController {
 
 // MARK: Data Bindings
 private extension ProfileImageViewController {
-    func didSetSelectedId() {
-        selectedProfileView.setProfile(id: selectedId)
-        delegate?.didSetSelectedId(selectedId: selectedId)
+    func dataBinding() {
+        Task { [weak self] in
+            guard let self else { return }
+            for await output in viewModel.output {
+                switch output {
+                case let .selectedId(oldValue, newValue):
+                    bindedSelectedId(oldValue, newValue)
+                }
+            }
+        }
+    }
+    
+    func bindedSelectedId(_ oldValue: Int, _ newValue: Int) {
+        selectedProfileView.setProfile(id: newValue)
+        
+        let deSelectedIndexPath = IndexPath(item: oldValue, section: 0)
+        profileCollectionView.deselectItem(
+            at: deSelectedIndexPath,
+            animated: true
+        )
+        
+        let indexPath = IndexPath(item: newValue, section: 0)
+        profileCollectionView.selectItem(
+            at: indexPath,
+            animated: true,
+            scrollPosition: []
+        )
     }
 }
 
@@ -123,20 +141,22 @@ extension ProfileImageViewController: UICollectionViewDataSource,
         guard let cell else { return UICollectionViewCell() }
         
         cell.forItemAt(indexPath.item)
-        if selectedId == indexPath.item {
-            collectionView.selectItem(at: indexPath, animated: true, scrollPosition: [])
+        if viewModel.model.selectedId == indexPath.item {
+            collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
         }
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        collectionView.deselectItem(at: IndexPath(item: selectedId, section: 0), animated: true)
-        selectedId = indexPath.item
-        collectionView.selectItem(at: indexPath, animated: true, scrollPosition: [])
+        viewModel.input(.collectionViewDidSelectItemAt(item: indexPath.item))
     }
+}
+
+fileprivate extension String {
+    static let profileImageCollectionCell = "ProfileImageCollectionViewCell"
 }
 
 @available(iOS 17.0, *)
 #Preview {
-    ProfileImageViewController(selectedId: 0, title: "프로필 이미지 설정")
+    ProfileImageViewController(title: "프로필 이미지 설정", viewModel: .init(selectedId: 0))
 }

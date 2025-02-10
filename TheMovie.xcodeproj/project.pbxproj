@@ -10,10 +10,12 @@
 		C996F0B52D43767900F5BB8A /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = C996F0B42D43767900F5BB8A /* Kingfisher */; };
 		C996F0B82D43768A00F5BB8A /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = C996F0B72D43768A00F5BB8A /* SnapKit */; };
 		C996F0BB2D4376A900F5BB8A /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = C996F0BA2D4376A900F5BB8A /* Alamofire */; };
+		C9F603572D59776700DD66FF /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = C9F603562D59776700DD66FF /* .gitignore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		C996F0972D436DD500F5BB8A /* TheMovie.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TheMovie.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C9F603562D59776700DD66FF /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -56,6 +58,7 @@
 			children = (
 				C996F0992D436DD500F5BB8A /* TheMovie */,
 				C996F0982D436DD500F5BB8A /* Products */,
+				C9F603562D59776700DD66FF /* .gitignore */,
 			);
 			sourceTree = "<group>";
 		};
@@ -139,6 +142,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C9F603572D59776700DD66FF /* .gitignore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
