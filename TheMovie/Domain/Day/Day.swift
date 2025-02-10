@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Day: Decodable {
+struct Day: Decodable, Equatable {
     let page: Int
     let results: [Movie]
 }
