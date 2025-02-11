@@ -7,14 +7,14 @@
 
 import Foundation
 
-struct Images: Decodable {
+struct Images: Decodable, Equatable {
     let id: Int
     let backdrops: [FilePath]
     let posters: [FilePath]
 }
 
 extension Images {
-    struct FilePath: Decodable {
+    struct FilePath: Decodable, Equatable {
         let filePath: String
         
         enum CodingKeys: String, CodingKey {
