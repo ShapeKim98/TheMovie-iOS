@@ -20,27 +20,13 @@ final class SearchViewController: UIViewController {
     private let activityIndicatorView = UIActivityIndicatorView(style: .large)
     private let emptyLabel = UILabel()
     
-    @UserDefault(
-        forKey: .userDefaults(.movieBox),
-        defaultValue: [:]
-    )
-    private var movieBox: [String: Int]?
-    @UserDefault(forKey: .userDefaults(.recentQueries))
-    private var recentQueries: [String]?
-    
-    private let searchClient = SearchClient.shared
-    
-    private var domain: Search? {
-        didSet { didSetDomain() }
-    }
-    private var isPaging: Bool = false
-    private var firstQuery: String
+    let viewModel: SearchViewModel
     
     weak var delegate: (any SearchViewControllerDelegate)?
     
     init(query: String = "") {
         searchController.searchBar.text = query
-        self.firstQuery = query
+        self.viewModel = SearchViewModel(firstQuery: query)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -51,6 +37,8 @@ final class SearchViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        dataBinding()
+        
         configureUI()
         
         configureLayout()
@@ -59,10 +47,7 @@ final class SearchViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        if !firstQuery.isEmpty {
-            fetchSearch(query: firstQuery)
-            firstQuery = ""
-        }
+        viewModel.input(.viewDidAppear)
         
         searchController.isActive = true
     }
@@ -141,7 +126,7 @@ private extension SearchViewController {
     }
     
     func configureActivityIndicatorView() {
-        if firstQuery.isEmpty {
+        if viewModel.firstQuery.isEmpty {
             activityIndicatorView.stopAnimating()
         } else {
             activityIndicatorView.startAnimating()
@@ -162,11 +147,29 @@ private extension SearchViewController {
 
 // MARK: Data Bindings
 private extension SearchViewController {
-    func didSetDomain() {
+    func dataBinding() {
+        Task { [weak self] in
+            guard let self else { return }
+            for await output in viewModel.output {
+                switch output {
+                case let .searchResults(searchResults):
+                    bindSearchResults(searchResults)
+                case .recentQueries:
+                    bindRecentQueries()
+                case let .failure(failure):
+                    bindFailure(failure)
+                }
+            }
+        }
+    }
+    
+    func bindSearchResults(_ searchResults: [Movie]?) {
+        print(#function)
         searchTableView.reloadData()
         
-        let isLoading = domain == nil
-        let isEmpty = domain?.results.isEmpty ?? true
+        let isLoading = searchResults == nil
+        let isEmpty = searchResults?.isEmpty ?? true
+        
         UIView.fadeAnimate { [weak self] in
             guard let `self` else { return }
             emptyLabel.alpha = isEmpty ? 1 : 0
@@ -182,71 +185,22 @@ private extension SearchViewController {
             emptyLabel.isHidden = !isEmpty
         }
     }
-}
-
-// MARK: Functions
-private extension SearchViewController {
-    func fetchSearch(query: String) {
-        updateRecentQueries(query: query)
-        let request = SearchRequest(query: query, page: 1)
-        searchClient.fetchSearch(request) { [weak self] result in
-            guard let `self` else { return }
-            switch result {
-            case .success(let success):
-                domain = success
-            case .failure(let failure):
-                handleFailure(failure)
-            }
-        }
+    
+    func bindRecentQueries() {
+        print(#function)
+        delegate?.updateRecentQueries()
     }
     
-    func paginationSearch() {
-        guard
-            let domain,
-            domain.totalPages > domain.page,
-            !isPaging,
-            let text = searchController.searchBar.text
-        else { return }
-        let request = SearchRequest(query: text, page: domain.page + 1)
-        searchClient.fetchSearch(request) { [weak self] result in
-            guard let `self` else { return }
-            switch result {
-            case .success(let success):
-                self.domain?.page = success.page
-                self.domain?.totalPages = success.totalPages
-                self.domain?.totalResults = success.totalResults
-                self.domain?.results += success.results
-            case .failure(let failure):
-                handleFailure(failure)
-            }
-        }
-    }
-    
-    func updateRecentQueries(query: String) {
-        defer { delegate?.updateRecentQueries() }
-        
-        guard let recentQueries else {
-            self.recentQueries = [query]
-            return
-        }
-        guard let index = recentQueries.firstIndex(of: query) else {
-            self.recentQueries?.insert(query, at: 0)
-            return
-        }
-        self.recentQueries?.remove(at: index)
-        self.recentQueries?.insert(query, at: 0)
+    func bindFailure(_ failure: Error?) {
+        print(#function)
+        guard let failure else { return }
+        handleFailure(failure)
     }
 }
 
 extension SearchViewController: UITextFieldDelegate, UISearchControllerDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        guard
-            let text = textField.text,
-            !text.isEmpty,
-            !text.filter({ !$0.isWhitespace }).isEmpty
-        else { return true }
-        domain = nil
-        fetchSearch(query: text)
+        viewModel.input(.textFieldShouldReturn(text: textField.text))
         searchController.searchBar.searchTextField.resignFirstResponder()
         return true
     }
@@ -264,7 +218,7 @@ extension SearchViewController: UITableViewDelegate,
                                 UITableViewDataSource,
                                 UITableViewDataSourcePrefetching {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        domain?.results.count ?? 0
+        viewModel.model.search?.results.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -274,9 +228,9 @@ extension SearchViewController: UITableViewDelegate,
         )
         guard
             let cell = cell as? SearchTableViewCell,
-            let movie = domain?.results[indexPath.row]
+            let movie = viewModel.model.search?.results[indexPath.row]
         else { return UITableViewCell() }
-        let isSelected = movieBox?.contains(where: { $0.key == String(movie.id) }) ?? false
+        let isSelected = viewModel.movieBox?.contains(where: { $0.key == String(movie.id) }) ?? false
         cell.delegate = self
         let query = searchController.searchBar.text ?? ""
         cell.forRowAt(movie, isSelected: isSelected, query: query)
@@ -284,7 +238,7 @@ extension SearchViewController: UITableViewDelegate,
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let movie = domain?.results[indexPath.row] else {
+        guard let movie = viewModel.model.search?.results[indexPath.row] else {
             return
         }
         let vieController = DetailViewController(movie)
@@ -294,17 +248,17 @@ extension SearchViewController: UITableViewDelegate,
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        guard domain?.results.count == indexPath.row + 2 else { return }
-        paginationSearch()
+        viewModel.input(.tableViewWillDisplay(
+            text: searchController.searchBar.text,
+            row: indexPath.row
+        ))
     }
     
     func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
-        for indexPath in indexPaths {
-            guard
-                domain?.results.count == indexPath.row + 2
-            else { continue }
-            paginationSearch()
-        }
+        viewModel.input(.tableViewPrefetchRowsAt(
+            text: searchController.searchBar.text,
+            rows: indexPaths.map(\.row)
+        ))
     }
     
     func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -314,12 +268,7 @@ extension SearchViewController: UITableViewDelegate,
 
 extension SearchViewController: SearchTableViewCellDelegate {
     func favoritButtonTouchUpInside(_ movieId: Int) {
-        let movieIdString = String(movieId)
-        if movieBox?.contains(where: { $0.key == movieIdString }) ?? false {
-            movieBox?.removeValue(forKey: movieIdString)
-        } else {
-            movieBox?.updateValue(movieId, forKey: movieIdString)
-        }
+        viewModel.input(.cellFavoriteButtonTouchUpInside(movieId: movieId))
         delegate?.favoriteButtonTouchUpInsideFromSearch(movieId)
     }
 }
@@ -328,7 +277,7 @@ extension SearchViewController: DetailViewControllerDelegate {
     func favoriteButtonTouchUpInside(movieId: Int) {
         delegate?.favoriteButtonTouchUpInsideFromSearch(movieId)
         
-        let index = domain?.results.firstIndex(where: { $0.id == movieId })
+        let index = viewModel.model.search?.results.firstIndex(where: { $0.id == movieId })
         guard let index else { return }
         let indexPath = IndexPath(row: index, section: 0)
         let cell = searchTableView.cellForRow(at: indexPath)
