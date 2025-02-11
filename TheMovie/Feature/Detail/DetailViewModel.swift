@@ -69,6 +69,8 @@ final class DetailViewModel: ViewModel {
         self.model = Model(detail: Detail(movie: movie))
     }
     
+    deinit { model.continuation?.finish() }
+    
     func input(_ action: Input) {
         switch action {
         case .viewDidLoad:
