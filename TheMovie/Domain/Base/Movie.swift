@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Movie: Decodable {
+struct Movie: Decodable, Equatable {
     let id: Int
     let backdropPath: String?
     let title: String?
@@ -30,7 +30,7 @@ extension Movie {
 }
 
 extension Movie {
-    enum Genre: Int, Decodable {
+    enum Genre: Int, Decodable, Equatable {
         case 액션 = 28
         case 애니메이션 = 16
         case 범죄 = 80

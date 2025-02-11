@@ -17,26 +17,18 @@ final class DayViewController: UIViewController {
     }()
     private let activityIndicatorView = UIActivityIndicatorView(style: .large)
     
-    @UserDefault(
-        forKey: .userDefaults(.movieBox),
-        defaultValue: [String: Int]()
-    )
-    private var movieBox: [String: Int]?
-    
-    private let dayClient = DayClient.shared
-    
-    private var domain: Day? {
-        didSet { didSetDomain() }
-    }
+    private let viewModel = DayViewModel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        dataBinding()
         
         configureUI()
         
         configureLayout()
         
-        fetchDay()
+        viewModel.input(.viewDidLoad)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -136,10 +128,24 @@ private extension DayViewController {
 
 // MARK: Data Bindings
 private extension DayViewController {
-    func didSetDomain() {
+    func dataBinding() {
+        Task { [weak self] in
+            guard let self else { return }
+            for await output in viewModel.output {
+                switch output {
+                case let .day(day):
+                    bindedDay(day)
+                case let .failure(failure):
+                    bindedFailure(failure)
+                }
+            }
+        }
+    }
+    
+    func bindedDay(_ day: Day?) {
         dayCollectionView.reloadData()
         
-        let isLoading = domain == nil
+        let isLoading = day == nil
         UIView.fadeAnimate { [weak self] in
             guard let `self` else { return }
             activityIndicatorView.alpha = isLoading ? 1 : 0
@@ -153,22 +159,15 @@ private extension DayViewController {
             }
         }
     }
+    
+    func bindedFailure(_ failure: Error?) {
+        guard let failure else { return }
+        handleFailure(failure)
+    }
 }
 
 // MARK: Functions
 private extension DayViewController {
-    func fetchDay() {
-        dayClient.fetchDay(DayRequest(page: 1)) { [weak self] result in
-            guard let `self` else { return }
-            switch result {
-            case .success(let success):
-                domain = success
-            case .failure(let failure):
-                handleFailure(failure)
-            }
-        }
-    }
-    
     func searchButtonTouchUpInside(_ action: UIAction) {
         let viewController = SearchViewController()
         viewController.delegate = self
@@ -185,7 +184,7 @@ private extension DayViewController {
     func updateMovieBox(_ movieId: Int) {
         profileView.updateMovieBoxLabel()
         
-        let index = domain?.results.firstIndex(where: { $0.id == movieId })
+        let index = viewModel.model.day?.results.firstIndex(where: { $0.id == movieId })
         guard let index else { return }
         let indexPath = IndexPath(row: index, section: 0)
         let cell = dayCollectionView.cellForItem(at: indexPath)
@@ -196,7 +195,7 @@ private extension DayViewController {
 extension DayViewController: UICollectionViewDataSource,
                              UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        domain?.results.count ?? 0
+        viewModel.model.day?.results.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -206,16 +205,16 @@ extension DayViewController: UICollectionViewDataSource,
         )
         guard
             let cell = cell as? DayCollectionViewCell,
-            let movie = domain?.results[indexPath.item]
+            let movie = viewModel.model.day?.results[indexPath.item]
         else { return UICollectionViewCell() }
-        let isSelected = movieBox?.contains(where: { $0.key == String(movie.id) }) ?? false
+        let isSelected = viewModel.movieBox?[String(movie.id)] != nil
         cell.forItemAt(movie, isSelected: isSelected)
         cell.delegate = self
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let movie = domain?.results[indexPath.item] else {
+        guard let movie = viewModel.model.day?.results[indexPath.item] else {
             return
         }
         let cell = collectionView.cellForItem(at: indexPath)
@@ -259,12 +258,7 @@ extension DayViewController: DetailViewControllerDelegate {
 
 extension DayViewController: DayCollectionViewCellDelegate {
     func favoriteButtonTouchUpInside(_ movieId: Int) {
-        let movieIdString = String(movieId)
-        if movieBox?.contains(where: { $0.key == movieIdString }) ?? false {
-            movieBox?.removeValue(forKey: movieIdString)
-        } else {
-            movieBox?.updateValue(movieId, forKey: movieIdString)
-        }
+        viewModel.input(.cellFavoriteButtonTouchUpInside(movieId))
         profileView.updateMovieBoxLabel()
     }
 }
