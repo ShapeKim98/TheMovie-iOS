@@ -10,10 +10,12 @@
 - 당일에 유행하는 영화 목록 조회
 - 영화 검색 기능
 - 영화에 대한 상세정보(줄거리, 표지, 포스터, 캐스트) 조회
+- 최근 검색어 저장
 
-나만의 프로필 설정 | 오늘 유행하는 영화 탐색 | 영화의 자세한 정보 탐색 | 영화 검색하기
-|:----------:|:----------:|:----------:|:----------:|
-![Simulator Screenshot - iPhone 16 Pro - 2025-02-04 at 21 35 15](https://github.com/user-attachments/assets/cda805d5-a470-48ea-a627-6901692cf8d3) | ![Simulator Screenshot - iPhone 16 Pro - 2025-02-04 at 21 41 56](https://github.com/user-attachments/assets/80280447-2b7d-4ced-bd92-bdb41c3ab7dd) | ![Simulator Screenshot - iPhone 16 Pro - 2025-02-04 at 21 39 11](https://github.com/user-attachments/assets/4cba7f71-deec-442a-aecf-435b411fbd5c) | ![Simulator Screenshot - iPhone 16 Pro - 2025-02-04 at 21 39 43](https://github.com/user-attachments/assets/db53cc3a-ab16-4b6a-9aa9-fb0050bb8f50)
+나만의 프로필 설정 | 오늘 유행하는 영화 탐색 | 영화의 자세한 정보 탐색 | 영화 검색하기 | 영화 좋아요 기능
+|:----------:|:----------:|:----------:|:----------:|:----------:|
+![Simulator Screen Recording - iPhone 16 Pro - 2025-02-12 at 00 06 51](https://github.com/user-attachments/assets/7c2de057-906b-4ecd-9fc4-6ad349616717) | ![Simulator Screen Recording - iPhone 16 Pro - 2025-02-12 at 00 07 44](https://github.com/user-attachments/assets/30d3f8c6-6bf1-4ae4-906e-258866e586e1) | ![Simulator Screen Recording - iPhone 16 Pro - 2025-02-12 at 00 09 37](https://github.com/user-attachments/assets/671eb5f6-beb3-45e9-b142-6d5f264f46f9) | ![Simulator Screen Recording - iPhone 16 Pro - 2025-02-12 at 00 10 54](https://github.com/user-attachments/assets/e3a04503-3c96-4a3b-966c-5d813265a26e) | ![Simulator Screen Recording - iPhone 16 Pro - 2025-02-12 at 00 12 47](https://github.com/user-attachments/assets/278439e1-508a-4575-b182-6444cdb2e084)
+
 
 ## 기술
 > `UIKit`, `MVVM`, `SnapKit`, `Kingfisher`, `Alamofire`, `GCD`
@@ -41,16 +43,16 @@ DispatchQueue.global().async {
 	let lowercasedText = NSMutableAttributedString(
 		string: text.lowercased()
 	)
-
+	
 	...
-
+	
 	guard matchCount != characters.count else {
 		DispatchQueue.main.async {
 			completion(mutableAttributedString)
 		}
 		return
 	}
-
+	
 	DispatchQueue.main.async {
 		completion(NSMutableAttributedString(string: text))
 	}
