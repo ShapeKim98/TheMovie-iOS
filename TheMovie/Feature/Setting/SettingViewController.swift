@@ -19,10 +19,14 @@ final class SettingViewController: UIViewController {
     
     private let items = SettingItem.allCases
     
+    private let viewModel = SettingViewModel()
+    
     weak var delegate: (any SettingViewControllerDelegate)?
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        dataBinding()
         
         configureUI()
         
@@ -87,24 +91,22 @@ private extension SettingViewController {
     }
 }
 
-// MARK: Functions
+// MARK: Data Bindings
 private extension SettingViewController {
-    func profileViewButtonTouchUpInside(_ action: UIAction) {
-        let viewController = ProfileViewController(mode: .edit)
-        viewController.delegate = self
-        let navigation = navigation(viewController)
-        present(navigation, animated: true)
-    }
-    
-    func withdrawButtonTouchUpInside(_ action: UIAlertAction) {
-        for key in UserDefaultsKey.allCases {
-            UserDefaults.standard.removeObject(forKey: key.rawValue)
+    func dataBinding() {
+        Task { [weak self] in
+            guard let self else { return }
+            for await output in viewModel.output {
+                switch output {
+                case let .isPresentWithdrawAlert(isPresentWithdrawAlert):
+                    bindIsPresentWithdrawAlert(isPresentWithdrawAlert)
+                }
+            }
         }
-        
-        delegate?.withdrawButtonTouchUpInside()
     }
     
-    func presentWithdrawAlert() {
+    func bindIsPresentWithdrawAlert(_ isPresentWithdrawAlert: Bool) {
+        guard isPresentWithdrawAlert else { return }
         let alert = UIAlertController(
             title: "탈퇴하기",
             message: "탈퇴를 하면 데이터가 모두 초기화됩니다. 탈퇴 하시겠습니까?",
@@ -115,13 +117,38 @@ private extension SettingViewController {
             style: .destructive,
             handler: withdrawButtonTouchUpInside
         )
-        let cancel = UIAlertAction(title: "취소", style: .cancel)
+        let cancel = UIAlertAction(
+            title: "취소",
+            style: .cancel,
+            handler: { [weak self] _ in
+                self?.cancelButtonTouchUpInside()
+            }
+        )
         alert.addAction(confirm)
         alert.addAction(cancel)
         alert.overrideUserInterfaceStyle = .dark
         UINotificationFeedbackGenerator()
             .notificationOccurred(.warning)
         present(alert, animated: true)
+    }
+}
+
+// MARK: Functions
+private extension SettingViewController {
+    func profileViewButtonTouchUpInside(_ action: UIAction) {
+        let viewController = ProfileViewController(mode: .edit)
+        viewController.delegate = self
+        let navigation = navigation(viewController)
+        present(navigation, animated: true)
+    }
+    
+    func withdrawButtonTouchUpInside(_ action: UIAlertAction) {
+        viewModel.input(.withdrawButtonTouchUpInside)
+        delegate?.withdrawButtonTouchUpInside()
+    }
+    
+    func cancelButtonTouchUpInside() {
+        viewModel.input(.cancelButtonTouchUpInside)
     }
 }
 
@@ -149,7 +176,7 @@ extension SettingViewController: UITableViewDelegate,
         let item = items[indexPath.row]
         tableView.deselectRow(at: indexPath, animated: true)
         guard item == .탈퇴하기 else { return }
-        presentWithdrawAlert()
+        viewModel.input(.tableViewDidSelectRowAt)
     }
 }
 
