@@ -311,7 +311,3 @@ private extension SearchTableViewCell {
         }
     }
 }
-
-extension String {
-    static let searchTableCell = "SearchTableViewCell"
-}

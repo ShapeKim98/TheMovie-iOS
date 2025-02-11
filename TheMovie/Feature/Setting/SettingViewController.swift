@@ -204,6 +204,10 @@ private extension SettingViewController {
     }
 }
 
+fileprivate extension String {
+    static let settingTableCell = "SettingTableViewCell"
+}
+
 @available(iOS 17.0, *)
 #Preview {
     SettingViewController()

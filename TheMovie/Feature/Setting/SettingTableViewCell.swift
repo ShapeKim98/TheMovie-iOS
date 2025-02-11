@@ -36,7 +36,3 @@ final class SettingTableViewCell: UITableViewCell {
         label.text = title
     }
 }
-
-extension String {
-    static let settingTableCell = "SettingTableViewCell"
-}

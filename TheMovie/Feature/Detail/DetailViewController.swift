@@ -490,6 +490,14 @@ extension DetailViewController: SynopsisViewDelegate {
     }
 }
 
+fileprivate extension String {
+    static let castCollectionCell = "CastCollectionCell"
+    
+    static let backdropCollectionCell = "BackdropCollectionViewCell"
+    
+    static let posterCollectionCell = "PosterCollectionViewCell"
+}
+
 @available(iOS 17.0, *)
 #Preview {
     DetailViewController(.mock)

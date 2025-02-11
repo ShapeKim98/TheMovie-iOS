@@ -285,6 +285,10 @@ extension SearchViewController: DetailViewControllerDelegate {
     }
 }
 
+fileprivate extension String {
+    static let searchTableCell = "SearchTableViewCell"
+}
+
 @available(iOS 17.0, *)
 #Preview {
     UINavigationController(rootViewController: SearchViewController())
