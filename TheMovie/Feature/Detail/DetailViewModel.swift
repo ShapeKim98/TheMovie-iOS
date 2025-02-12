@@ -61,10 +61,6 @@ final class DetailViewModel: ViewModel {
     
     var output: AsyncStream<Output> {
         return AsyncStream { continuation in
-            guard model.continuation == nil else {
-                continuation.finish()
-                return
-            }
             model.continuation = continuation
         }
     }
@@ -73,10 +69,7 @@ final class DetailViewModel: ViewModel {
         self.model = Model(detail: Detail(movie: movie))
     }
     
-    func cancel() {
-        model.continuation?.finish()
-        model.continuation = nil
-    }
+    deinit { model.continuation?.finish()  }
     
     func input(_ action: Input) {
         switch action {

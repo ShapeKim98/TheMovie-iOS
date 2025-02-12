@@ -39,19 +39,12 @@ final class ProfileImageViewModel: ViewModel {
         self.model = Model(selectedId: selectedId)
     }
     
+    deinit { model.continuation?.finish() }
+    
     var output: AsyncStream<Output> {
         return AsyncStream { continuation in
-            guard model.continuation == nil else {
-                continuation.finish()
-                return
-            }
             model.continuation = continuation
         }
-    }
-    
-    func cancel() {
-        model.continuation?.finish()
-        model.continuation = nil
     }
     
     func input(_ action: Input) {

@@ -41,18 +41,6 @@ final class SettingViewController: UIViewController {
         profileView.updateProfile()
         profileView.updateMovieBoxLabel()
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        dataBinding()
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        viewModel.cancel()
-    }
 }
 
 // MARK: Configure Views
@@ -110,12 +98,13 @@ private extension SettingViewController {
 // MARK: Data Bindings
 private extension SettingViewController {
     func dataBinding() {
+        let outputs = viewModel.output
+        
         Task { [weak self] in
-            guard let self else { return }
-            for await output in viewModel.output {
+            for await output in outputs {
                 switch output {
                 case let .isPresentWithdrawAlert(isPresentWithdrawAlert):
-                    bindIsPresentWithdrawAlert(isPresentWithdrawAlert)
+                    self?.bindIsPresentWithdrawAlert(isPresentWithdrawAlert)
                 }
             }
         }

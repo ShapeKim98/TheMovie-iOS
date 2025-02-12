@@ -68,16 +68,6 @@ final class DetailViewController: UIViewController {
         
         viewModel.input(.viewDidLoad)
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        dataBinding()
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        viewModel.cancel()
-    }
 }
 
 // MARK: Configure View
@@ -388,19 +378,19 @@ private extension DetailViewController {
 // MARK: Data Bindins
 private extension DetailViewController {
     func dataBinding() {
+        let outputs = viewModel.output
+        
         Task { [weak self] in
-            guard let self else { return }
-            
-            for await output in viewModel.output {
+            for await output in outputs {
                 switch output {
                 case let .detail(detail):
-                    bindDetail(detail)
+                    self?.bindDetail(detail)
                 case let .failure(failure):
-                    bindFailure(failure)
+                    self?.bindFailure(failure)
                 case .movieBox:
-                    bindMovieBox()
+                    self?.bindMovieBox()
                 case let .currentPage(currentPage):
-                    bindCurrentPage(currentPage)
+                    self?.bindCurrentPage(currentPage)
                 }
             }
         }

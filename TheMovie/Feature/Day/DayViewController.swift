@@ -38,18 +38,6 @@ final class DayViewController: UIViewController {
         
         profileView.updateProfile()
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        dataBinding()
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        viewModel.cancel()
-    }
 }
 
 // MARK: Configure Views
@@ -147,14 +135,14 @@ private extension DayViewController {
 // MARK: Data Bindings
 private extension DayViewController {
     func dataBinding() {
+        let outputs = viewModel.output
         Task { [weak self] in
-            guard let self else { return }
-            for await output in viewModel.output  {
+            for await output in outputs  {
                 switch output {
                 case let .day(day):
-                    bindedDay(day)
+                    self?.bindedDay(day)
                 case let .failure(failure):
-                    bindedFailure(failure)
+                    self?.bindedFailure(failure)
                 }
             }
         }

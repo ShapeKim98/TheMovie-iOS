@@ -62,18 +62,6 @@ final class ProfileViewController: UIViewController {
         
         nicknameTextField.textField.becomeFirstResponder()
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        dataBinding()
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        viewModel.cancel()
-    }
 }
 
 // MARK: Configure Views
@@ -216,19 +204,19 @@ private extension ProfileViewController {
 // MARK: Data Bindings
 private extension ProfileViewController {
     func dataBinding() {
+        let outputs = viewModel.output
+        
         Task { [weak self] in
-            guard let self else { return }
-            
-            for await output in viewModel.output {
+            for await output in outputs {
                 switch output {
                 case let .profileImageId(profileImageId):
-                    bindedProfileImageId(profileImageId)
+                    self?.bindedProfileImageId(profileImageId)
                 case let .isValidProfile(isValidProfile):
-                    bindedIsValidProfile(isValidProfile)
+                    self?.bindedIsValidProfile(isValidProfile)
                 case let .nicknameState(nicknameState):
-                    bindedNicknameState(nicknameState)
+                    self?.bindedNicknameState(nicknameState)
                 case let .selectedMBTI(selectedMBTI):
-                    bindedSelectedMBTI(selectedMBTI)
+                    self?.bindedSelectedMBTI(selectedMBTI)
                 }
             }
         }

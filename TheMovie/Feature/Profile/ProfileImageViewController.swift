@@ -43,18 +43,6 @@ final class ProfileImageViewController: UIViewController {
         
         dataBinding()
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        dataBinding()
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        viewModel.cancel()
-    }
 }
 
 // MARK: Configure Views
@@ -112,12 +100,13 @@ private extension ProfileImageViewController {
 // MARK: Data Bindings
 private extension ProfileImageViewController {
     func dataBinding() {
+        let outputs = viewModel.output
+        
         Task { [weak self] in
-            guard let self else { return }
-            for await output in viewModel.output {
+            for await output in outputs {
                 switch output {
                 case let .selectedId(oldValue, newValue):
-                    bindedSelectedId(oldValue, newValue)
+                    self?.bindedSelectedId(oldValue, newValue)
                 }
             }
         }
