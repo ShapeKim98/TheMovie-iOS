@@ -66,15 +66,14 @@ private extension MBTICollectionViewCell {
     
     func configureUpdateHandler() {
         configurationUpdateHandler = { [weak self] cell, state in
-            guard let self = self else { return }
             if state.isSelected {
-                label.textColor = .tm(.semantic(.text(.primary)))
-                container.backgroundColor = .tm(.semantic(.background(.brand)))
-                container.layer.borderColor = UIColor.clear.cgColor
+                self?.label.textColor = .tm(.semantic(.text(.primary)))
+                self?.container.backgroundColor = .tm(.semantic(.background(.brand)))
+                self?.container.layer.borderColor = UIColor.clear.cgColor
             } else {
-                label.textColor = .tm(.semantic(.text(.tertiary)))
-                container.backgroundColor = .clear
-                container.layer.borderColor = .tm(.semantic(.border(.tertiary)))
+                self?.label.textColor = .tm(.semantic(.text(.tertiary)))
+                self?.container.backgroundColor = .clear
+                self?.container.layer.borderColor = .tm(.semantic(.border(.tertiary)))
             }
         }
     }

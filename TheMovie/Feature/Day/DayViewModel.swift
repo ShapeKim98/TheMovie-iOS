@@ -47,11 +47,18 @@ final class DayViewModel: ViewModel {
     
     var output: AsyncStream<Output> {
         return AsyncStream { continuation in
+            guard model.continuation == nil else {
+                continuation.finish()
+                return
+            }
             model.continuation = continuation
         }
     }
     
-    deinit { model.continuation?.finish() }
+    func cancel() {
+        model.continuation?.finish()
+        model.continuation = nil
+    }
     
     func input(_ action: Input) {
         switch action {
@@ -71,12 +78,11 @@ final class DayViewModel: ViewModel {
 private extension DayViewModel {
     func fetchDay() {
         dayClient.fetchDay(DayRequest(page: 1)) { [weak self] result in
-            guard let `self` else { return }
             switch result {
             case .success(let success):
-                model.day = success
+                self?.model.day = success
             case .failure(let failure):
-                model.failure = failure
+                self?.model.failure = failure
             }
         }
     }

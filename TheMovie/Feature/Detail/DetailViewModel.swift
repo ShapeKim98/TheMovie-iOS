@@ -61,6 +61,10 @@ final class DetailViewModel: ViewModel {
     
     var output: AsyncStream<Output> {
         return AsyncStream { continuation in
+            guard model.continuation == nil else {
+                continuation.finish()
+                return
+            }
             model.continuation = continuation
         }
     }
@@ -69,7 +73,10 @@ final class DetailViewModel: ViewModel {
         self.model = Model(detail: Detail(movie: movie))
     }
     
-    deinit { model.continuation?.finish() }
+    func cancel() {
+        model.continuation?.finish()
+        model.continuation = nil
+    }
     
     func input(_ action: Input) {
         switch action {
@@ -96,24 +103,22 @@ private extension DetailViewModel {
     func fetchCredits() {
         let request = CreditsRequest(id: model.detail.movie.id)
         creditsClient.fetchCredits(request) { [weak self] result in
-            guard let `self` else { return }
             switch result {
             case .success(let success):
-                model.detail.credits = success
+                self?.model.detail.credits = success
             case .failure(let failure):
-                model.failure = failure
+                self?.model.failure = failure
             }
         }
     }
     
     func fetchImages() {
         imagesClient.fetchImages(model.detail.movie.id) { [weak self] result in
-            guard let `self` else { return }
             switch result {
             case .success(let success):
-                model.detail.images = success
+                self?.model.detail.images = success
             case .failure(let failure):
-                model.failure = failure
+                self?.model.failure = failure
             }
         }
     }

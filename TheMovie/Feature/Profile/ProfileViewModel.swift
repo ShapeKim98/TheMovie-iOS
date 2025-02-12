@@ -75,10 +75,6 @@ final class ProfileViewModel: ViewModel {
         model.isValidProfile = model.selectedMBTI.count == 4
     }
     
-    deinit {
-        model.continuation?.finish()
-    }
-    
     @UserDefault(forKey: .userDefaults(.nickname))
     private(set) var nickname: String?
     @UserDefault(forKey: .userDefaults(.profileCompleted))
@@ -98,8 +94,17 @@ final class ProfileViewModel: ViewModel {
     
     var output: AsyncStream<Output> {
         return AsyncStream { continuation in
+            guard model.continuation == nil else {
+                continuation.finish()
+                return
+            }
             model.continuation = continuation
         }
+    }
+    
+    func cancel() {
+        model.continuation?.finish()
+        model.continuation = nil
     }
     
     func input(_ action: Input) {

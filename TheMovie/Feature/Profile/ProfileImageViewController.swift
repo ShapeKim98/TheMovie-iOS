@@ -32,6 +32,8 @@ final class ProfileImageViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit { print("ProfileImageViewController deinitialized") }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -40,6 +42,18 @@ final class ProfileImageViewController: UIViewController {
         configureLayout()
         
         dataBinding()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        dataBinding()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        viewModel.cancel()
     }
 }
 

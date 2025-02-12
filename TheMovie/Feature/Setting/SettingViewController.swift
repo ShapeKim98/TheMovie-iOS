@@ -23,6 +23,8 @@ final class SettingViewController: UIViewController {
     
     weak var delegate: (any SettingViewControllerDelegate)?
     
+    deinit { print("SettingViewController deinitialized") }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -38,6 +40,18 @@ final class SettingViewController: UIViewController {
         
         profileView.updateProfile()
         profileView.updateMovieBoxLabel()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        dataBinding()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        viewModel.cancel()
     }
 }
 
@@ -71,7 +85,9 @@ private extension SettingViewController {
     }
     
     func configureProfileView() {
-        profileView.addButtonAction(profileViewButtonTouchUpInside)
+        profileView.addButtonAction { [weak self] _ in
+            self?.profileViewButtonTouchUpInside()
+        }
         view.addSubview(profileView)
     }
     
@@ -115,7 +131,9 @@ private extension SettingViewController {
         let confirm = UIAlertAction(
             title: "확인",
             style: .destructive,
-            handler: withdrawButtonTouchUpInside
+            handler: { [weak self] _ in
+                self?.withdrawButtonTouchUpInside()
+            }
         )
         let cancel = UIAlertAction(
             title: "취소",
@@ -135,14 +153,14 @@ private extension SettingViewController {
 
 // MARK: Functions
 private extension SettingViewController {
-    func profileViewButtonTouchUpInside(_ action: UIAction) {
+    func profileViewButtonTouchUpInside() {
         let viewController = ProfileViewController(mode: .edit)
         viewController.delegate = self
         let navigation = navigation(viewController)
         present(navigation, animated: true)
     }
     
-    func withdrawButtonTouchUpInside(_ action: UIAlertAction) {
+    func withdrawButtonTouchUpInside() {
         viewModel.input(.withdrawButtonTouchUpInside)
         delegate?.withdrawButtonTouchUpInside()
     }

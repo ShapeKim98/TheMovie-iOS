@@ -132,7 +132,9 @@ private extension RecentQueryView {
         removeAllButton.configuration = configuration
         removeAllButton.isHidden = (recentQueries?.isEmpty ?? true)
         removeAllButton.addAction(
-            UIAction(handler: removeAllButtonTouchUpInside),
+            UIAction { [weak self] _ in
+                self?.removeAllButtonTouchUpInside()
+            },
             for: .touchUpInside
         )
         addSubview(removeAllButton)
@@ -175,22 +177,20 @@ private extension RecentQueryView {
     func didSetRecentQueries() {
         let isEmpty = recentQueries?.isEmpty ?? true
         UIView.fadeAnimate { [weak self] in
-            guard let `self` else { return }
-            scrollView.alpha = isEmpty ? 0 : 1
-            emptyLabel.alpha = isEmpty ? 1 : 0
-            removeAllButton.alpha = isEmpty ? 0 : 1
+            self?.scrollView.alpha = isEmpty ? 0 : 1
+            self?.emptyLabel.alpha = isEmpty ? 1 : 0
+            self?.removeAllButton.alpha = isEmpty ? 0 : 1
         } completion: { [weak self] _ in
-            guard let `self` else { return }
-            scrollView.isHidden = isEmpty
-            emptyLabel.isHidden = !isEmpty
-            removeAllButton.isHidden = isEmpty
+            self?.scrollView.isHidden = isEmpty
+            self?.emptyLabel.isHidden = !isEmpty
+            self?.removeAllButton.isHidden = isEmpty
         }
     }
 }
 
 // MARK: Functions
 private extension RecentQueryView {
-    func removeAllButtonTouchUpInside(_ action: UIAction) {
+    func removeAllButtonTouchUpInside() {
         UINotificationFeedbackGenerator()
             .notificationOccurred(.error)
         recentQueries?.removeAll()
@@ -217,8 +217,7 @@ extension RecentQueryView: QueryButtonDelegate {
         }
         
         UIView.springAnimate { [weak self] in
-            guard let `self` else { return }
-            scrollView.layoutIfNeeded()
+            self?.scrollView.layoutIfNeeded()
         }
     }
 }

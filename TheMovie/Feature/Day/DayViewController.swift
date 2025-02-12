@@ -19,6 +19,8 @@ final class DayViewController: UIViewController {
     
     private let viewModel = DayViewModel()
     
+    deinit { print("DayViewController deinitialized") }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -35,6 +37,18 @@ final class DayViewController: UIViewController {
         super.viewDidAppear(animated)
         
         profileView.updateProfile()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        dataBinding()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        viewModel.cancel()
     }
 }
 
@@ -80,13 +94,17 @@ private extension DayViewController {
         let image = UIImage(systemName: "magnifyingglass")
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             image: image,
-            primaryAction: UIAction(handler: searchButtonTouchUpInside)
+            primaryAction: UIAction { [weak self] _ in
+                self?.searchButtonTouchUpInside()
+            }
         )
         setTMBackButton()
     }
     
     func configureProfileView() {
-        profileView.addButtonAction(profileViewButtonTouchUpInside)
+        profileView.addButtonAction { [weak self] _ in
+            self?.profileViewButtonTouchUpInside()
+        }
         view.addSubview(profileView)
     }
     
@@ -131,7 +149,7 @@ private extension DayViewController {
     func dataBinding() {
         Task { [weak self] in
             guard let self else { return }
-            for await output in viewModel.output {
+            for await output in viewModel.output  {
                 switch output {
                 case let .day(day):
                     bindedDay(day)
@@ -147,15 +165,13 @@ private extension DayViewController {
         
         let isLoading = day == nil
         UIView.fadeAnimate { [weak self] in
-            guard let `self` else { return }
-            activityIndicatorView.alpha = isLoading ? 1 : 0
-            dayCollectionView.alpha = isLoading ? 0 : 1
+            self?.activityIndicatorView.alpha = isLoading ? 1 : 0
+            self?.dayCollectionView.alpha = isLoading ? 0 : 1
         } completion: { [weak self] _ in
-            guard let `self` else { return }
             if isLoading {
-                activityIndicatorView.startAnimating()
+                self?.activityIndicatorView.startAnimating()
             } else {
-                activityIndicatorView.stopAnimating()
+                self?.activityIndicatorView.stopAnimating()
             }
         }
     }
@@ -168,13 +184,13 @@ private extension DayViewController {
 
 // MARK: Functions
 private extension DayViewController {
-    func searchButtonTouchUpInside(_ action: UIAction) {
+    func searchButtonTouchUpInside() {
         let viewController = SearchViewController()
         viewController.delegate = self
         push(viewController)
     }
     
-    func profileViewButtonTouchUpInside(_ action: UIAction) {
+    func profileViewButtonTouchUpInside() {
         let viewController = ProfileViewController(mode: .edit)
         viewController.delegate = self
         let navigation = navigation(viewController)

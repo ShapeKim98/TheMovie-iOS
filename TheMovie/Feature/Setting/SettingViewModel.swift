@@ -34,12 +34,19 @@ final class SettingViewModel: ViewModel {
     
     private(set) var model = Model()
     
-    deinit { model.continuation?.finish() }
-    
     var output: AsyncStream<Output> {
         return AsyncStream { continuation in
+            guard model.continuation == nil else {
+                continuation.finish()
+                return
+            }
             model.continuation = continuation
         }
+    }
+    
+    func cancel() {
+        model.continuation?.finish()
+        model.continuation = nil
     }
     
     func input(_ action: Input) {

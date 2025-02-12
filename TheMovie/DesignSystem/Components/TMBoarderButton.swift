@@ -40,14 +40,13 @@ final class TMBoarderButton: UIButton {
     
     private func configureUpdateHandler() {
         configurationUpdateHandler = { [weak self] button in
-            guard let `self` else { return }
             switch button.state {
             case .highlighted:
                 UIView.fadeAnimate {
                     button.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
                 }
             case .disabled:
-                updateState(
+                self?.updateState(
                     strokeColor: .tm(.semantic(.border(.tertiary))),
                     textColor: .tm(.semantic(.text(.tertiary)))
                 )
@@ -55,7 +54,7 @@ final class TMBoarderButton: UIButton {
                     button.transform = CGAffineTransform(scaleX: 1, y: 1)
                 }
             default:
-                updateState(
+                self?.updateState(
                     strokeColor: .tm(.semantic(.border(.brand))),
                     textColor: .tm(.semantic(.text(.brand)))
                 )
