@@ -39,7 +39,3 @@ final class BackdropCollectionViewCell: UICollectionViewCell {
         )
     }
 }
-
-extension String {
-    static let backdropCollectionCell = "BackdropCollectionViewCell"
-}

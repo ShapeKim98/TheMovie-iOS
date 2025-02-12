@@ -24,7 +24,7 @@ final class DetailViewController: UIViewController {
     private let movieInfoLabels = [MovieInfoLabel]()
     private let hstack = UIStackView()
     private lazy var synopsisView: SynopsisView = {
-        SynopsisView(overview: domain.movie.overview)
+        SynopsisView(overview: viewModel.model.detail.movie.overview)
     }()
     private let castLabel = UILabel()
     private lazy var castCollectionView: UICollectionView = {
@@ -37,27 +37,16 @@ final class DetailViewController: UIViewController {
     private let activityIndicatorView = UIActivityIndicatorView(style: .large)
     private let favoriteButton = TMFavoriteButton()
     
-    private let imagesClient = ImagesClient.shared
-    private let creditsClient = CreditsClient.shared
-    
-    @UserDefault(
-        forKey: .userDefaults(.movieBox),
-        defaultValue: [:]
-    )
-    private var movieBox: [String: Int]?
-    
-    private var domain: Detail {
-        didSet { didSetDomain() }
-    }
+    private let viewModel: DetailViewModel
     private var backdropImages: [String] {
-        let images = domain.images?.backdrops.map(\.filePath)
+        let images = viewModel.model.detail.images?.backdrops.map(\.filePath)
         return Array(images?.prefix(5) ?? [])
     }
     
     weak var delegate: (any DetailViewControllerDelegate)?
     
     init(_ movie: Movie) {
-        self.domain = Detail(movie: movie)
+        self.viewModel = DetailViewModel(movie: movie)
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -69,13 +58,13 @@ final class DetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        dataBinding()
+        
         configureUI()
         
         configureLayout()
         
-        fetchImages()
-        
-        fetchCredits()
+        viewModel.input(.viewDidLoad)
     }
 }
 
@@ -228,8 +217,9 @@ private extension DetailViewController {
     }
     
     func configureNavigation() {
-        navigationItem.title = domain.movie.title
-        let isSelected = movieBox?.contains(where: { $0.key == "\(domain.movie.id)" }) ?? false
+        navigationItem.title = viewModel.model.detail.movie.title
+        let movieId = "\(viewModel.model.detail.movie.id)"
+        let isSelected = viewModel.model.movieBox?[movieId] != nil
         favoriteButton.isSelected = isSelected
         favoriteButton.addAction(
             UIAction(handler: favoriteButtonTouchUpInside),
@@ -261,10 +251,11 @@ private extension DetailViewController {
     }
     
     func configureMovieInfoLabel() {
-        let releaseDate = domain.movie.releaseDate
-        let voteAverage = String(format: "%.1f", domain.movie.voteAverage ?? 0)
-        var genres = domain.movie.genreIds?.map(\.title).prefix(2) ?? []
-        let count = domain.movie.genreIds?.count ?? 0
+        let movie = viewModel.model.detail.movie
+        let releaseDate = movie.releaseDate
+        let voteAverage = String(format: "%.1f", movie.voteAverage ?? 0)
+        var genres = movie.genreIds?.map(\.title).prefix(2) ?? []
+        let count = movie.genreIds?.count ?? 0
         if count > 2 {
             genres.append("+\(count - 2)")
         }
@@ -310,7 +301,7 @@ private extension DetailViewController {
         ) as? CastCollectionViewCell
         guard
             let cell,
-            let cast = domain.credits?.cast[indexPath.item]
+            let cast = viewModel.model.detail.credits?.cast[indexPath.item]
         else { return UICollectionViewCell() }
         cell.forItemAt(cast)
         return cell
@@ -333,7 +324,7 @@ private extension DetailViewController {
         ) as? PosterCollectionViewCell
         guard
             let cell,
-            let path = domain.images?.posters[indexPath.item]
+            let path = viewModel.model.detail.images?.posters[indexPath.item]
         else { return UICollectionViewCell() }
         cell.forItemAt(path.filePath)
         return cell
@@ -382,8 +373,26 @@ private extension DetailViewController {
 
 // MARK: Data Bindins
 private extension DetailViewController {
-    func didSetDomain() {
-        let isLoading = domain.images == nil || domain.credits == nil
+    func dataBinding() {
+        Task { [weak self] in
+            guard let self else { return }
+            for await output in viewModel.output {
+                switch output {
+                case let .detail(detail):
+                    bindDetail(detail)
+                case let .failure(failure):
+                    bindFailure(failure)
+                case .movieBox:
+                    bindMovieBox()
+                case let .currentPage(currentPage):
+                    bindCurrentPage(currentPage)
+                }
+            }
+        }
+    }
+    
+    func bindDetail(_ detail: Detail) {
+        let isLoading = detail.images == nil || detail.credits == nil
         guard !isLoading else { return }
         
         backdropCollectionView.reloadData()
@@ -392,8 +401,8 @@ private extension DetailViewController {
         backdropPageControl.numberOfPages = backdropImages.count
         
         let backdropIsEmpty = backdropImages.isEmpty
-        let castIsEmpty = domain.credits?.cast.isEmpty ?? true
-        let posterIsEmpty = domain.images?.posters.isEmpty ?? true
+        let castIsEmpty = detail.credits?.cast.isEmpty ?? true
+        let posterIsEmpty = detail.images?.posters.isEmpty ?? true
         
         UIView.fadeAnimate { [weak self] in
             guard let `self` else { return }
@@ -406,45 +415,15 @@ private extension DetailViewController {
             activityIndicatorView.stopAnimating()
         }
     }
-}
+    
+    func bindFailure(_ failure: Error?) {
+        guard let failure else { return }
+        handleFailure(failure)
+    }
+    
+    func bindMovieBox() {
+        favoriteButton.isSelected.toggle()
 
-// MARK: Functions
-private extension DetailViewController {
-    func fetchCredits() {
-        let request = CreditsRequest(id: domain.movie.id)
-        creditsClient.fetchCredits(request) { [weak self] result in
-            guard let `self` else { return }
-            switch result {
-            case .success(let success):
-                domain.credits = success
-            case .failure(let failure):
-                handleFailure(failure)
-            }
-        }
-    }
-    
-    func fetchImages() {
-        imagesClient.fetchImages(domain.movie.id) { [weak self] result in
-            guard let `self` else { return }
-            switch result {
-            case .success(let success):
-                domain.images = success
-            case .failure(let failure):
-                handleFailure(failure)
-            }
-        }
-    }
-    
-    func favoriteButtonTouchUpInside(_ action: UIAction) {
-        guard let button = action.sender as? UIButton else { return }
-        button.isSelected.toggle()
-        
-        let movieIdString = String(domain.movie.id)
-        if movieBox?.contains(where: { $0.key == movieIdString }) ?? false {
-            movieBox?.removeValue(forKey: movieIdString)
-        } else {
-            movieBox?.updateValue(domain.movie.id, forKey: movieIdString)
-        }
         if favoriteButton.isSelected {
             UINotificationFeedbackGenerator()
                 .notificationOccurred(.success)
@@ -452,17 +431,30 @@ private extension DetailViewController {
             UINotificationFeedbackGenerator()
                 .notificationOccurred(.warning)
         }
-        delegate?.favoriteButtonTouchUpInside(movieId: domain.movie.id)
+        let movieId = viewModel.model.detail.movie.id
+        delegate?.favoriteButtonTouchUpInside(movieId: movieId)
+    }
+    
+    func bindCurrentPage(_ currentPage: Int) {
+        backdropPageControl.currentPage = currentPage
+    }
+}
+
+// MARK: Functions
+private extension DetailViewController {
+    func favoriteButtonTouchUpInside(_ action: UIAction) {
+        viewModel.input(.favoriteButtonTouchUpInside)
     }
 }
 
 extension DetailViewController: UICollectionViewDelegate,
                                 UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        let detail = viewModel.model.detail
         switch collectionView.tag {
         case 0: return backdropImages.count
-        case 1: return domain.credits?.cast.count ?? 0
-        case 2: return domain.images?.posters.count ?? 0
+        case 1: return detail.credits?.cast.count ?? 0
+        case 2: return detail.images?.posters.count ?? 0
         default: return 0
         }
     }
@@ -482,8 +474,10 @@ extension DetailViewController: UICollectionViewDelegate,
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         guard scrollView.tag == 0 else { return }
-        let index = round(scrollView.contentOffset.x / view.frame.width)
-        backdropPageControl.currentPage = Int(index)
+        viewModel.input(.scrollViewDidScroll(
+            offsetX: scrollView.contentOffset.x,
+            width: view.frame.width
+        ))
     }
 }
 
@@ -494,6 +488,14 @@ extension DetailViewController: SynopsisViewDelegate {
             view.layoutIfNeeded()
         }
     }
+}
+
+fileprivate extension String {
+    static let castCollectionCell = "CastCollectionCell"
+    
+    static let backdropCollectionCell = "BackdropCollectionViewCell"
+    
+    static let posterCollectionCell = "PosterCollectionViewCell"
 }
 
 @available(iOS 17.0, *)

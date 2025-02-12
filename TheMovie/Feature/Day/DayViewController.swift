@@ -263,6 +263,10 @@ extension DayViewController: DayCollectionViewCellDelegate {
     }
 }
 
+fileprivate extension String {
+    static let dayCollectionCell = "DayCollectionViewCell"
+}
+
 @available(iOS 17.0, *)
 #Preview {
     ViewController()

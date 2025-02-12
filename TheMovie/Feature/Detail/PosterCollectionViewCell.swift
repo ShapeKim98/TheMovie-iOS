@@ -39,7 +39,3 @@ final class PosterCollectionViewCell: UICollectionViewCell {
         )
     }
 }
-
-extension String {
-    static let posterCollectionCell = "PosterCollectionViewCell"
-}

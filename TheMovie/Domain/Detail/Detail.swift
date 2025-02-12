@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Detail {
+struct Detail: Equatable {
     let movie: Movie
     var images: Images?
     var credits: Credits?

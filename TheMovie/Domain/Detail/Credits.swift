@@ -7,13 +7,13 @@
 
 import Foundation
 
-struct Credits: Decodable {
+struct Credits: Decodable, Equatable {
     let id: Int
     let cast: [Cast]
 }
 
 extension Credits {
-    struct Cast: Decodable {
+    struct Cast: Decodable, Equatable {
         let name: String
         let character: String
         let profilePath: String?

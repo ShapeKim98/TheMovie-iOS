@@ -103,7 +103,3 @@ private extension CastCollectionViewCell {
         labelContainer.addSubview(characterLabel)
     }
 }
-
-extension String {
-    static let castCollectionCell = "CastCollectionCell"
-}

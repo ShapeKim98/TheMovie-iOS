@@ -154,7 +154,3 @@ private extension DayCollectionViewCell {
         delegate?.favoriteButtonTouchUpInside(button.tag)
     }
 }
-
-extension String {
-    static let dayCollectionCell = "DayCollectionViewCell"
-}

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Search: Decodable {
+struct Search: Decodable, Equatable {
     var page: Int
     var results: [Movie]
     var totalPages: Int

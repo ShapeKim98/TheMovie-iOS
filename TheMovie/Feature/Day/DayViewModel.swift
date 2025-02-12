@@ -51,6 +51,8 @@ final class DayViewModel: ViewModel {
         }
     }
     
+    deinit { model.continuation?.finish() }
+    
     func input(_ action: Input) {
         switch action {
         case .viewDidLoad:
