@@ -34,6 +34,10 @@ final class SearchViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        print("SearchViewController deinit")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -44,12 +48,28 @@ final class SearchViewController: UIViewController {
         configureLayout()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        dataBinding()
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
         viewModel.input(.viewDidAppear)
         
         searchController.isActive = true
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        viewModel.cancel()
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        searchController.isActive = false
     }
 }
 
@@ -150,6 +170,7 @@ private extension SearchViewController {
     func dataBinding() {
         Task { [weak self] in
             guard let self else { return }
+            
             for await output in viewModel.output {
                 switch output {
                 case let .searchResults(searchResults):

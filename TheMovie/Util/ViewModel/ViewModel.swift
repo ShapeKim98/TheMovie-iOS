@@ -16,5 +16,7 @@ protocol ViewModel: AnyObject {
     
     var output: AsyncStream<Output> { get }
     
+    func cancel()
+    
     func input(_ action: Input)
 }

@@ -68,6 +68,10 @@ final class SearchViewModel: ViewModel {
     
     var output: AsyncStream<Output> {
         return AsyncStream { continuation in
+            guard model.continuation == nil else {
+                continuation.finish()
+                return
+            }
             model.continuation = continuation
         }
     }
@@ -76,7 +80,10 @@ final class SearchViewModel: ViewModel {
         self.firstQuery = firstQuery
     }
     
-    deinit { model.continuation?.finish() }
+    func cancel() {
+        model.continuation?.finish()
+        model.continuation = nil
+    }
     
     func input(_ action: Input) {
         switch action {
