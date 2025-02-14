@@ -76,7 +76,9 @@ private extension SynopsisView {
         ])
         moreButton.configuration = configuration
         moreButton.addAction(
-            UIAction(handler: moreButtonTouchUpInside),
+            UIAction { [weak self] _ in
+                self?.moreButtonTouchUpInside()
+            },
             for: .touchUpInside
         )
         addSubview(moreButton)
@@ -99,14 +101,13 @@ private extension SynopsisView {
 
 // MARK: Functions
 private extension SynopsisView {
-    func moreButtonTouchUpInside(_ action: UIAction) {
+    func moreButtonTouchUpInside() {
         let lines = overviewLabel.numberOfLines
         overviewLabel.numberOfLines = lines == 3 ? 0 : 3
         UIView.fadeAnimate(duration: 0.4) { [weak self] in
-            guard let `self` else { return }
-            overviewLabel.alpha = 0
-            overviewLabel.alpha = 1
-            moreButton.configuration?.attributedTitle = .make(lines == 3 ? "Hide" : "More", [
+            self?.overviewLabel.alpha = 0
+            self?.overviewLabel.alpha = 1
+            self?.moreButton.configuration?.attributedTitle = .make(lines == 3 ? "Hide" : "More", [
                 .font: UIFont.systemFont(ofSize: 14, weight: .semibold),
                 .foregroundColor: UIColor.tm(.semantic(.text(.brand)))
             ])

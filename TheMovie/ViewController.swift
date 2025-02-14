@@ -29,8 +29,7 @@ final class ViewController: UITabBarController {
         networkMonitor.monitoringStart()
         
         networkMonitor.monitoringHandler { [weak self] path in
-            guard let `self` else { return }
-            networkIsConnected = path.status == .satisfied
+            self?.networkIsConnected = path.status == .satisfied
         }
     }
     
@@ -88,13 +87,12 @@ private extension ViewController {
 private extension ViewController {
     func didSetNetworkIsConnected() {
         UIView.springAnimate { [weak self] in
-            guard let `self` else { return }
-            if networkIsConnected {
-                toastMessageView.alpha = 0
-                toastMessageView.transform = CGAffineTransform(translationX: 0, y: 0)
+            if self?.networkIsConnected ?? false {
+                self?.toastMessageView.alpha = 0
+                self?.toastMessageView.transform = CGAffineTransform(translationX: 0, y: 0)
             } else {
-                toastMessageView.alpha = 1
-                toastMessageView.transform = CGAffineTransform(translationX: 0, y: 50)
+                self?.toastMessageView.alpha = 1
+                self?.toastMessageView.transform = CGAffineTransform(translationX: 0, y: 50)
             }
         }
     }

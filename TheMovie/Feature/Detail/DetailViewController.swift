@@ -51,6 +51,8 @@ final class DetailViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
     
+    deinit { print("deinit DetailViewController") }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -222,7 +224,9 @@ private extension DetailViewController {
         let isSelected = viewModel.model.movieBox?[movieId] != nil
         favoriteButton.isSelected = isSelected
         favoriteButton.addAction(
-            UIAction(handler: favoriteButtonTouchUpInside),
+            UIAction { [weak self] _ in
+                self?.favoriteButtonTouchUpInside()
+            },
             for: .touchUpInside
         )
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: favoriteButton)
@@ -374,18 +378,19 @@ private extension DetailViewController {
 // MARK: Data Bindins
 private extension DetailViewController {
     func dataBinding() {
+        let outputs = viewModel.output
+        
         Task { [weak self] in
-            guard let self else { return }
-            for await output in viewModel.output {
+            for await output in outputs {
                 switch output {
                 case let .detail(detail):
-                    bindDetail(detail)
+                    self?.bindDetail(detail)
                 case let .failure(failure):
-                    bindFailure(failure)
+                    self?.bindFailure(failure)
                 case .movieBox:
-                    bindMovieBox()
+                    self?.bindMovieBox()
                 case let .currentPage(currentPage):
-                    bindCurrentPage(currentPage)
+                    self?.bindCurrentPage(currentPage)
                 }
             }
         }
@@ -405,14 +410,12 @@ private extension DetailViewController {
         let posterIsEmpty = detail.images?.posters.isEmpty ?? true
         
         UIView.fadeAnimate { [weak self] in
-            guard let `self` else { return }
-            activityIndicatorView.alpha = 0
-            backdropCollectionView.backgroundView?.alpha = backdropIsEmpty ? 1 : 0
-            castCollectionView.backgroundView?.alpha = castIsEmpty ? 1 : 0
-            posterCollectionView.backgroundView?.alpha = posterIsEmpty ? 1 : 0
+            self?.activityIndicatorView.alpha = 0
+            self?.backdropCollectionView.backgroundView?.alpha = backdropIsEmpty ? 1 : 0
+            self?.castCollectionView.backgroundView?.alpha = castIsEmpty ? 1 : 0
+            self?.posterCollectionView.backgroundView?.alpha = posterIsEmpty ? 1 : 0
         } completion: { [weak self] _ in
-            guard let `self` else { return }
-            activityIndicatorView.stopAnimating()
+            self?.activityIndicatorView.stopAnimating()
         }
     }
     
@@ -442,7 +445,7 @@ private extension DetailViewController {
 
 // MARK: Functions
 private extension DetailViewController {
-    func favoriteButtonTouchUpInside(_ action: UIAction) {
+    func favoriteButtonTouchUpInside() {
         viewModel.input(.favoriteButtonTouchUpInside)
     }
 }
@@ -484,8 +487,7 @@ extension DetailViewController: UICollectionViewDelegate,
 extension DetailViewController: SynopsisViewDelegate {
     func moreButtonTouchUpInside() {
         UIView.springAnimate { [weak self] in
-            guard let `self` else { return }
-            view.layoutIfNeeded()
+            self?.view.layoutIfNeeded()
         }
     }
 }

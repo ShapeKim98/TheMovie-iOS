@@ -32,6 +32,8 @@ final class ProfileImageViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit { print("ProfileImageViewController deinitialized") }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -98,12 +100,13 @@ private extension ProfileImageViewController {
 // MARK: Data Bindings
 private extension ProfileImageViewController {
     func dataBinding() {
+        let outputs = viewModel.output
+        
         Task { [weak self] in
-            guard let self else { return }
-            for await output in viewModel.output {
+            for await output in outputs {
                 switch output {
                 case let .selectedId(oldValue, newValue):
-                    bindedSelectedId(oldValue, newValue)
+                    self?.bindedSelectedId(oldValue, newValue)
                 }
             }
         }

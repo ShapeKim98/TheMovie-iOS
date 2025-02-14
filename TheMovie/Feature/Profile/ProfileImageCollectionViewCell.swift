@@ -25,11 +25,9 @@ final class ProfileImageCollectionViewCell: UICollectionViewCell {
         }
         
         configurationUpdateHandler = { [weak self] _, state in
-            guard let `self` else { return }
-            
             UIView.animate(withDuration: 0.3) {
-                self.profileImageView.isSelected(state.isSelected)
-                self.profileImageView.layoutIfNeeded()
+                self?.profileImageView.isSelected(state.isSelected)
+                self?.profileImageView.layoutIfNeeded()
             }
         }
     }

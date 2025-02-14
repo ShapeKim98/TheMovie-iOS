@@ -23,6 +23,8 @@ final class SettingViewController: UIViewController {
     
     weak var delegate: (any SettingViewControllerDelegate)?
     
+    deinit { print("SettingViewController deinitialized") }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -71,7 +73,9 @@ private extension SettingViewController {
     }
     
     func configureProfileView() {
-        profileView.addButtonAction(profileViewButtonTouchUpInside)
+        profileView.addButtonAction { [weak self] _ in
+            self?.profileViewButtonTouchUpInside()
+        }
         view.addSubview(profileView)
     }
     
@@ -94,12 +98,13 @@ private extension SettingViewController {
 // MARK: Data Bindings
 private extension SettingViewController {
     func dataBinding() {
+        let outputs = viewModel.output
+        
         Task { [weak self] in
-            guard let self else { return }
-            for await output in viewModel.output {
+            for await output in outputs {
                 switch output {
                 case let .isPresentWithdrawAlert(isPresentWithdrawAlert):
-                    bindIsPresentWithdrawAlert(isPresentWithdrawAlert)
+                    self?.bindIsPresentWithdrawAlert(isPresentWithdrawAlert)
                 }
             }
         }
@@ -115,7 +120,9 @@ private extension SettingViewController {
         let confirm = UIAlertAction(
             title: "확인",
             style: .destructive,
-            handler: withdrawButtonTouchUpInside
+            handler: { [weak self] _ in
+                self?.withdrawButtonTouchUpInside()
+            }
         )
         let cancel = UIAlertAction(
             title: "취소",
@@ -135,14 +142,14 @@ private extension SettingViewController {
 
 // MARK: Functions
 private extension SettingViewController {
-    func profileViewButtonTouchUpInside(_ action: UIAction) {
+    func profileViewButtonTouchUpInside() {
         let viewController = ProfileViewController(mode: .edit)
         viewController.delegate = self
         let navigation = navigation(viewController)
         present(navigation, animated: true)
     }
     
-    func withdrawButtonTouchUpInside(_ action: UIAlertAction) {
+    func withdrawButtonTouchUpInside() {
         viewModel.input(.withdrawButtonTouchUpInside)
         delegate?.withdrawButtonTouchUpInside()
     }

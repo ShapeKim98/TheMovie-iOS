@@ -76,7 +76,10 @@ final class SearchViewModel: ViewModel {
         self.firstQuery = firstQuery
     }
     
-    deinit { model.continuation?.finish() }
+    deinit {
+        model.continuation?.finish()
+        model.continuation = nil
+    }
     
     func input(_ action: Input) {
         switch action {
@@ -121,12 +124,11 @@ private extension SearchViewModel {
         updateRecentQueries(query: query)
         let request = SearchRequest(query: query, page: 1)
         searchClient.fetchSearch(request) { [weak self] result in
-            guard let `self` else { return }
             switch result {
             case .success(let success):
-                model.search = success
+                self?.model.search = success
             case .failure(let failure):
-                model.failure = failure
+                self?.model.failure = failure
             }
         }
     }
@@ -139,15 +141,14 @@ private extension SearchViewModel {
         else { return }
         let request = SearchRequest(query: query, page: search.page + 1)
         searchClient.fetchSearch(request) { [weak self] result in
-            guard let `self` else { return }
             switch result {
             case .success(let success):
-                model.search?.page = success.page
-                model.search?.totalPages = success.totalPages
-                model.search?.totalResults = success.totalResults
-                model.search?.results += success.results
+                self?.model.search?.page = success.page
+                self?.model.search?.totalPages = success.totalPages
+                self?.model.search?.totalResults = success.totalResults
+                self?.model.search?.results += success.results
             case .failure(let failure):
-                model.failure = failure
+                self?.model.failure = failure
             }
         }
     }

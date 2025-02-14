@@ -21,6 +21,8 @@ final class OnboardViewController: UIViewController {
     
     weak var delegate: (any OnboardViewControllerDelegate)?
     
+    deinit { print("OnboardViewController deinitialized") }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -96,7 +98,9 @@ private extension OnboardViewController {
     
     func configureStartButton() {
         startButton.addAction(
-            UIAction(handler: startButtonTouchUpInside),
+            UIAction { [weak self] _ in
+                self?.startButtonTouchUpInside()
+            },
             for: .touchUpInside
         )
         view.addSubview(startButton)
@@ -105,7 +109,7 @@ private extension OnboardViewController {
 
 // MARK: Functions
 private extension OnboardViewController {
-    func startButtonTouchUpInside(_ action: UIAction) {
+    func startButtonTouchUpInside() {
         let viewController = ProfileViewController(mode: .setting)
         viewController.delegate = self
         push(viewController)

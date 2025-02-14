@@ -67,13 +67,12 @@ final class TMProfileButton: UIButton {
     
     private func configureUpdateHandler() {
         configurationUpdateHandler = { [weak self] button in
-            guard let `self` else { return }
             switch button.state {
             case .selected:
-                profileImageView.isSelected(true)
+                self?.profileImageView.isSelected(true)
                 button.configuration?.background.backgroundColor = .clear
             default:
-                profileImageView.isSelected(false)
+                self?.profileImageView.isSelected(false)
             }
         }
     }

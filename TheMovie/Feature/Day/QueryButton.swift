@@ -72,7 +72,9 @@ final class QueryButton: UIView {
         configuration.titleAlignment = .center
         textButton.configuration = configuration
         textButton.addAction(
-            UIAction(handler: textButtonAddAction),
+            UIAction { [weak self] _ in
+                self?.textButtonAddAction()
+            },
             for: .touchUpInside
         )
         addSubview(textButton)
@@ -92,17 +94,19 @@ final class QueryButton: UIView {
         removeButton.tintColor = .tm(.semantic(.icon(.quaternary)))
         removeButton.configuration = configuration
         removeButton.addAction(
-            UIAction(handler: removeButtonAddAction),
+            UIAction { [weak self] _ in
+                self?.removeButtonAddAction()
+            },
             for: .touchUpInside
         )
         addSubview(removeButton)
     }
     
-    private func textButtonAddAction(_ action: UIAction) {
+    private func textButtonAddAction() {
         delegate?.textButtonTouchUpInside(text: text)
     }
     
-    private func removeButtonAddAction(_ action: UIAction) {
+    private func removeButtonAddAction() {
         UINotificationFeedbackGenerator()
             .notificationOccurred(.error)
         delegate?.removeButtonTouchUpInside(text: text)

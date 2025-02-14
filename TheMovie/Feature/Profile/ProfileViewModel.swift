@@ -75,10 +75,6 @@ final class ProfileViewModel: ViewModel {
         model.isValidProfile = model.selectedMBTI.count == 4
     }
     
-    deinit {
-        model.continuation?.finish()
-    }
-    
     @UserDefault(forKey: .userDefaults(.nickname))
     private(set) var nickname: String?
     @UserDefault(forKey: .userDefaults(.profileCompleted))
@@ -95,6 +91,8 @@ final class ProfileViewModel: ViewModel {
         defaultValue: [:]
     )
     private(set) var mbti: [String: String]?
+    
+    deinit { model.continuation?.finish() }
     
     var output: AsyncStream<Output> {
         return AsyncStream { continuation in

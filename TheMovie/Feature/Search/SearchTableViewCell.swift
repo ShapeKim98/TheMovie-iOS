@@ -60,8 +60,7 @@ final class SearchTableViewCell: UITableViewCell {
             text: movie.title ?? "",
             keyword: query
         ) { [weak self] text in
-            guard let `self` else { return }
-            titleLabel.attributedText = text
+            self?.titleLabel.attributedText = text
         }
         
         let date = movie.releaseDate?.date(format: .yyyy_MM_dd)
@@ -77,12 +76,11 @@ final class SearchTableViewCell: UITableViewCell {
         }
         
         group.notify(queue: .main) { [weak self] in
-            guard let `self` else { return }
             let genresCount = movie.genreIds?.count ?? 0
             guard genresCount > 2 else { return }
             
             let count = genresCount - 2
-            configureGenreLabel("+\(count)", query: "")
+            self?.configureGenreLabel("+\(count)", query: "")
         }
     }
     
@@ -171,7 +169,9 @@ private extension SearchTableViewCell {
     
     func configureFavoriteButton() {
         favoriteButton.addAction(
-            UIAction(handler: favoritButtonTouchUpInside),
+            UIAction { [weak self] action in
+                self?.favoritButtonTouchUpInside(action)
+            },
             for: .touchUpInside
         )
         contentView.addSubview(favoriteButton)
@@ -189,11 +189,10 @@ private extension SearchTableViewCell {
         
         group?.enter()
         highlightAttributedString(text: genre, keyword: query) { [weak self] text in
-            guard let `self` else { return }
             label.attributedText = text
             label.snp.makeConstraints { $0.edges.equalToSuperview().inset(4) }
-            genreLabels.append(container)
-            hstack.addArrangedSubview(container)
+            self?.genreLabels.append(container)
+            self?.hstack.addArrangedSubview(container)
             group?.leave()
         }
     }
@@ -220,9 +219,8 @@ private extension SearchTableViewCell {
         completion: @escaping (NSAttributedString) -> Void
     ) {
         highlightWords(text: text, keyword: keyword) { [weak self] attributedString in
-            guard let `self` else { return }
             guard let attributedString else {
-                highlightCharacters(text: text, keyword: keyword) { attributedString in
+                self?.highlightCharacters(text: text, keyword: keyword) { attributedString in
                     completion(attributedString)
                 }
                 return

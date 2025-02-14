@@ -41,6 +41,8 @@ final class ProfileViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
     
+    deinit { print("ProfileViewController deinitialized") }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -114,12 +116,16 @@ private extension ProfileViewController {
         if mode == .edit {
             navigationItem.leftBarButtonItem = UIBarButtonItem(
                 image: UIImage(systemName: "xmark"),
-                primaryAction: UIAction(handler: backButtonTouchUpInside)
+                primaryAction: UIAction { [weak self] _ in
+                    self?.backButtonTouchUpInside()
+                }
             )
             
             navigationItem.rightBarButtonItem = UIBarButtonItem(
                 title: "저장",
-                primaryAction: UIAction(handler: saveButtonTouchUpInside)
+                primaryAction: UIAction { [weak self] _ in
+                    self?.saveButtonTouchUpInside()
+                }
             )
             navigationItem.rightBarButtonItem?.isEnabled = viewModel.model.isValidProfile
         }
@@ -135,7 +141,9 @@ private extension ProfileViewController {
     func configureProfileButton() {
         profileButton.isSelected = true
         profileButton.addAction(
-            UIAction(handler: profileButtonTouchUpInside),
+            UIAction { [weak self] _ in
+                self?.profileButtonTouchUpInside()
+            },
             for: .touchUpInside
         )
         view.addSubview(profileButton)
@@ -152,7 +160,9 @@ private extension ProfileViewController {
         completeButton.isHidden = mode == .edit
         completeButton.isEnabled = viewModel.model.isValidProfile
         completeButton.addAction(
-            UIAction(handler: completeButtonTouchUpInside),
+            UIAction { [weak self] _ in
+                self?.completeButtonTouchUpInside()
+            },
             for: .touchUpInside
         )
         view.addSubview(completeButton)
@@ -194,18 +204,19 @@ private extension ProfileViewController {
 // MARK: Data Bindings
 private extension ProfileViewController {
     func dataBinding() {
+        let outputs = viewModel.output
+        
         Task { [weak self] in
-            guard let self else { return }
-            for await output in viewModel.output {
+            for await output in outputs {
                 switch output {
                 case let .profileImageId(profileImageId):
-                    bindedProfileImageId(profileImageId)
+                    self?.bindedProfileImageId(profileImageId)
                 case let .isValidProfile(isValidProfile):
-                    bindedIsValidProfile(isValidProfile)
+                    self?.bindedIsValidProfile(isValidProfile)
                 case let .nicknameState(nicknameState):
-                    bindedNicknameState(nicknameState)
+                    self?.bindedNicknameState(nicknameState)
                 case let .selectedMBTI(selectedMBTI):
-                    bindedSelectedMBTI(selectedMBTI)
+                    self?.bindedSelectedMBTI(selectedMBTI)
                 }
             }
         }
@@ -252,7 +263,7 @@ private extension ProfileViewController {
 
 // MARK: Functions
 private extension ProfileViewController {
-    func profileButtonTouchUpInside(_ action: UIAction) {
+    func profileButtonTouchUpInside() {
         guard
             let profileImageId = viewModel.model.profileImageId
         else { return }
@@ -265,7 +276,7 @@ private extension ProfileViewController {
         push(viewController)
     }
     
-    func completeButtonTouchUpInside(_ action: UIAction) {
+    func completeButtonTouchUpInside() {
         viewModel.input(.completeButtonTouchUpInside(text: nicknameTextField.textField.text))
         UINotificationFeedbackGenerator()
             .notificationOccurred(.success)
@@ -275,19 +286,17 @@ private extension ProfileViewController {
         completeButtonTouchUpInside()
     }
     
-    func backButtonTouchUpInside(_ action: UIAction) {
+    func backButtonTouchUpInside() {
         dismiss(animated: true)
     }
     
-    func saveButtonTouchUpInside(_ action: UIAction) {
+    func saveButtonTouchUpInside() {
         viewModel.input(.saveButtonTouchUpInside(text: nicknameTextField.textField.text))
         
         UINotificationFeedbackGenerator()
             .notificationOccurred(.success)
         dismiss(animated: true) { [weak self] in
-            guard let `self` else { return }
-            guard let dismiss = delegate?.dismiss else { return }
-            dismiss()
+            self?.delegate?.dismiss?()
         }
     }
 }

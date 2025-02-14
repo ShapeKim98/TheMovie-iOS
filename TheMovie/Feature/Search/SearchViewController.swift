@@ -34,6 +34,10 @@ final class SearchViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        print("SearchViewController deinit")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -50,6 +54,11 @@ final class SearchViewController: UIViewController {
         viewModel.input(.viewDidAppear)
         
         searchController.isActive = true
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        searchController.isActive = false
     }
 }
 
@@ -148,16 +157,17 @@ private extension SearchViewController {
 // MARK: Data Bindings
 private extension SearchViewController {
     func dataBinding() {
+        let outputs = viewModel.output
+        
         Task { [weak self] in
-            guard let self else { return }
-            for await output in viewModel.output {
+            for await output in outputs {
                 switch output {
                 case let .searchResults(searchResults):
-                    bindSearchResults(searchResults)
+                    self?.bindSearchResults(searchResults)
                 case .recentQueries:
-                    bindRecentQueries()
+                    self?.bindRecentQueries()
                 case let .failure(failure):
-                    bindFailure(failure)
+                    self?.bindFailure(failure)
                 }
             }
         }
@@ -171,18 +181,16 @@ private extension SearchViewController {
         let isEmpty = searchResults?.isEmpty ?? true
         
         UIView.fadeAnimate { [weak self] in
-            guard let `self` else { return }
-            emptyLabel.alpha = isEmpty ? 1 : 0
-            activityIndicatorView.alpha = isLoading ? 1 : 0
-            searchTableView.alpha = isLoading ? 0 : 1
+            self?.emptyLabel.alpha = isEmpty ? 1 : 0
+            self?.activityIndicatorView.alpha = isLoading ? 1 : 0
+            self?.searchTableView.alpha = isLoading ? 0 : 1
         } completion: { [weak self] _ in
-            guard let `self` else { return }
             if isLoading {
-                activityIndicatorView.startAnimating()
+                self?.activityIndicatorView.startAnimating()
             } else {
-                activityIndicatorView.stopAnimating()
+                self?.activityIndicatorView.stopAnimating()
             }
-            emptyLabel.isHidden = !isEmpty
+            self?.emptyLabel.isHidden = !isEmpty
         }
     }
     

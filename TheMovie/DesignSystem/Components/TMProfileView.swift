@@ -117,9 +117,8 @@ final class TMProfileView: UIView {
         }
         image.tintColor = .tm(.semantic(.icon(.tertiary)))
         button.configurationUpdateHandler = { [weak self] button in
-            guard let `self` else { return }
             UIView.fadeAnimate {
-                self.transform = button.isHighlighted
+                self?.transform = button.isHighlighted
                 ? CGAffineTransform(scaleX: 0.95, y: 0.95)
                 : CGAffineTransform(scaleX: 1, y: 1)
             }

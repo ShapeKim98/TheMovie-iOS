@@ -125,7 +125,9 @@ private extension DayCollectionViewCell {
     
     func configureFavoriteButton() {
         favoriteButton.addAction(
-            UIAction(handler: favoritButtonTouchUpInside),
+            UIAction { [weak self] action in
+                self?.favoritButtonTouchUpInside(action)
+            },
             for: .touchUpInside
         )
         contentView.addSubview(favoriteButton)
