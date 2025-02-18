@@ -2,7 +2,7 @@
 > 오늘의 유행하는 영화를 추천 받고, 좋아하는 영화를 즐겨찾기 해보세요!
 
 ## 소개
-[TBDB API](https://developer.themoviedb.org/docs/getting-started) 를 활용한 영화 정보 어플리케이션입니다.
+[TMDB API](https://developer.themoviedb.org/docs/getting-started) 를 활용한 영화 정보 어플리케이션입니다.
 
 ## 기능
 - 프로필 닉네임, 이미지, MBTI 설정 및 수정
