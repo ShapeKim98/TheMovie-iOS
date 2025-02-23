@@ -19,13 +19,13 @@
 
 ## 기술
 > `UIKit`, `MVVM`, `SnapKit`, `Kingfisher`, `Alamofire`, `GCD`
-- `ViewModel`의 `Input`, `Output`을 열거형으로 정의 하고, `AsyncStream`으로 내부 모델의 변화를 방출하는 자체 `Redux Pattern` 구성하였습니다.
-- `Redux Pattern`을 통해 `View` - `Input` - `Model` - `Ouput`의 흐름을 따르는 단방향 데이터 플로우 구성으로, 데이터 흐름을 명확하게 하였습니다.
-- `Delegate Pattern`을 통한 화면 간의 데이터 동기화를 구현하였습니다.
-- `UIButton.ConfigurationUpdateHandler`를 정의하여, 버튼의 상태에 맞는 커스텀 UI 구현하였습니다.
-- `Property Wrapper`를 통해 `UserDefaults`의 재사용성을 높이고, 저장 데이터 관리 로직을 간결하게 하였습니다.
-- `Router Pattern`과 `Generic`을 활용한 네트워크 코드 추상화로 `Alamofire` 코드의 재사용성을 높였습니다.
-- `Mirror` 타입을 활용하여, 네트워크 파라미터의 `Key-Value`를 정의하는데 드는 보일러 플레이트를 줄이고, key값 변화에 대응 할 수 있도록 구성하였습니다.
+- `ViewModel`의 `Input`, `Output`을 열거형으로 정의 하고, `AsyncStream`을 활용해 내부 모델의 변화를 방출하는 자체 `Redux` 패턴 구성했습니다.
+- `Redux` 패턴을 적용해 `View` - `Input` - `Model` - `Output`의 단방향 데이터 플로우를 구현함으로써, 데이터 흐름의 명료성과 예측 가능성을 확보했습니다.
+- `Delegate` 패턴을 활용하여 화면 간 데이터 동기화를 구현하여, 각 화면의 정보를 실시간으로 반영함으로써 일관된 사용자 경험을 제공했습니다.
+- `UIButton.ConfigurationUpdateHandler`를 정의하여 버튼의 상태에 따른 맞춤형 UI를 구현함으로써, 사용자 인터랙션에 따른 동적 변화를 제공했습니다.
+- `Property Wrapper`를 통해 `UserDefaults`의 재사용성을 높이고, 저장 데이터 관리 로직을 간결하게 구성했습니다.
+- `Router Pattern`과 `Generic`을 활용하여 네트워크 코드 추상화함으로써 `Alamofire` 기반 코드의 재사용성을 높였습니다.
+- `Mirror` 타입을 활용하여, 네트워크 파라미터의 `Key-Value`정의에 필요한 보일러플레이트 코드를 최소화하고, key 값 변화에 유연하게 대응할 수 있도록 구성했습니다.
 - `UITableView`의 `tableView(_:prefetchRowsAt:)`과 `tableView(_:willDisplay:forRowAt:)`을 이용하여 자연스러운 페이지네이션을 구현하였습니다.
 
 
@@ -43,22 +43,18 @@ DispatchQueue.global().async {
 	let lowercasedText = NSMutableAttributedString(
 		string: text.lowercased()
 	)
-	
+
 	...
-	
+
 	guard matchCount != characters.count else {
 		DispatchQueue.main.async {
 			completion(mutableAttributedString)
 		}
 		return
 	}
-	
+
 	DispatchQueue.main.async {
 		completion(NSMutableAttributedString(string: text))
 	}
 }
 ```
-
-### 메모리 누수
-
-### `MVVM`
